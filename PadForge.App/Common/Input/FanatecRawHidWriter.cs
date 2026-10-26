@@ -13,14 +13,26 @@ namespace PadForge.Common.Input
     /// no GPL source translation. Uses the shared <see cref="RawHidOutput"/>
     /// write path.</para>
     ///
-    /// <para>HARDWARE VERIFICATION (real device): the wheel FFB output report ID
-    /// is assumed 0 (the Linux driver leaves <c>report-&gt;id</c> unset);
-    /// the pedal rumble report ID is 0x01 per the driver. Confirm both against
-    /// the device's HID descriptor (<c>OutputReportByteLength</c> / report IDs).</para>
+    /// <para>Every pedal and wheel command goes out as report 0x01, the Fanatec
+    /// command report (<see cref="CommandReportId"/>). hid-fanatecff sends all
+    /// of its commands through the first output report the descriptor declares
+    /// (<c>ftec_init</c>, hid-ftec.c:173-204), Linux writes that report's ID
+    /// ahead of the payload (<c>hid_output_report</c>, hid-core.c:1895-1905),
+    /// and the driver passes the Fanatec SDK's own reports 1, 2 and 255 straight
+    /// to the device (hid-ftec.c:755-757). It splices its force feedback
+    /// collection into the collection that carries report 1, so games find
+    /// force feedback on the wheel's own collection (hid-ftec.c:248-300). A
+    /// write that names report 0 on a collection whose reports are numbered
+    /// fails (hidapi.h, hid_write), which is how the wheel commands, sent as
+    /// report 0 through 5.1.0, failed on a CSL DD.</para>
     /// </summary>
     internal static class FanatecRawHidWriter
     {
         public const ushort FanatecVid = 0x0EB7;
+
+        /// <summary>The Fanatec command report every pedal and wheel command
+        /// goes out on (see the class notes).</summary>
+        internal const byte CommandReportId = 0x01;
 
         /// <summary>ClubSport Pedals V3 (0x183B) + CSL Elite / Loadcell pedal
         /// PIDs. Pedals use the rumble protocol (two motors).</summary>
@@ -113,7 +125,7 @@ namespace PadForge.Common.Input
         internal static byte[] BuildPedalReport(byte throttle, byte brake)
         {
             var buf = t_pedalScratch ??=
-                new byte[] { 0x01, 0xF8, 0x09, 0x01, 0x04, 0x00, 0x00, 0x00 };
+                new byte[] { CommandReportId, 0xF8, 0x09, 0x01, 0x04, 0x00, 0x00, 0x00 };
             buf[5] = throttle;
             buf[6] = brake;
             return buf;
@@ -321,12 +333,14 @@ namespace PadForge.Common.Input
             return ok;
         }
 
-        // Wheel FFB report: report ID 0 (driver leaves id unset) + 7 command
-        // bytes at offset 1. See HARDWARE VERIFICATION note re: report ID/length.
-        private static byte[] BuildWheelReport(byte[] cmd7)
+        /// <summary>Wheel report: the command report ID, then the seven command
+        /// bytes (the driver's <c>hid_validate_values(..., 7)</c>, hid-ftec.c:190).
+        /// Every wheel command (force, springs, centering, range, rev LEDs) is
+        /// built here. Internal so the framing is testable.</summary>
+        internal static byte[] BuildWheelReport(byte[] cmd7)
         {
             byte[] report = new byte[8];
-            report[0] = 0x00; // report ID
+            report[0] = CommandReportId;
             Array.Copy(cmd7, 0, report, 1, 7);
             return report;
         }
