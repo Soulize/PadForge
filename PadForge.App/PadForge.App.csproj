@@ -317,10 +317,20 @@
          unstable in-progress work from the HIDMaestro repo. Update by
          copying the Release build of HIDMaestro.Core.dll from the
          HIDMaestro repo into Resources\HIDMaestro\ after tagging a
-         release there. Current: v2.0.3, whose removal also takes
-         usbip-win2's USB root hub filter when usbip-win2 is included and
-         no other program uses it. Taking the filter off restarts every
-         USB 3 root hub, and the filter's service goes at the next start.
+         release there. Current: v2.1.0, which delivers each frame once
+         and in order, keeps an Xbox 360 profile's HID device through a
+         system sleep, runs each device's driver host at high priority so
+         input holds under CPU load, and removes a device only once no
+         other program holds it open. No signature changed. Its profile
+         maps (ButtonMap, AxisMap, ExtendedReport, ExtendedOutputReport,
+         Layout) return copies, which PadForge only reads, and
+         HMVRController.SubmitState throws ObjectDisposedException after
+         Dispose, which the VR lane's try already catches. The driver is
+         a new build, so the first slot that needs it installs it once.
+         v2.0.3 before it takes usbip-win2's USB root hub filter in its
+         removal when usbip-win2 is included and no other program uses
+         it. Taking the filter off restarts every USB 3 root hub, and the
+         filter's service goes at the next start.
          v2.0.2 before it gives the Valve personas
          a report clock of their own (4 ms on the Deck and the 2026
          controller, 9 ms on the 2015 controller), calibrated motion, a
