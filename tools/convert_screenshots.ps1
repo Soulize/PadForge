@@ -158,6 +158,14 @@ $map = @{
     "settings-bthps3"               = "settings-bthps3"
     "settings-hidmaestro-uninstall" = "settings-hidmaestro-uninstall"
     "settings-bthps3-uninstall"     = "settings-bthps3-uninstall"
+    # v5.2.0 additions
+    "dashboard-game-mods"           = "game-mods"
+    "dashboard-game-telemetry"      = "game-telemetry"
+    "telemetry-format-editor"       = "telemetry-custom-formats"
+    "pad-forcefeedback-falcon"      = "novint-falcon"
+    "pad-steering-angle-rumble"     = "steering-angle-rumble"
+    "settings-novint-falcon"        = "settings-novint-falcon"
+    "settings-keyboard-screens"     = "settings-keyboard-screens"
 }
 
 $jpgEncoder = [System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders() | Where-Object { $_.MimeType -eq "image/jpeg" }

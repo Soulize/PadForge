@@ -1696,7 +1696,8 @@ $script:SyntheticGuids = @(
     "bbbb4444-3333-4444-5555-666677778888",  # Microphone
     "cdcd1111-2222-3333-4444-555566667777",  # Razer Huntsman V3 Pro
     "efef1111-2222-3333-4444-555566667777",  # Logitech G502 HERO
-    "efef2222-2222-3333-4444-555566667777"   # SteelSeries Rival 710
+    "efef2222-2222-3333-4444-555566667777",  # SteelSeries Rival 710
+    "fafa1111-2222-3333-4444-555566667777"   # Novint Falcon
 )
 
 # A synthetic device row stands in for hardware nobody plugged in, so it may
@@ -3575,8 +3576,14 @@ try {
         # (Ensure-DeviceAssigned -PeripheralOutputs).
         Add-DeviceOnce (New-SyntheticDevice "efef1111-2222-3333-4444-555566667777" "Logitech G502 HERO Gaming Mouse" 1133 49291 "HID\VID_046D&PID_C08B&MI_00\dummy" 18 3 5 0)
         Add-DeviceOnce (New-SyntheticDevice "efef2222-2222-3333-4444-555566667777" "SteelSeries Rival 710 Gaming Mouse" 4152 5936 "HID\VID_1038&PID_1730&MI_00\dummy" 18 3 5 0)
+        # A Novint Falcon (#521) for its card on the Force Feedback tab. The
+        # pad page shows the card for a selected row whose CapType is
+        # NovintFalcon, 43 (PadPage SyncFalconCard), so an offline row shows
+        # it. 0403:CB48 and the falcon:// path are what an open Falcon gets:
+        # three axes and the grip's four buttons.
+        Add-DeviceOnce (New-SyntheticDevice "fafa1111-2222-3333-4444-555566667777" "Novint Falcon" 1027 52040 "falcon://1" 43 3 4 0)
 
-        Write-Host "  Injected synthetic G29 wheel + MIDI Keyboard + 3 Wii-family + DS3 + Steam Controller + Xbox GIP + Wii Remote + NFC + DualSense + PlayStation Move + Microphone + analog keyboard + 2 mice" -ForegroundColor Green
+        Write-Host "  Injected synthetic G29 wheel + MIDI Keyboard + 3 Wii-family + DS3 + Steam Controller + Xbox GIP + Wii Remote + NFC + DualSense + PlayStation Move + Microphone + analog keyboard + 2 mice + Novint Falcon" -ForegroundColor Green
     }
 } catch {
     Write-Host "  !! Failed to inject synthetic devices: $_" -ForegroundColor Yellow
@@ -3904,6 +3911,51 @@ if ($appSettings) {
         }
         $swNode.InnerText = "true"
         Write-Host "  Set $sw=true"
+    }
+
+    # Four 5.2.0 switches, written the same way. The Dashboard's Game Mods
+    # (#529) and Game Telemetry (#531) cards report their listeners only
+    # while they listen, and the Settings cards for the Novint Falcon (#521)
+    # and keyboard screens (#519) show their library lines only while on.
+    # The DSX stand-in stays as the file has it, off. The owner's values
+    # ride the backup and are restored in STEP 4.
+    foreach ($sw in @("EnableGameModServer", "EnableGameTelemetry", "NovintFalconEnabled", "KeyboardScreensEnabled")) {
+        $swNode = $appSettings.SelectSingleNode($sw)
+        if (-not $swNode) {
+            $swNode = $xml.CreateElement($sw)
+            $appSettings.AppendChild($swNode) | Out-Null
+        }
+        $swNode.InnerText = "true"
+        Write-Host "  Set $sw=true"
+    }
+
+    # One custom telemetry format (#531), so the Custom Formats window opens
+    # on a format with its fields rather than an empty list. The shape is
+    # AppSettingsData.GameTelemetryFormats: a Format per format, a Field per
+    # field, every value an attribute (CustomTelemetryFormat.cs).
+    $fmtList = $appSettings.SelectSingleNode("GameTelemetryFormats")
+    if (-not $fmtList) {
+        $fmtList = $xml.CreateElement("GameTelemetryFormats")
+        $appSettings.AppendChild($fmtList) | Out-Null
+    }
+    if (-not $fmtList.SelectSingleNode("Format")) {
+        $fmt = $xml.CreateElement("Format")
+        foreach ($a in @(@("Name", "My Rally Game"), @("Kind", "Binary"), @("Length", "64"))) { $fmt.SetAttribute($a[0], $a[1]) }
+        foreach ($f in @(
+                @{ Target = "Speed"; Offset = "0"; Type = "F32"; Scale = "3.6" },
+                @{ Target = "Rpm"; Offset = "4"; Type = "F32"; Scale = "1" },
+                @{ Target = "Gear"; Offset = "8"; Type = "S32"; Scale = "1" },
+                @{ Target = "Throttle"; Offset = "12"; Type = "F32"; Scale = "1" },
+                @{ Target = "Brake"; Offset = "16"; Type = "F32"; Scale = "1" },
+                @{ Target = "Variable"; Name = "Boost"; Offset = "20"; Type = "F32"; Scale = "1"; Min = "0"; Max = "2" })) {
+            $fieldNode = $xml.CreateElement("Field")
+            foreach ($k in @("Target", "Name", "Offset", "Type", "Scale", "Min", "Max")) {
+                if ($f.ContainsKey($k)) { $fieldNode.SetAttribute($k, $f[$k]) }
+            }
+            $fmt.AppendChild($fieldNode) | Out-Null
+        }
+        $fmtList.AppendChild($fmt) | Out-Null
+        Write-Host "  Added the custom telemetry format 'My Rally Game'"
     }
 
     # Force English language for screenshots (nav items use localized text)
@@ -5517,6 +5569,147 @@ function Capture-PeripheralTabs {
     }
 }
 
+# The 5.2.0 cards. Game Mods (#529) with its port, and Game Telemetry
+# (#531) with its game, ports and Full Speed, on the Dashboard. The Novint
+# Falcon (#521) and Keyboard Screens (#519) cards in Settings, whose library
+# lines say no library loaded on a PC without one. STEP 0 turns all four on.
+# The Dashboard draws its section titles in capitals, and a UIA name match
+# is exact, so the two Dashboard recipes anchor on the drawn title.
+function Capture-GameModsCard {
+    if (-not (Want "dashboard-game-mods")) { return }
+    Write-Host "[5.2.0] Dashboard: Game Mods card"
+    Nav "Dashboard"; Start-Sleep -Milliseconds 900
+    ScrollContent -Clicks 90
+    if ((Scroll-AnchorToTop -Anchor "GAME MODS") -and (Test-InFrame "Game Mod Port")) {
+        Cap "dashboard-game-mods"
+    } else {
+        Refuse-Shots @("dashboard-game-mods") "the Game Mods card never fit one frame"
+    }
+    ScrollContent -Clicks 90
+}
+
+function Capture-GameTelemetryCard {
+    if (-not (Want "dashboard-game-telemetry")) { return }
+    Write-Host "[5.2.0] Dashboard: Game Telemetry card"
+    Nav "Dashboard"; Start-Sleep -Milliseconds 900
+    ScrollContent -Clicks 90
+    if ((Scroll-AnchorToTop -Anchor "GAME TELEMETRY") -and (Test-InFrame "Custom Formats$([char]0x2026)")) {
+        Cap "dashboard-game-telemetry"
+    } else {
+        Refuse-Shots @("dashboard-game-telemetry") "the Game Telemetry card never fit one frame"
+    }
+    ScrollContent -Clicks 90
+}
+
+# The Custom Formats window (#531), open on the format STEP 0 adds. It is a
+# modal FluentWindow, found by its own HWND, and it closes by WM_CLOSE with
+# nothing saved.
+function Capture-TelemetryFormatEditor {
+    if (-not (Want "telemetry-format-editor")) { return }
+    Write-Host "[5.2.0] Dashboard: Custom Formats window"
+    Nav "Dashboard"; Start-Sleep -Milliseconds 900
+    ScrollContent -Clicks 90
+    $label = "Custom Formats$([char]0x2026)"
+    if (-not ((Scroll-AnchorToTop -Anchor "GAME TELEMETRY") -and (Test-InFrame $label))) {
+        Refuse-Shots @("telemetry-format-editor") "the Custom Formats button never came into view"
+        ScrollContent -Clicks 90
+        return
+    }
+    $r = Get-Rect (Find-UIA -Name $label)
+    if ($null -eq $r) {
+        Refuse-Shots @("telemetry-format-editor") "the Custom Formats button has no rectangle"
+        ScrollContent -Clicks 90
+        return
+    }
+    [Win32]::ForceFG($script:hwnd); Start-Sleep -Milliseconds 150
+    Click-At ([int]($r.X + $r.Width / 2)) ([int]($r.Y + $r.Height / 2))
+    Start-Sleep -Milliseconds 1500
+    $dlg = Find-DialogHwndByEnum -MinW 300 -MinH 200 -Retries 6
+    if ($dlg -eq [IntPtr]::Zero) {
+        Refuse-Shots @("telemetry-format-editor") "the Custom Formats window did not open"
+    } else {
+        [Win32]::SetForegroundWindow([IntPtr]$dlg) | Out-Null; Start-Sleep -Milliseconds 700
+        Cap "telemetry-format-editor" -AllowModal
+        Close-DialogHwnd $dlg
+    }
+    Close-AnyModal | Out-Null
+    ScrollContent -Clicks 90
+}
+
+function Capture-FalconSettingsCard {
+    if (-not (Want "settings-novint-falcon")) { return }
+    Write-Host "[5.2.0] Settings: Novint Falcon card"
+    Nav "Settings"; Start-Sleep -Milliseconds 900
+    ScrollContent -Clicks 90
+    if ((Scroll-AnchorToTop -Anchor "Novint Falcon") -and (Test-InFrame "Choose dhd64.dll$([char]0x2026)")) {
+        Cap "settings-novint-falcon"
+    } else {
+        Refuse-Shots @("settings-novint-falcon") "the Novint Falcon card never fit one frame"
+    }
+    ScrollContent -Clicks 90
+}
+
+function Capture-KeyboardScreensCard {
+    if (-not (Want "settings-keyboard-screens")) { return }
+    Write-Host "[5.2.0] Settings: Keyboard Screens card"
+    Nav "Settings"; Start-Sleep -Milliseconds 900
+    ScrollContent -Clicks 90
+    if ((Scroll-AnchorToTop -Anchor "Keyboard Screens") -and (Test-InFrame "Download Strike7API.dll")) {
+        Cap "settings-keyboard-screens"
+    } else {
+        Refuse-Shots @("settings-keyboard-screens") "the Keyboard Screens card never fit one frame"
+    }
+    ScrollContent -Clicks 90
+}
+
+# The Xbox slot's Force Feedback tab twice: the Novint Falcon card (#521) on
+# the stand-in Falcon STEP 0 injects, and the Steering Angle Rumble card
+# with its motor picker (#510) on the Xbox pad. The Falcon goes on the slot
+# by its settings record and a restart, so this runs after every other shot
+# of that slot, as the mice's tabs do.
+$script:FalconPadShots = @("pad-forcefeedback-falcon", "pad-steering-angle-rumble")
+function Capture-FalconPadShots {
+    $wanted = @($script:FalconPadShots | Where-Object { Want $_ })
+    if ($wanted.Count -eq 0) { return }
+    Write-Host "[5.2.0] Xbox slot: the Novint Falcon card and Steering Angle Rumble"
+    $okF = Ensure-DeviceAssigned -DeviceNamePart "Novint Falcon" -PadIndex 0 -SlotType 0 `
+        -XmlPath $PadForgeXml -ExePath $PadForgeExe
+    if (-not (@($okF)[-1] -eq $true)) {
+        Refuse-Shots $wanted "the stand-in Falcon was not staged on the Xbox slot"
+        return
+    }
+    Start-Sleep -Milliseconds 2000
+    $script:uiaWin = [System.Windows.Automation.AutomationElement]::FromHandle([IntPtr]$script:hwnd)
+    Nav "Dashboard"; Start-Sleep -Milliseconds 1500
+    $shF = Find-UIA -Aid "SlotsItemsControl"
+    $cdF = @()
+    if ($shF) { try { $cdF = @($shF.FindAll($TC, [System.Windows.Automation.Condition]::TrueCondition)) } catch { $cdF = @() } }
+    $ppF = if ((Get-Count $cdF) -ge 1) { Open-SlotCard $cdF[0] "Xbox slot card (Falcon)" } else { $null }
+    if (-not $ppF) { Refuse-Shots $wanted "the Xbox slot did not open"; return }
+    Dismiss-AssignBanner | Out-Null
+    if (Want "pad-forcefeedback-falcon") {
+        if ((Select-MappedDevice "Novint Falcon") -and (Tab "Force Feedback")) {
+            Start-Sleep -Milliseconds 800
+            if (Find-UIA -Name "Novint Falcon") { Cap "pad-forcefeedback-falcon" }
+            else { Refuse-Shots @("pad-forcefeedback-falcon") "the Force Feedback tab shows no Novint Falcon card" }
+        } else { Refuse-Shots @("pad-forcefeedback-falcon") "the Falcon's Force Feedback tab did not open" }
+    }
+    if (Want "pad-steering-angle-rumble") {
+        if ((Select-MappedDevice "Xbox Series X GIP") -and (Tab "Force Feedback")) {
+            Start-Sleep -Milliseconds 800
+            # The slot and device bars cover the pad page's top 200 px, so the
+            # card's title stops lower than on Settings and must sit below them.
+            $sarOk = Scroll-AnchorToTop -Anchor "Steering Angle Rumble" -TopPx 300
+            $sarR = Get-Rect (Find-UIA -Name "Steering Angle Rumble")
+            $sarW = New-Object Win32+RECT
+            [Win32]::GetWindowRect($script:hwnd, [ref]$sarW) | Out-Null
+            if ($sarOk -and $null -ne $sarR -and $sarR.Y -ge ($sarW.Top + 210)) { Cap "pad-steering-angle-rumble" }
+            else { Refuse-Shots @("pad-steering-angle-rumble") "the Steering Angle Rumble card's title never cleared the pad header" }
+            ScrollContent -Clicks 90
+        } else { Refuse-Shots @("pad-steering-angle-rumble") "the Xbox pad's Force Feedback tab did not open" }
+    }
+}
+
 # The interface in 109 languages (#505): the Language list open on the
 # languages' own names, then Settings laid out right to left in Arabic.
 # Last in either pass, since every anchor this script finds is English. The
@@ -6614,6 +6807,12 @@ if ($Only.Count -gt 0) {
     Capture-LightGunSection
     Capture-PairDialog
     Capture-StarterGallery
+    # The 5.2.0 cards and the Custom Formats window. Each checks Want.
+    Capture-GameModsCard
+    Capture-GameTelemetryCard
+    Capture-TelemetryFormatEditor
+    Capture-FalconSettingsCard
+    Capture-KeyboardScreensCard
 
     # Unscrolled whole-page shots.
     $pageTargets = @(
@@ -7267,6 +7466,7 @@ if ($Only.Count -gt 0) {
     Capture-WebShots
     Capture-UninstallPreviews
     Capture-PeripheralTabs
+    Capture-FalconPadShots
     Capture-LanguageShots
     Capture-Colorways
 
@@ -8421,6 +8621,9 @@ Capture-UpdatesCard
 # 18a-bis. The Input Engine card, with the 5.0.0 analog keyboard and
 # Bliss-Box readers.
 Capture-InputEngineCard
+# 18a-ter. The 5.2.0 Novint Falcon and Keyboard Screens cards.
+Capture-FalconSettingsCard
+Capture-KeyboardScreensCard
 
 # 18b-20b. Every scrolled Settings card, by ANCHOR rather than by a click
 # count. A fixed scroll is a guess about page LENGTH, and this page grew two
@@ -9007,6 +9210,10 @@ foreach ($ds in $dashSections) {
 }
 # The web controller's plain HTTP address (5.0.0), framed from its heading.
 Capture-WebPlainSection
+# The 5.2.0 Game Mods and Game Telemetry cards and the Custom Formats window.
+Capture-GameModsCard
+Capture-GameTelemetryCard
+Capture-TelemetryFormatEditor
 
 # The Pair dialog, every family it offers (Capture-PairDialog).
 Capture-PairDialog
@@ -9298,6 +9505,7 @@ Write-Host "=== 5.1.0 surfaces ===" -ForegroundColor Cyan
 try {
     Capture-UninstallPreviews
     Capture-PeripheralTabs
+    Capture-FalconPadShots
     Capture-LanguageShots
 } catch {
     $script:StateFailures += "the 5.1.0 recipes failed: $($_.Exception.Message)"
