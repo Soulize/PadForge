@@ -4255,6 +4255,14 @@
   <data name="About_X1nputDesc" xml:space="preserve"><value>Xbox インパルストリガーの 9 バイトのレポートとその書き込み経路。araghon007 製。MIT。</value></data>
   <data name="About_ChiakiNg" xml:space="preserve"><value>chiaki-ng</value></data>
   <data name="About_ChiakiNgDesc" xml:space="preserve"><value>PS5 の触覚 PCM 形式 (符号付き 16 ビット、3 kHz)。Bluetooth 触覚の符号付き 8 ビット エンコードを確定させました。AGPL-3.0、ドキュメントとしてのみ参照、AGPL コードは同梱しません。</value></data>
+  <data name="About_GameModRefs" xml:space="preserve"><value>DSX ゲーム MOD の参照元</value></data>
+  <data name="About_GameModRefsDesc" xml:space="preserve"><value>ゲーム MOD を支える UDP の命令、応答、ポートファイル、トリガーエフェクトのバイト列は、Paliverse の公式 DSX v3.1 と DualSenseX v2 の MOD サンプル、DualSenseY の両バージョンと DualSense4Rockstar (ライセンス未公開)、DSZ と pydualsense (MIT)、Wujek Dualsense API と hbashton の DS4Windows フォークにある DSX サーバー (GPL-3.0) から読み取りました。資料のみで、コードは同梱していません。</value></data>
+  <data name="About_Ds4HeadsetRefs" xml:space="preserve"><value>DualShock 4 ヘッドセットの参照元</value></data>
+  <data name="About_Ds4HeadsetRefsDesc" xml:space="preserve"><value>DualShock 4 の Bluetooth オーディオを支えるヘッドホンとスピーカーのルーティング、音量の上限、マイクのフレーミング、レポートモードは、DS4-Sound-Link (MIT)、ds4mac (GPL-2.0)、ds4drv (MIT)、hbashton の DS4Windows フォーク (GPL-3.0) から読み取り、SBC デコーダーの合成ウィンドウは Google の libsbc (Apache-2.0) と照合しました。資料のみで、コードは同梱していません。</value></data>
+  <data name="About_KeyboardScreenRefs" xml:space="preserve"><value>キーボード画面の参照元</value></data>
+  <data name="About_KeyboardScreenRefsDesc" xml:space="preserve"><value>キーボード画面を支えるライブラリ、フレーム、キーは、Logitech の LCD SDK と Arx Control SDK、Mad Catz の S.T.R.I.K.E. 7 SDK から読み取り、logitech-lcd (MIT または Apache-2.0)、dcspy (MIT)、foo_logitech_lcd (LGPL-2.1)、LogitechStuff と ArxWidgetManager (ライセンス未公開)、Linux の hid-lg-g15 ドライバー (GPL-2.0-or-later)、libg15、G15Interface、lcdproc (GPL-2.0)、gnome15 (GPL-3.0)、G19USB (Apache-2.0) と照合しました。PadForge は Logitech Gaming Software のライブラリと、ダウンロードまたは選択した Strike7API.dll を読み込み、これらのコードは一切同梱しません。</value></data>
+  <data name="About_FalconRefs" xml:space="preserve"><value>Novint Falcon の参照元</value></data>
+  <data name="About_FalconRefsDesc" xml:space="preserve"><value>Novint Falcon 対応を支えるライブラリ呼び出し、操作感、ゲームフォースは、Force Dimension の SDK ヘッダー、ドキュメント、サンプルから読み取り、ジョイスティックの操作感は FalconJoystick、エイムの操作感とランブルは FalconJoyForce (どちらも Cyclops-11B 作、ライセンス未公開) から取り、CHAI3D (BSD 3-Clause) と libnifalcon (BSD) と照合しました。PadForge はお使いの環境にインストールされた Force Dimension のライブラリを読み込みます。そのライセンスには再配布の権利がないためで、これらのコードは一切同梱しません。</value></data>
   <data name="Settings_KeyboardScreens_Title" xml:space="preserve"><value>キーボード画面</value></data>
   <data name="Settings_KeyboardScreens_Desc" xml:space="preserve"><value>Logitech の GamePanel キーボードと Mad Catz S.T.R.I.K.E. 7 に内蔵された画面、およびスマートフォン上の Logitech Arx Control に、プロファイル、時計、プレイ時間、ストップウォッチ、画像、DualShock 4 または DualSense のライトバーの色を表示します。各画面にはデバイスページに専用の行があり、そこで表示内容を設定します。画面の横にあるキーは、その行のボタンになります。</value></data>
   <data name="Settings_KeyboardScreens" xml:space="preserve"><value>キーボード画面を制御する</value></data>

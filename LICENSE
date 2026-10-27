@@ -653,8 +653,30 @@ Protocol documentation references (no code from these projects ships)
   corroboration, and the combined Bluetooth transport layout.
   DS5Dongle (https://github.com/awalol/DS5Dongle, MIT): the default and
   floor of the DualSense Bluetooth audio buffer length.
+  DSX game mod references: the UDP instructions, replies, port files and
+  trigger effect bytes behind Game Mods, read from Paliverse's official mod
+  examples for DSX v3.1 (https://github.com/Paliverse/DSX) and DualSenseX v2
+  (https://github.com/Paliverse/DualSenseX), WujekFoliarz's DualSenseY
+  (https://github.com/WujekFoliarz/DualSenseY) and DualSenseY-v2
+  (https://github.com/WujekFoliarz/DualSenseY-v2), and tommargar's
+  DualSense4Rockstar (https://github.com/tommargar/DualSense4Rockstar), none
+  of which publishes a license, DSZ (https://github.com/MaximumFreak/dsz,
+  MIT), pydualsense (https://github.com/flok/pydualsense, MIT), the Wujek
+  Dualsense API (https://github.com/ThreeDeeJay/Wujek-Dualsense-API, GPL-3.0)
+  and the DSX server in hbashton's DS4Windows fork
+  (https://github.com/hbashton/DS4Windows, GPL-3.0). DSX itself is closed
+  source.
   DualSenseSupport (https://github.com/Mxater/DualSenseSupport, no license
   published): the GameCube adaptive-trigger preset values.
+  DualShock 4 headset references: the headphone and speaker routing, volume
+  ceilings, microphone framing and report mode behind DualShock 4 Bluetooth
+  audio, read from DS4-Sound-Link
+  (https://github.com/abh1shekbana/DS4-Sound-Link, MIT), ds4mac
+  (https://github.com/khallmark/ds4mac, GPL-2.0), ds4drv
+  (https://github.com/chrippa/ds4drv, MIT) and hbashton's DS4Windows fork
+  (https://github.com/hbashton/DS4Windows, GPL-3.0), with the SBC decoder's
+  synthesis windows checked against Google's libsbc
+  (https://github.com/google/libsbc, Apache-2.0).
   Eden (https://git.eden-emu.dev/eden-emu/eden, GPL-3.0-or-later): the DSU
   motion axis signs, checked against its UDP decoder.
   EDRefCard2 (https://github.com/brammmers/edrefcard2, MIT): the Elite
@@ -762,6 +784,23 @@ Protocol documentation references (no code from these projects ships)
   joycon-singer (https://github.com/Sergey004/joycon-singer, no license
   published): Joy-Con HD-rumble wire format, cross-checked against
   dekuNukem's research.
+  Keyboard screen references: the libraries, frames and keys behind keyboard
+  screens, read from Logitech's LCD and Arx Control SDKs and Mad Catz's
+  S.T.R.I.K.E. 7 SDK (each under its maker's own terms), cross-checked against
+  logitech-lcd (https://github.com/henninglive/logitech-lcd, MIT OR
+  Apache-2.0), dcspy (https://github.com/emcek/dcspy, MIT), foo_logitech_lcd
+  (https://github.com/ectotropic/foo_logitech_lcd, LGPL-2.1), LogitechStuff
+  (https://github.com/exp111/LogitechStuff, no license published),
+  ArxWidgetManager (https://github.com/Roemer/ArxWidgetManager, no license
+  published), Linux's hid-lg-g15 driver
+  (https://github.com/torvalds/linux/blob/master/drivers/hid/hid-lg-g15.c,
+  GPL-2.0-or-later), libg15 (https://github.com/vividnightmare/libg15,
+  GPL-2.0), G15Interface (https://github.com/madscientist42/G15Interface,
+  GPL-2.0), lcdproc (https://github.com/lcdproc/lcdproc, GPL-2.0), gnome15
+  (https://github.com/achilleas-k/gnome15, GPL-3.0) and G19USB
+  (https://github.com/MagicMau/G19USB, Apache-2.0). PadForge loads Logitech
+  Gaming Software's libraries and the Strike7API.dll the user downloads or
+  chooses.
   Lenovo Legion Toolkit (https://github.com/BartoszCichecki/LenovoLegionToolkit,
   GPL-3.0): the Lenovo WMI utility-event class the handheld hidden-button
   learner subscribes to, and the elevated IPC server pattern behind
@@ -788,6 +827,15 @@ Protocol documentation references (no code from these projects ships)
   (https://github.com/ndeadly/switch2_controller_research, no license
   published): Joy-Con and Pro Controller HID, HD rumble and home LED notes,
   and the Switch 2 controller commands and report notes.
+  Novint Falcon references: the library calls, feels and game forces behind
+  Novint Falcon support, read from Force Dimension's SDK (its dhdc.h header,
+  documentation and multithread example, licensed for use with no right to
+  redistribute), FalconJoystick
+  (https://github.com/Cyclops-11B/FalconJoystick) and FalconJoyForce
+  (https://github.com/Cyclops-11B/FalconJoyForce1.0), both by Cyclops-11B with
+  no license published, CHAI3D (https://github.com/chai3d/chai3d, BSD
+  3-Clause) and libnifalcon (https://github.com/libnifalcon/libnifalcon, BSD).
+  PadForge loads the Force Dimension library the user installs.
   OpenRGB (https://gitlab.com/CalcProgrammer1/OpenRGB, GPL-2.0-or-later):
   DualSense and DualShock 4 lightbar output-report byte usage, and the
   Logitech HID++ 0x8070 lighting frames and collection layout.

@@ -4255,6 +4255,14 @@
   <data name="About_X1nputDesc" xml:space="preserve"><value>Xbox 임펄스 트리거의 9바이트 리포트와 그 쓰기 경로. araghon007 제작. MIT.</value></data>
   <data name="About_ChiakiNg" xml:space="preserve"><value>chiaki-ng</value></data>
   <data name="About_ChiakiNgDesc" xml:space="preserve"><value>PS5 햅틱 PCM 형식(부호 있는 16비트, 3 kHz)으로, Bluetooth 햅틱의 부호 있는 8비트 인코딩을 확정했습니다. AGPL-3.0, 문서로만 참고했으며 AGPL 코드는 포함하지 않습니다.</value></data>
+  <data name="About_GameModRefs" xml:space="preserve"><value>DSX 게임 모드 참조</value></data>
+  <data name="About_GameModRefsDesc" xml:space="preserve"><value>게임 모드를 뒷받침하는 UDP 명령, 응답, 포트 파일, 트리거 효과 바이트로, Paliverse의 공식 DSX v3.1 및 DualSenseX v2 모드 예제, DualSenseY 두 버전과 DualSense4Rockstar(라이선스 미공개), DSZ와 pydualsense(MIT), Wujek Dualsense API와 hbashton의 DS4Windows 포크에 있는 DSX 서버(GPL-3.0)에서 읽었습니다. 문서만 참고했으며 코드는 포함하지 않습니다.</value></data>
+  <data name="About_Ds4HeadsetRefs" xml:space="preserve"><value>DualShock 4 헤드셋 참조</value></data>
+  <data name="About_Ds4HeadsetRefsDesc" xml:space="preserve"><value>DualShock 4 Bluetooth 오디오를 뒷받침하는 헤드폰 및 스피커 라우팅, 볼륨 상한, 마이크 프레이밍, 리포트 모드는 DS4-Sound-Link(MIT), ds4mac(GPL-2.0), ds4drv(MIT), hbashton의 DS4Windows 포크(GPL-3.0)에서 읽었으며, SBC 디코더의 합성 윈도는 Google의 libsbc(Apache-2.0)와 대조했습니다. 문서만 참고했으며 코드는 포함하지 않습니다.</value></data>
+  <data name="About_KeyboardScreenRefs" xml:space="preserve"><value>키보드 화면 참조</value></data>
+  <data name="About_KeyboardScreenRefsDesc" xml:space="preserve"><value>키보드 화면을 뒷받침하는 라이브러리, 프레임, 키는 Logitech의 LCD 및 Arx Control SDK와 Mad Catz의 S.T.R.I.K.E. 7 SDK에서 읽었으며, logitech-lcd(MIT 또는 Apache-2.0), dcspy(MIT), foo_logitech_lcd(LGPL-2.1), LogitechStuff와 ArxWidgetManager(라이선스 미공개), Linux의 hid-lg-g15 드라이버(GPL-2.0-or-later), libg15, G15Interface, lcdproc(GPL-2.0), gnome15(GPL-3.0), G19USB(Apache-2.0)와 대조했습니다. PadForge는 Logitech Gaming Software의 라이브러리와 사용자가 내려받거나 선택한 Strike7API.dll을 로드하며, 그 어느 것의 코드도 포함하지 않습니다.</value></data>
+  <data name="About_FalconRefs" xml:space="preserve"><value>Novint Falcon 참조</value></data>
+  <data name="About_FalconRefsDesc" xml:space="preserve"><value>Novint Falcon 지원을 뒷받침하는 라이브러리 호출, 느낌, 게임 힘은 Force Dimension의 SDK 헤더, 문서, 예제에서 읽었으며, 조이스틱 느낌은 FalconJoystick에서, 조준 느낌과 진동은 FalconJoyForce(둘 다 Cyclops-11B 제작, 라이선스 미공개)에서 가져왔고, CHAI3D(BSD 3-Clause) 및 libnifalcon(BSD)과 대조했습니다. PadForge는 사용자가 설치한 Force Dimension 라이브러리를 로드하며, 해당 라이선스가 재배포 권리를 부여하지 않으므로 그 어느 것의 코드도 포함하지 않습니다.</value></data>
   <data name="Settings_KeyboardScreens_Title" xml:space="preserve"><value>키보드 화면</value></data>
   <data name="Settings_KeyboardScreens_Desc" xml:space="preserve"><value>Logitech GamePanel 키보드와 Mad Catz S.T.R.I.K.E. 7에 내장된 화면, 그리고 Logitech Arx Control을 통해 휴대폰에 프로필, 시계, 플레이 시간, 스톱워치, 그림, DualShock 4 또는 DualSense 라이트바의 색을 표시합니다. 각 화면은 장치 페이지에 자체 행이 있으며, 여기서 표시할 내용을 설정합니다. 화면 옆의 키는 해당 행의 버튼입니다.</value></data>
   <data name="Settings_KeyboardScreens" xml:space="preserve"><value>키보드 화면 구동</value></data>

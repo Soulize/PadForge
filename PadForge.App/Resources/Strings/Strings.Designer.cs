@@ -4066,6 +4066,14 @@ public class Strings : INotifyPropertyChanged
     public string About_X1nputDesc => Get("About_X1nputDesc");
     public string About_ChiakiNg => Get("About_ChiakiNg");
     public string About_ChiakiNgDesc => Get("About_ChiakiNgDesc");
+    public string About_GameModRefs => Get("About_GameModRefs");
+    public string About_GameModRefsDesc => Get("About_GameModRefsDesc");
+    public string About_Ds4HeadsetRefs => Get("About_Ds4HeadsetRefs");
+    public string About_Ds4HeadsetRefsDesc => Get("About_Ds4HeadsetRefsDesc");
+    public string About_KeyboardScreenRefs => Get("About_KeyboardScreenRefs");
+    public string About_KeyboardScreenRefsDesc => Get("About_KeyboardScreenRefsDesc");
+    public string About_FalconRefs => Get("About_FalconRefs");
+    public string About_FalconRefsDesc => Get("About_FalconRefsDesc");
     public string Settings_KeyboardScreens_Title => Get("Settings_KeyboardScreens_Title");
     public string Settings_KeyboardScreens_Desc => Get("Settings_KeyboardScreens_Desc");
     public string Settings_KeyboardScreens => Get("Settings_KeyboardScreens");

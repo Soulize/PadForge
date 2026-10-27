@@ -4304,6 +4304,14 @@
   <data name="About_X1nputDesc" xml:space="preserve"><value>Xbox 脈衝扳機的 9 位元組報告及其寫入路徑，作者：araghon007。MIT。</value></data>
   <data name="About_ChiakiNg" xml:space="preserve"><value>chiaki-ng</value></data>
   <data name="About_ChiakiNgDesc" xml:space="preserve"><value>PS5 觸覺 PCM 格式(帶正負號的 16 位元、3 kHz)，據此確定了帶正負號 8 位元的藍牙觸覺編碼。AGPL-3.0，僅作為文件閱讀，未隨附任何 AGPL 程式碼。</value></data>
+  <data name="About_GameModRefs" xml:space="preserve"><value>DSX 遊戲模組參考資料</value></data>
+  <data name="About_GameModRefsDesc" xml:space="preserve"><value>遊戲模組所用的 UDP 指令、回覆、連接埠檔案和扳機效果位元組，讀自 Paliverse 官方的 DSX v3.1 與 DualSenseX v2 模組範例、DualSenseY 的兩個版本和 DualSense4Rockstar(未公開授權)、DSZ 和 pydualsense(MIT)，以及 Wujek Dualsense API 和 hbashton 的 DS4Windows 分支中的 DSX 伺服器(GPL-3.0)。僅作為文件參考，未隨附任何程式碼。</value></data>
+  <data name="About_Ds4HeadsetRefs" xml:space="preserve"><value>DualShock 4 耳麥參考資料</value></data>
+  <data name="About_Ds4HeadsetRefsDesc" xml:space="preserve"><value>DualShock 4 藍牙音訊所用的耳機與喇叭路由、音量上限、麥克風封包格式和報告模式，讀自 DS4-Sound-Link(MIT)、ds4mac(GPL-2.0)、ds4drv(MIT)和 hbashton 的 DS4Windows 分支(GPL-3.0)，SBC 解碼器的合成視窗則與 Google 的 libsbc(Apache-2.0)比對。僅作為文件參考，未隨附任何程式碼。</value></data>
+  <data name="About_KeyboardScreenRefs" xml:space="preserve"><value>鍵盤螢幕參考資料</value></data>
+  <data name="About_KeyboardScreenRefsDesc" xml:space="preserve"><value>鍵盤螢幕所用的程式庫、畫面和按鍵，讀自 Logitech 的 LCD 與 Arx Control SDK 以及 Mad Catz 的 S.T.R.I.K.E. 7 SDK，並與 logitech-lcd(MIT 或 Apache-2.0)、dcspy(MIT)、foo_logitech_lcd(LGPL-2.1)、LogitechStuff 和 ArxWidgetManager(未公開授權)、Linux 的 hid-lg-g15 驅動程式(GPL-2.0-or-later)、libg15、G15Interface 和 lcdproc(GPL-2.0)、gnome15(GPL-3.0)及 G19USB(Apache-2.0)交叉比對。PadForge 會載入 Logitech Gaming Software 的程式庫，以及您下載或選擇的 Strike7API.dll，未隨附其中任何程式碼。</value></data>
+  <data name="About_FalconRefs" xml:space="preserve"><value>Novint Falcon 參考資料</value></data>
+  <data name="About_FalconRefsDesc" xml:space="preserve"><value>Novint Falcon 支援所用的程式庫呼叫、手感和遊戲力道，讀自 Force Dimension 的 SDK 標頭檔、文件和範例，其中搖桿手感來自 FalconJoystick，瞄準手感和震動來自 FalconJoyForce(兩者皆為 Cyclops-11B 所作，未公開授權)，並與 CHAI3D(BSD 3-Clause)和 libnifalcon(BSD)比對。PadForge 會載入您安裝的 Force Dimension 程式庫，因為其授權不允許轉散發，未隨附其中任何程式碼。</value></data>
   <data name="Settings_KeyboardScreens_Title" xml:space="preserve"><value>鍵盤螢幕</value></data>
   <data name="Settings_KeyboardScreens_Desc" xml:space="preserve"><value>在 Logitech 的 GamePanel 鍵盤與 Mad Catz S.T.R.I.K.E. 7 內建的螢幕上繪製內容，也可透過 Logitech Arx Control 顯示在手機上：設定檔、時鐘、遊玩時間、碼錶、圖片，或 DualShock 4 或 DualSense 燈條的顏色。每個螢幕在「裝置」頁面都有自己的一列，可在該處設定它顯示的內容。螢幕旁的按鍵是該列的按鈕。</value></data>
   <data name="Settings_KeyboardScreens" xml:space="preserve"><value>驅動鍵盤螢幕</value></data>

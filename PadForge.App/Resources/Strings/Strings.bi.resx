@@ -1410,6 +1410,10 @@
   <data name="About_WiiBrew" xml:space="preserve"><value>WiiBrew</value></data>
   <data name="About_X1nput" xml:space="preserve"><value>X1nput</value></data>
   <data name="About_ChiakiNg" xml:space="preserve"><value>chiaki-ng</value></data>
+  <data name="About_GameModRefs" xml:space="preserve"><value>Ol referens blong DSX gem mod</value></data>
+  <data name="About_Ds4HeadsetRefs" xml:space="preserve"><value>Ol referens blong hedset blong DualShock 4</value></data>
+  <data name="About_KeyboardScreenRefs" xml:space="preserve"><value>Ol referens blong skrin blong kiboad</value></data>
+  <data name="About_FalconRefs" xml:space="preserve"><value>Ol referens blong Novint Falcon</value></data>
   <data name="Settings_KeyboardScreens_Title" xml:space="preserve"><value>Ol skrin blong kiboad</value></data>
   <data name="Settings_KeyboardScreens_Desc" xml:space="preserve"><value>PadForge i droem long ol skrin we oli stap insaed long ol kiboad GamePanel blong Logitech mo Mad Catz S.T.R.I.K.E. 7, mo long wan fon tru long Logitech Arx Control: profael, wan klok, taem blong plei, wan stopwatch, wan pija, no kala blong laetba blong wan DualShock 4 no DualSense. Evri skrin i gat rao blong hem long pej blong Ol divaes, we yu jusum wanem we hem i soem. Ol ki klosap long wan skrin oli ol baton blong rao blong hem.</value></data>
   <data name="Settings_KeyboardScreens" xml:space="preserve"><value>Kontrolem ol skrin blong kiboad</value></data>
