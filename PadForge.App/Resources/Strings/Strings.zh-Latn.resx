@@ -304,6 +304,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Shìyòng yú wèi DSX zhìzuò de mózǔ, lìrú GTA V, Red Dead Redemption 2, Skyrim hé Forza de mózǔ. Fúwùqì jiāntīng qījiān, PadForge huì bǎ qí duānkǒu xiě dào zhèxiē mózǔ cházhǎo de wèizhì.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Jiāntīng :{0}. {1} zhèngzài xiàng xūnǐ kòngzhìqì {2} fāsòng.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Jiāntīng :{0}. {1} zhèngzài fāsòng, dàn méiyǒu xūnǐ kòngzhìqì shàng yǒu PlayStation kòngzhìqì.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Jiāntīng :{0}. {1} zhèngzài xiàng kòngzhìqì suǒyǐn {2} fāsòng, ér méiyǒu dài PlayStation kòngzhìqì de xūnǐ kòngzhìqì shǐyòng gāi suǒyǐn.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Duānkǒu {0} yǐ bèi qítā chéngxù (lìrú DSX) zhànyòng. Qǐng guānbì gāi chéngxù huò xuǎnzé qítā duānkǒu.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Mǒu gè yóuxì mózǔ</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Shìyòng yú OpenTrack, rènhé fāsòng qí UDP shūchū huò xiěrù FreeTrack 2.0 gòngxiǎng nèicún de zhuīzōngqì, yǐjí běn jī shàng néng zài hòutái yùnxíng huìhuà de OpenXR yùnxíngshí.</value></data>
@@ -4043,7 +4044,7 @@ Yào ràng PadForge xiànzài xièzài tāmen ma? Cǐ cāozuò xūyào tíshēng
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Zhèngzài děngdài FreeTrack gòngxiǎng nèicún shùjù.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>FreeTrack gòngxiǎng nèicún bùkěyòng.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Zhuǎnxiàng jiǎodù zhèndòng</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Suí suǒ xuǎn xūnǐ yáogǎn zhóu lí zhōngxīn yuè yuǎn, chíxù zhèndòng yuè qiáng. Shǐyòng suǒyǒu yǐ fēnpèi lái yuán yìngshè hòu de shūchū. Xuǎnzé “Àn fāngxiàng fēnkāi” shí, fù fāngxiàng qūdòng zuǒ mǎdá, zhèng fāngxiàng qūdòng yòu mǎdá. Xuǎnzé “Zuǒ mǎdá” huò “Yòu mǎdá” zé liǎng gè fāngxiàng dōu zài nà yī gè mǎdá shàng zhèndòng. Shìyòng yú shǐyòng zhèndòng shèbèi de Xbox hé PlayStation shūchū, bù yòng yú fāngxiàngpán de yuánshēng lìfǎnkuì.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Suí suǒ xuǎn xūnǐ yáogǎn zhóu lí zhōngxīn yuè yuǎn, chíxù zhèndòng yuè qiáng. Shǐyòng suǒyǒu yǐ fēnpèi lái yuán yìngshè hòu de shūchū. Xuǎnzé “Àn fāngxiàng fēnkāi” shí, fù fāngxiàng qūdòng zuǒ mǎdá, zhèng fāngxiàng qūdòng yòu mǎdá. Xuǎnzé “Zuǒ mǎdá” huò “Yòu mǎdá” zé liǎng gè fāngxiàng dōu zài nà yī gè mǎdá shàng zhèndòng. Shìyòng yú shǐyòng zhèndòng shèbèi de Xbox hé PlayStation shūchū. Tā bù chǔlǐ fāngxiàngpán, qítā dài héngdìng lìfǎnkuì de shèbèi hé Fanatec tàbǎn.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Qǐyòng zhuǎnxiàng jiǎodù zhèndòng</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Xūnǐ zhóu</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Zuǒ yáogǎn X</value></data>
@@ -4207,6 +4208,7 @@ Yào ràng PadForge xiànzài xièzài tāmen ma? Cǐ cāozuò xūyào tíshēng
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>zhíjiē zài {0} shàng</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>zhèngzài bǎ WinUSB bǎngdìng dào G19 de píngmù</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>G19 de píngmù shǐyòng qítā qūdòng chéngxù ({0}), qǐng qǐdòng Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>G19 de píngmù shǐyòng qítā chéngxù de qūdòng chéngxù ({0}), PadForge bù huì gǎidòng tā</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>xūyào Logitech Gaming Software 8.52 huò gèng gāo bǎnběn</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>qǐdòng Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>děngdài ānzhuāngle Arx Control de shǒujī</value></data>
@@ -4278,6 +4280,7 @@ Yào ràng PadForge xiànzài xièzài tāmen ma? Cǐ cāozuò xūyào tíshēng
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Wòbǐng</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} zhèngzài shèzhì cǐ kòngzhìqì de bānjī.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} zhèngzài shèzhì cǐ kòngzhìqì de dēngguāng.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} zhèngzài shèzhì cǐ shèbèi de dēngguāng.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} zhèngzài shèzhì cǐ kòngzhìqì de bānjī hé dēngguāng.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} zhèngzài cǐ kòngzhìqì de chōngjī bānjī shàng bōfàng bānjī zhèndòng.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Qīngchú mózǔ xiàoguǒ</value></data>
@@ -4285,10 +4288,10 @@ Yào ràng PadForge xiànzài xièzài tāmen ma? Cǐ cāozuò xūyào tíshēng
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Zuǒ/yòu</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Shàng/xià</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Jìn/chū</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Ànniǔ {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, cóng {1} jiāzài</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Nín xuǎnzé de dhd64.dll wèi néng jiāzài, suǒyǐ PadForge shǐyòng shàngmiàn de fùběn.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Force Dimension de kù zhǐ néng zài PadForge de x64 bǎnběn zhōng yùnxíng.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>Zhǎodào le dhd64.dll, dàn wúfǎ jiāzài.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Zhège dhd64.dll bú shì PadForge suǒ qīwàng de Force Dimension kù.</value></data>
@@ -4298,11 +4301,12 @@ Yào ràng PadForge xiànzài xièzài tāmen ma? Cǐ cāozuò xūyào tíshēng
   <data name="Falcon_Status_Open" xml:space="preserve"><value>yǐ dǎkāi</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Yī tái Falcon zài qítā chéngxù zhōng yǐ dǎkāi, lìrú FalconJoyForce huò Force Dimension zìjǐ de gōngjù. Qǐng zài nàlǐ guānbì.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon shǐyòng le qítā qūdòng chéngxù ({0}), suǒyǐ Force Dimension de kù wúfǎ dǎkāi tā. Qǐng zài Shèbèi guǎnlǐqì zhōng, cóng Force Dimension SDK wénjiànjiā lǐ de drivers\usb wénjiànjiā gēngxīn Falcon de qūdòng chéngxù.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon shǐyòng Force Dimension de qūdòng chéngxù, dàn Force Dimension de kù wúfǎ dǎkāi tā: {0}. Qǐng jiǎnchá tā de diànyuán hé USB shùjùxiàn.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Yī tái Falcon yǐ chārù, dàn méiyǒu qūdòng chéngxù. Ānzhuāng Falcon qūdòng chéngxù huì wèi tā ānzhuāng Force Dimension de qūdòng chéngxù.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Yī tái Falcon yǐ chārù, dàn méiyǒu qūdòng chéngxù, érqiě SDK wénjiànjiā zhōng méiyǒu kě gěi tā ānzhuāng de qūdòng chéngxù bāo. Qǐng chóngxīn ānzhuāng Force Dimension SDK.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Wèi zhǎodào Falcon. Qǐng chārù tā de diànyuán hé USB shùjùxiàn.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Xuǎnzé dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Yōuxiān jiāzài Force Dimension kù de zhège fùběn. SDK ānzhuāng de fùběn wúxū cǐ xiàng yě néng bèi zhǎodào.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Yòng Force Dimension kù de zhège fùběn tìdài qítā fùběn jiāzài. Zài qítā fùběn shàng dǎkāi de Falcon huì guānbì, bìng zài zhège fùběn shàng chóngxīn dǎkāi. SDK ānzhuāng de fùběn wúxū cǐ xiàng yě néng bèi zhǎodào.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Kùwénjiàn (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Ānzhuāng Falcon qūdòng chéngxù</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Cóng SDK wénjiànjiā wèi méiyǒu qūdòng chéngxù de Falcon ānzhuāng Force Dimension de qūdòng chéngxù. Windows kěnéng xiān xúnwèn shìfǒu xìnrèn Force Dimension.</value></data>
@@ -4319,7 +4323,7 @@ Yào ràng PadForge xiànzài xièzài tāmen ma? Cǐ cāozuò xūyào tíshēng
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Tōngguò Force Dimension SDK yòng Novint Falcon wán yóuxì. SDK xū nín cóng Force Dimension ānzhuāng. Wòbǐng zuòwéi yáogǎn, wòbǐng shàng de sì gè ànniǔ zuòwéi ànniǔ, PadForge jiāng yóuxì de zhèndòng hé tèxiào yǐ lì de xíngshì shīyú wòbǐng. Měi gè cáowèi de Lìfǎnkuì xuǎnxiàngkǎ shèzhì Falcon de shǒugǎn.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Qūdòng Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Tōngguò Force Dimension de dhd64.dll dǎkāi měi tái Falcon. Yǐ dǎkāi de Falcon zhǐ guī PadForge suǒyǒu, yīncǐ cǐ xiàng kāiqǐ shí FalconJoyForce hé Force Dimension gōngjù wúfǎ dǎkāi tā. Guānbì shí, PadForge huì guānbì suǒyǒu Falcon.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon kù yǐ shèwéi {0}. Yǐ zài shǐyòng de fùběn zài PadForge zàicì qǐdòng qián bǎochí bùbiàn.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon kù yǐ shèwéi {0}. PadForge huì zài jǐ miǎo nèi jiāzài tā, zài qítā fùběn shàng dǎkāi de Falcon huì zài zhège fùběn shàng chóngxīn dǎkāi.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Zhèngzài ānzhuāng Force Dimension de Falcon qūdòng chéngxù…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Force Dimension de Falcon qūdòng chéngxù bāo huò qí mùlù wénjiàn quēshī: {0}. Qǐng chóngxīn ānzhuāng Force Dimension SDK.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Wèi chārù Falcon.</value></data>

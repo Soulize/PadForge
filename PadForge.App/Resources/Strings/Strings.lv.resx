@@ -319,6 +319,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Darbojas ar DSX paredzētajām modifikācijām, piemēram, spēlēm GTA V, Red Dead Redemption 2, Skyrim un Forza. Kamēr serveris klausās, PadForge ieraksta savu portu tur, kur šīs modifikācijas to meklē.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Klausās :{0}. {1} sūta uz virtuālo kontrolleri {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Klausās :{0}. {1} sūta, bet nevienam virtuālajam kontrolleram nav pievienots PlayStation kontrolleris.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Klausās :{0}. {1} sūta uz kontrollera indeksu {2}, un nevienam virtuālajam kontrolleram ar PlayStation kontrolleri nav šāda indeksa.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Portu {0} izmanto cita programma, piemēram, DSX. Aizveriet to vai izvēlieties citu portu.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Spēles modifikācija</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Darbojas ar OpenTrack un jebkuru izsekotāju, kas sūta savu UDP izvadi vai raksta FreeTrack 2.0 koplietojamajā atmiņā, kā arī ar šī datora OpenXR izpildlaiku, kas spēj darbināt sesiju fonā.</value></data>
@@ -4127,7 +4128,7 @@ Vai vēlaties, lai PadForge tos tagad atinstalē? Tam nepieciešamas paaugstinā
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Gaida FreeTrack koplietojamās atmiņas datus.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>FreeTrack koplietojamā atmiņa nav pieejama.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Stūrēšanas leņķa vibrācija</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Pievieno nepārtrauktu vibrāciju, kad atlasītā virtuālās sviras ass attālinās no centra. Izmanto piesaistīto izvadi no visiem piešķirtajiem avotiem. Ar iestatījumu Sadalīt pēc virziena negatīva kustība darbina kreiso motoru, pozitīva kustība labo. Izvēloties Kreisais motors vai Labais motors, abi virzieni darbina tikai šo motoru. Paredzēts Xbox un PlayStation izvadei ar vibrācijas ierīcēm. Stūru iebūvētā spēka atgriezeniskā saite netiek ietverta.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Pievieno nepārtrauktu vibrāciju, kad atlasītā virtuālās sviras ass attālinās no centra. Izmanto piesaistīto izvadi no visiem piešķirtajiem avotiem. Ar iestatījumu Sadalīt pēc virziena negatīva kustība darbina kreiso motoru, pozitīva kustība labo. Izvēloties Kreisais motors vai Labais motors, abi virzieni darbina tikai šo motoru. Paredzēts Xbox un PlayStation izvadei ar vibrācijas ierīcēm. Tā izlaiž stūres, citas ierīces ar pastāvīgu spēka atgriezenisko saiti un Fanatec pedāļus.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Iespējot stūrēšanas leņķa vibrāciju</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Virtuālā ass</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Kreisā svira X</value></data>
@@ -4330,6 +4331,7 @@ Vai vēlaties, lai PadForge tos tagad atinstalē? Tam nepieciešamas paaugstinā
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>tieši uz {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>notiek WinUSB piesaiste G19 ekrānam</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>G19 ekrānam ir cits draiveris ({0}), tāpēc palaidiet Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>G19 ekrāns izmanto citas programmas draiveri ({0}), ko PadForge neaiztiek</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>nepieciešama Logitech Gaming Software 8.52 vai jaunāka versija</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>palaidiet Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>gaida tālruni ar Arx Control</value></data>
@@ -4401,6 +4403,7 @@ Vai vēlaties, lai PadForge tos tagad atinstalē? Tam nepieciešamas paaugstinā
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Rokturis</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} iestata šī kontrollera mēlītes.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} iestata šī kontrollera gaismas.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} iestata šīs ierīces gaismas.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} iestata šī kontrollera mēlītes un gaismas.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} atskaņo mēlīšu vibrācijas šī kontrollera impulsa mēlītēs.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Notīrīt modifikāciju efektus</value></data>
@@ -4408,10 +4411,10 @@ Vai vēlaties, lai PadForge tos tagad atinstalē? Tam nepieciešamas paaugstinā
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Pa kreisi/pa labi</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Augšup/lejup</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Iekšā/ārā</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Poga {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, ielādēts no {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Izvēlētais dhd64.dll neielādējās, tāpēc PadForge izmanto iepriekš minēto kopiju.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Force Dimension bibliotēka darbojas tikai PadForge x64 versijā.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>dhd64.dll atrasts, bet to nevarēja ielādēt.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Šī dhd64.dll nav Force Dimension bibliotēka, ko PadForge gaida.</value></data>
@@ -4421,11 +4424,12 @@ Vai vēlaties, lai PadForge tos tagad atinstalē? Tam nepieciešamas paaugstinā
   <data name="Falcon_Status_Open" xml:space="preserve"><value>atvērts</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Falcon ir atvērts citā programmā, piemēram, FalconJoyForce vai pašu Force Dimension rīkos. Aizveriet to tur.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon izmanto citu draiveri ({0}), tāpēc Force Dimension bibliotēka to nevar atvērt. Ierīču pārvaldniekā atjauniniet Falcon draiveri no mapes drivers\usb Force Dimension SDK mapē.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon izmanto Force Dimension draiveri, un Force Dimension bibliotēka to nevarēja atvērt: {0}. Pārbaudiet tā strāvu un USB kabeli.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Falcon ir pievienots bez draivera. Poga Instalēt Falcon draiveri tam piešķir Force Dimension draiveri.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Falcon ir pievienots bez draivera, un SDK mapē nav draivera pakotnes, ko tam piešķirt. Pārinstalējiet Force Dimension SDK.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Falcon nav atrasts. Pievienojiet tam strāvu un USB kabeli.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Izvēlēties dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Ielādē šo Force Dimension bibliotēkas kopiju pirms citām. Kopijas, ko instalē SDK, tiek atrastas arī bez tā.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Ielādē šo Force Dimension bibliotēkas kopiju citu vietā. Falcon, kas ir atvērts citā kopijā, aizveras un atveras vēlreiz ar šo. Kopijas, ko instalē SDK, tiek atrastas arī bez tā.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Bibliotēkas (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Instalēt Falcon draiveri</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Instalē Force Dimension draiveri no SDK mapes Falcon ierīcei, kurai tā nav. Windows var vispirms vaicāt, vai uzticēties Force Dimension.</value></data>
@@ -4442,7 +4446,7 @@ Vai vēlaties, lai PadForge tos tagad atinstalē? Tam nepieciešamas paaugstinā
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Spēlējiet spēles ar Novint Falcon, izmantojot Force Dimension SDK, ko instalējat no Force Dimension. Rokturis ir svira, roktura četras pogas ir pogas, un PadForge pārnes spēles vibrāciju un efektus uz rokturi kā spēku. Katra slota cilnē Spēka atgriezeniskā saite iestata, kā Falcon justies.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Vadīt Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Atver katru Falcon, izmantojot Force Dimension dhd64.dll. Atvērts Falcon pieder tikai PadForge, tāpēc FalconJoyForce un Force Dimension rīki to nevar atvērt, kamēr tas ir ieslēgts. Izslēgts, PadForge aizver katru Falcon.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon bibliotēka iestatīta uz {0}. Jau izmantotā kopija paliek, līdz PadForge tiek startēts atkārtoti.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon bibliotēka iestatīta uz {0}. PadForge to ielādē dažu sekunžu laikā, un Falcon, kas ir atvērts citā kopijā, atveras vēlreiz ar šo.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Notiek Force Dimension Falcon draivera instalēšana…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Force Dimension Falcon draivera pakotne vai tās katalogs trūkst: {0}. Pārinstalējiet Force Dimension SDK.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Neviens Falcon nav pievienots.</value></data>

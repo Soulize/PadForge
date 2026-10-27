@@ -304,6 +304,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>ለDSX ከተሠሩ ሞዶች ጋር ይሠራል፣ ለምሳሌ ለGTA V፣ Red Dead Redemption 2፣ Skyrim እና Forza ከተሠሩት ጋር። አገልጋዩ በሚያዳምጥበት ጊዜ PadForge ወደቡን እነዚያ ሞዶች በሚፈልጉት ቦታ ይጽፋል።</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>በ:{0} ላይ በማዳመጥ ላይ። {1} ወደ ምናባዊ መቆጣጠሪያ {2} እየላከ ነው።</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>በ:{0} ላይ በማዳመጥ ላይ። {1} እየላከ ነው፣ ነገር ግን የPlayStation መቆጣጠሪያ የተመደበለት ምናባዊ መቆጣጠሪያ የለም።</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>በ:{0} ላይ በማዳመጥ ላይ። {1} ወደ መቆጣጠሪያ ቁጥር {2} እየላከ ነው፣ ነገር ግን PlayStation መቆጣጠሪያ ያለበት ምንም ምናባዊ መቆጣጠሪያ ያንን ቁጥር የለውም።</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>ወደብ {0} በሌላ ፕሮግራም፣ ለምሳሌ በDSX፣ በጥቅም ላይ ነው። ያንን ፕሮግራም ዝጋ ወይም ሌላ ወደብ ምረጥ።</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>አንድ የጨዋታ ሞድ</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>ከOpenTrack እና የUDP ውጽዓቱን ከሚልክ ወይም የFreeTrack 2.0 የጋራ ማህደረ ትውስታ ከሚጽፍ ማንኛውም መከታተያ ጋር ይሠራል፣ እንዲሁም በዚህ ኮምፒውተር ላይ ክፍለ ጊዜን ከበስተጀርባ ማስኬድ ከሚችል የOpenXR ራንታይም ጋር ይሠራል።</value></data>
@@ -4070,7 +4071,7 @@ PadForge አሁን እንዲያራግፋቸው ይፈልጋሉ? ይህ የአስ
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>የFreeTrack የጋራ ማህደረ ትውስታ ውሂብን በመጠበቅ ላይ።</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>የFreeTrack የጋራ ማህደረ ትውስታ አይገኝም።</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>የመሪ ማዕዘን ንዝረት</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>የተመረጠው ምናባዊ የስቲክ ዘንግ ከመሃል ሲርቅ ቀጣይነት ያለው ንዝረት ያክላል። ከሁሉም የተመደቡ ምንጮች የተዛመደውን ውጤት ይጠቀማል። «በአቅጣጫ የተከፈለ» ሲመረጥ፣ አሉታዊ እንቅስቃሴ የግራውን ሞተር፣ አዎንታዊ እንቅስቃሴ ደግሞ የቀኙን ያንቀሳቅሳል። «የግራ ሞተር» ወይም «የቀኝ ሞተር» ሁለቱንም አቅጣጫዎች በዚያ አንድ ሞተር ላይ ያደርጋል። ለXbox እና PlayStation ውጤት ከንዝረት መሣሪያዎች ጋር። የመሪው ቤተኛ የኃይል ግብረመልስ አይካተትም።</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>የተመረጠው ምናባዊ የስቲክ ዘንግ ከመሃል ሲርቅ ቀጣይነት ያለው ንዝረት ያክላል። ከሁሉም የተመደቡ ምንጮች የተዛመደውን ውጤት ይጠቀማል። «በአቅጣጫ የተከፈለ» ሲመረጥ፣ አሉታዊ እንቅስቃሴ የግራውን ሞተር፣ አዎንታዊ እንቅስቃሴ ደግሞ የቀኙን ያንቀሳቅሳል። «የግራ ሞተር» ወይም «የቀኝ ሞተር» ሁለቱንም አቅጣጫዎች በዚያ አንድ ሞተር ላይ ያደርጋል። ለXbox እና PlayStation ውጤት ከንዝረት መሣሪያዎች ጋር። መሪዎችን፣ ቋሚ የኃይል ግብረመልስ ያላቸውን ሌሎች መሣሪያዎች እና የFanatec ፔዳሎችን ይዘልላል።</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>የመሪ ማዕዘን ንዝረትን አንቃ</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>ምናባዊ ዘንግ</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>የግራ ስቲክ X</value></data>
@@ -4273,6 +4274,7 @@ PadForge አሁን እንዲያራግፋቸው ይፈልጋሉ? ይህ የአስ
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>በቀጥታ በ{0} ላይ</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>WinUSBን ከG19 ማያ ገጽ ጋር በማገናኘት ላይ</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>የG19 ማያ ገጽ በሌላ አሽከርካሪ ({0}) ላይ ነው፣ ስለዚህ Logitech Gaming Software አስጀምር</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>የG19 ማያ ገጽ በሌላ ፕሮግራም አሽከርካሪ ({0}) ላይ ነው፣ PadForge ያንን አሽከርካሪ አይነካውም</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>Logitech Gaming Software 8.52 ወይም ከዚያ በኋላ ያለው ያስፈልጋል</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>Logitech Gaming Software አስጀምር</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>Arx Control ያለው ስልክ በመጠበቅ ላይ</value></data>
@@ -4344,6 +4346,7 @@ PadForge አሁን እንዲያራግፋቸው ይፈልጋሉ? ይህ የአስ
   <data name="Devices_FalconHandle" xml:space="preserve"><value>እጀታ</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} የዚህን መቆጣጠሪያ ትሪገሮች እያዘጋጀ ነው።</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} የዚህን መቆጣጠሪያ መብራቶች እያዘጋጀ ነው።</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} የዚህን መሣሪያ መብራቶች እያዘጋጀ ነው።</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} የዚህን መቆጣጠሪያ ትሪገሮች እና መብራቶች እያዘጋጀ ነው።</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} በዚህ መቆጣጠሪያ የኢምፐልስ ትሪገሮች ላይ የትሪገር ንዝረቶችን እያጫወተ ነው።</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>የሞድ ውጤቶችን አጽዳ</value></data>
@@ -4351,10 +4354,10 @@ PadForge አሁን እንዲያራግፋቸው ይፈልጋሉ? ይህ የአስ
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>ግራ/ቀኝ</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>ላይ/ታች</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>ውስጥ/ውጭ</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>አዝራር {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}፦ {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}፣ ከ{1} የተጫነ</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>የመረጥከው dhd64.dll አልተጫነም፣ ስለዚህ PadForge ከላይ ያለውን ቅጂ ይጠቀማል።</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>የForce Dimension ቤተ-መጻሕፍት የሚሠራው በx64 የPadForge ስሪት ላይ ብቻ ነው።</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>dhd64.dll ተገኝቷል ነገር ግን ሊጫን አልቻለም።</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>ያ dhd64.dll PadForge የሚጠብቀው የForce Dimension ቤተ-መጻሕፍት አይደለም።</value></data>
@@ -4364,11 +4367,12 @@ PadForge አሁን እንዲያራግፋቸው ይፈልጋሉ? ይህ የአስ
   <data name="Falcon_Status_Open" xml:space="preserve"><value>ክፍት</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>አንድ Falcon በሌላ ፕሮግራም ውስጥ ክፍት ነው፣ ለምሳሌ FalconJoyForce ወይም የForce Dimension የራሱ ፕሮግራሞች። እዚያ ዝጋው።</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon በሌላ አሽከርካሪ ({0}) ላይ ነው፣ ስለዚህ የForce Dimension ቤተ-መጻሕፍት ሊከፍተው አይችልም። በመሣሪያ አስተዳዳሪ ውስጥ የFalcon አሽከርካሪን በForce Dimension SDK አቃፊ ውስጥ ካለው drivers\usb አቃፊ አዘምን።</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon በForce Dimension አሽከርካሪ ላይ ነው፣ ነገር ግን የForce Dimension ቤተ-መጻሕፍት ሊከፍተው አልቻለም: {0}። የኃይል ገመዱን እና የUSB ገመዱን ፈትሽ።</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>አንድ Falcon ያለ አሽከርካሪ ተሰክቷል። «የFalcon አሽከርካሪ ጫን» የForce Dimension አሽከርካሪን ይሰጠዋል።</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>አንድ Falcon ያለ አሽከርካሪ ተሰክቷል፣ እና የSDK አቃፊው የሚሰጠው የአሽከርካሪ ጥቅል የለውም። የForce Dimension SDK-ን እንደገና ጫን።</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>ምንም Falcon አልተገኘም። የኃይል ገመዱን እና የUSB ገመዱን ሰካ።</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>dhd64.dll ምረጥ…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>ይህንን የForce Dimension ቤተ-መጻሕፍት ቅጂ ከሌሎች ሁሉ በፊት ይጭናል። SDK የሚጭናቸው ቅጂዎች ያለዚህ ይገኛሉ።</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>ይህንን የForce Dimension ቤተ-መጻሕፍት ቅጂ በሌሎች ሁሉ ምትክ ይጭናል። በሌላ ቅጂ ላይ ክፍት የሆነ Falcon ይዘጋና በዚህኛው ላይ እንደገና ይከፈታል። SDK የሚጭናቸው ቅጂዎች ያለዚህ ይገኛሉ።</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|ቤተ-መጻሕፍት (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>የFalcon አሽከርካሪ ጫን</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>አሽከርካሪ በሌለው Falcon ላይ የForce Dimension አሽከርካሪን ከSDK አቃፊ ይጭናል። Windows መጀመሪያ Force Dimensionን ማመን እንዳለበት ሊጠይቅ ይችላል።</value></data>
@@ -4385,7 +4389,7 @@ PadForge አሁን እንዲያራግፋቸው ይፈልጋሉ? ይህ የአስ
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>ከForce Dimension በምትጭነው የForce Dimension SDK አማካኝነት በNovint Falcon ጨዋታዎችን እንድትጫወት ያስችላል። እጀታው ስቲክ ነው፣ የመያዣው አራት አዝራሮች አዝራሮች ናቸው፣ እና PadForge የጨዋታውን ንዝረት እና ውጤቶች በእጀታው ላይ እንደ ኃይል ያደርጋል። የእያንዳንዱ ቦታ የኃይል ግብረመልስ ትር Falcon እንዴት እንደሚሰማ ያዘጋጃል።</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Novint Falconን ተቆጣጠር</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>እያንዳንዱን Falcon በForce Dimension dhd64.dll በኩል ይከፍታል። ክፍት የሆነ Falcon የPadForge ብቻ ነው፣ ስለዚህ ይህ በርቶ ሳለ FalconJoyForce እና የForce Dimension ፕሮግራሞች ሊከፍቱት አይችሉም። ሲጠፋ PadForge ሁሉንም Falcon ይዘጋል።</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>የFalcon ቤተ-መጻሕፍት ወደ {0} ተቀናብሯል። አስቀድሞ በጥቅም ላይ ያለ ቅጂ PadForge እንደገና እስኪጀምር ድረስ ይቆያል።</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>የFalcon ቤተ-መጻሕፍት ወደ {0} ተቀናብሯል። PadForge በጥቂት ሰከንዶች ውስጥ ይጭነዋል፣ በሌላ ቅጂ ላይ ክፍት የሆነ Falcon ደግሞ በዚህኛው ላይ እንደገና ይከፈታል።</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>የForce Dimension Falcon አሽከርካሪን በመጫን ላይ…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>የForce Dimension Falcon አሽከርካሪ ጥቅል ወይም ካታሎጉ ጠፍቷል፦ {0}። የForce Dimension SDK-ን እንደገና ጫን።</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>ምንም Falcon አልተሰካም።</value></data>

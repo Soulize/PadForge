@@ -135,6 +135,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Esalaka na ba mod oyo esalemi mpo na DSX, lokola oyo ya GTA V, Red Dead Redemption 2, Skyrim mpe Forza. Ntango serveur ezali koyoka, PadForge ekomaka port na yango epai ba mod wana ezali koluka yango.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Ezali koyoka na :{0}. {1} ezali kotinda na manette virtuelle {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Ezali koyoka na :{0}. {1} ezali kotinda, kasi manette virtuelle moko te ezali na manette ya PlayStation.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Ezali koyoka na :{0}. {1} ezali kotinda na manette nimero {2}, kasi ezali na manette virtuelle moko te ya manette PlayStation oyo ezali na nimero yango.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Programme mosusu, lokola DSX, ezali kosalela port {0}. Kanga yango to pona port mosusu.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Mod moko ya lisano</value></data>
 
@@ -1556,6 +1557,7 @@ Olingi PadForge elongola yango sikoyo? Esengeli na ba droit ya administrateur mp
   <data name="KeyboardScreens_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="KeyboardScreens_Status_Off" xml:space="preserve"><value>ezimi</value></data>
   <data name="KeyboardScreens_Status_Lgs" xml:space="preserve"><value>na nzela ya Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>écran ya G19 ezali na pilote ya programme mosusu ({0}), oyo PadForge esimbaka te</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>bandisa Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>ezali kozela telefone na Arx Control</value></data>
   <data name="KeyboardScreens_Status_ArxOnPhone" xml:space="preserve"><value>na telefone</value></data>
@@ -1592,23 +1594,27 @@ Olingi PadForge elongola yango sikoyo? Esengeli na ba droit ya administrateur mp
   <data name="DeviceType_NovintFalcon" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} ezali kobongisa ba gâchette ya manette oyo.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} ezali kobongisa miinda ya manette oyo.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} ezali kobongisa miinda ya appareil oyo.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} ezali kobongisa ba gâchette mpe miinda ya manette oyo.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} ezali kobeta ba vibration ya gâchette na ba gâchette Impulse ya manette oyo.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Longola ba effet ya mod</value></data>
   <data name="Devices_ClearModEffects_Tooltip" xml:space="preserve"><value>Esilisaka oyo ba mod ya masano batiaki na manette oyo. Ba paramètres na yango moko ezongaka kino mod moko ekotinda lisusu.</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Likoló/Nsé</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Kati/Libándá</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Bouton {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>dhd64.dll oyo oponaki esalaki te, yango wana PadForge ezali kosalela copie oyo ezali likoló.</value></data>
   <data name="Falcon_Status_Rate_Format" xml:space="preserve"><value>ezali kotambola na {0:0.0} kHz</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon ezali na pilote ya Force Dimension, kasi bibliothèque ya Force Dimension ekokaki kofungola yango te: {0}. Tala courant na yango mpe câble USB na yango.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Pona dhd64.dll…</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Ezwaka copie oyo ya bibliothèque ya Force Dimension na esika ya mosusu nyonso. Falcon oyo efungwami na copie mosusu ekokangama mpe ekofungwama lisusu na oyo. Ba copie oyo SDK ekotisaka ezwamaka kozanga yango.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Ba bibliothèque (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Installer pilote ya Falcon</value></data>
   <data name="Falcon_OpenDownload" xml:space="preserve"><value>Zwa SDK ya Force Dimension</value></data>
   <data name="Falcon_Calibrate_Done_Format" xml:space="preserve"><value>Calibrage esili. {0}</value></data>
   <data name="Settings_Falcon_Title" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Salela Novint Falcon</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Bibliothèque ya Falcon etiami na {0}. PadForge ekozwa yango na kati ya ba seconde moke, mpe Falcon oyo efungwami na copie mosusu ekofungwama lisusu na oyo.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Installation ya pilote ya Falcon ya Force Dimension…</value></data>
   <data name="Pad_Falcon_Header" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Pad_Falcon_ResetAll" xml:space="preserve"><value>Kozongisa Novint Falcon</value></data>

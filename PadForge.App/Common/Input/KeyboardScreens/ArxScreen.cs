@@ -18,6 +18,15 @@ namespace PadForge.Common.Input.KeyboardScreens
     /// <c>LogiArxSetTagPropertyById</c> points the page's image at it, so the
     /// app never reads a picture that is still being replaced.</para>
     ///
+    /// <para>A call that fails with "connection with LGS broken" or "SDK
+    /// not initialized" means LGS takes no further call, so the session is
+    /// shut down and the init tried again on its timer, the SDK guide's
+    /// procedure (pages 8 and 15). The callback does not report LGS exiting,
+    /// and a still picture makes no call after its first send, so while the
+    /// picture stands one call every <see cref="LivenessMs"/> points the
+    /// page's image at the picture it already shows, which changes nothing
+    /// and returns true while LGS answers (page 13).</para>
+    ///
     /// <para>The callback runs on LGS's thread and only sets flags, the
     /// G-key callback's rule. Every library call is made on the host's
     /// worker.</para>
@@ -25,11 +34,14 @@ namespace PadForge.Common.Input.KeyboardScreens
     internal sealed class ArxScreen : System.IDisposable
     {
         private const int LoadRetryMs = 30000;
-        private const int InitRetryMs = 10000;
+        internal const int InitRetryMs = 10000;
         private const int IdleShutdownMs = 2000;
         /// <summary>A picture at most this often: LGS compresses each one to
         /// PNG and sends it over Wi-Fi.</summary>
-        private const int MinImageMs = 250;
+        internal const int MinImageMs = 250;
+        /// <summary>How often a still picture's session is asked whether LGS
+        /// still answers.</summary>
+        internal const int LivenessMs = 5000;
         private const string Identifier = "org.padforge.keyboardscreen";
         private const string ImageTag = "screen";
 
@@ -45,12 +57,19 @@ namespace PadForge.Common.Input.KeyboardScreens
             + "img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain}</style></head>"
             + "<body><img id=\"" + ImageTag + "\" src=\"screen0.png\" alt=\"\"></body></html>");
 
+        private readonly System.Func<long, ILogitechArx> _library;
         private bool _active;
-        private long _nextInit, _idleSince = -1, _nextImage;
+        private long _nextInit, _idleSince = -1, _nextImage, _nextLive;
         private long _sent = -1;
         private int _name;
         private int _republish;
         private volatile bool _phone;
+
+        public ArxScreen() : this(Library) { }
+
+        /// <summary>Test seam: the library, null while it does not
+        /// load.</summary>
+        internal ArxScreen(System.Func<long, ILogitechArx> library) => _library = library;
 
         public bool Active => _active;
 
@@ -76,7 +95,7 @@ namespace PadForge.Common.Input.KeyboardScreens
 
         public void Step(byte[] frame, long version, long now)
         {
-            var lib = Library(now);
+            var lib = _library(now);
             if (lib == null) return;
 
             if (frame == null)
@@ -105,28 +124,52 @@ namespace PadForge.Common.Input.KeyboardScreens
             if (Interlocked.Exchange(ref _republish, 0) == 1)
             {
                 // The image first, so the page's first load finds it.
-                if (SendImage(lib, frame)) _sent = version;
-                lib.AddContent(IndexPage, "index.html", "text/html");
-                lib.SetIndex("index.html");
-                lib.SetTagProperty(ImageTag, "src", CurrentName);
+                bool sent = SendImage(lib, frame);
+                if (Lost(lib, sent, now)) return;
+                if (sent) _sent = version;
+                if (Lost(lib, lib.AddContent(IndexPage, "index.html", "text/html"), now)
+                    || Lost(lib, lib.SetIndex("index.html"), now)
+                    || Lost(lib, lib.SetTagProperty(ImageTag, "src", CurrentName), now)) return;
                 _nextImage = now + MinImageMs;
+                _nextLive = now + LivenessMs;
                 return;
             }
 
-            if (_sent == version || now < _nextImage) return;
-            _nextImage = now + MinImageMs;
-            _name ^= 1;
-            if (SendImage(lib, frame))
+            if (_sent == version)
             {
-                lib.SetTagProperty(ImageTag, "src", CurrentName);
-                _sent = version;
+                if (now < _nextLive) return;
+                _nextLive = now + LivenessMs;
+                Lost(lib, lib.SetTagProperty(ImageTag, "src", CurrentName), now);
+                return;
             }
+            if (now < _nextImage) return;
+            _nextImage = now + MinImageMs;
+            _nextLive = now + LivenessMs;
+            _name ^= 1;
+            bool drawn = SendImage(lib, frame);
+            if (Lost(lib, drawn, now) || !drawn) return;
+            if (Lost(lib, lib.SetTagProperty(ImageTag, "src", CurrentName), now)) return;
+            _sent = version;
         }
 
         private string CurrentName => _name == 0 ? "screen0.png" : "screen1.png";
 
-        private bool SendImage(LogitechArxLibrary lib, byte[] frame)
+        private bool SendImage(ILogitechArx lib, byte[] frame)
             => lib.AddImage(frame, KeyboardScreenFormats.ArxWidth, KeyboardScreenFormats.ArxHeight, CurrentName);
+
+        /// <summary>Whether a call's failure says the session is gone, in
+        /// which case it is shut down and the init tried again after
+        /// <see cref="InitRetryMs"/>. Any other failure leaves the session
+        /// up, and the picture goes out again with the next one.</summary>
+        private bool Lost(ILogitechArx lib, bool ok, long now)
+        {
+            if (ok) return false;
+            int error = lib.LastError;
+            if (error != LogitechArxLibrary.ErrorConnectionBroken && error != LogitechArxLibrary.ErrorNotInitialized) return false;
+            Shutdown(lib);
+            _nextInit = now + InitRetryMs;
+            return true;
+        }
 
         /// <summary>LGS's thread: flags only.</summary>
         private void OnEvent(uint type, uint value)
@@ -142,7 +185,7 @@ namespace PadForge.Common.Input.KeyboardScreens
             }
         }
 
-        private void Shutdown(LogitechArxLibrary lib)
+        private void Shutdown(ILogitechArx lib)
         {
             lib.Shutdown();
             _active = false;
@@ -152,9 +195,11 @@ namespace PadForge.Common.Input.KeyboardScreens
 
         public void Dispose()
         {
-            LogitechArxLibrary lib;
-            lock (s_loadLock) lib = s_library;
-            if (_active && lib != null) Shutdown(lib);
+            if (!_active) return;
+            // A time before any load answers the library already loaded and
+            // never loads one.
+            var lib = _library(long.MinValue);
+            if (lib != null) Shutdown(lib);
         }
     }
 }

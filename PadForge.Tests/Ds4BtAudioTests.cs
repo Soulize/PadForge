@@ -4,9 +4,11 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Pipes;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using PadForge.Common.Input;
 using PadForge.ViewModels;
 using Xunit;
@@ -537,6 +539,367 @@ namespace PadForge.Tests
             int ds4 = src.IndexOf("Ds4BtTick(s, pull, inFrames);", tick, StringComparison.Ordinal);
             int gate = src.IndexOf("if (!audible)", tick, StringComparison.Ordinal);
             Assert.True(ds4 > 0 && gate > 0 && ds4 < gate);
+        }
+    }
+
+    /// <summary>The voice-only microphone lane against a pipe standing in for
+    /// the pad, the way MicrophoneDecoderLifetimeTests drives the DualSense's
+    /// persona lane. With no effects dispatcher serving the pad, nothing but
+    /// the lane itself can carry the 0xA1 mode byte, and the controller drops
+    /// the microphone about four seconds after the last one (DS4Device.cs:2061-2070
+    /// in the hbashton fork at 68a5c64).</summary>
+    [Collection("AudioProfileLifecycle")]
+    public sealed class Ds4VoiceMicKeepaliveTests
+    {
+        private const BindingFlags Static = BindingFlags.Static | BindingFlags.NonPublic;
+
+        private static void AssertModeReport(byte[] r, bool armed)
+        {
+            Assert.Equal(0x11, r[0]);
+            Assert.Equal(0xC0, r[1]);
+            Assert.Equal(armed ? Ds4BtAudio.ModeMicrophone : Ds4BtAudio.ModeSpeaker, r[2]);
+            // Only the microphone gain is enabled: rumble, lightbar and both
+            // volumes belong to the effects writer and the audio lane.
+            Assert.Equal(armed ? Ds4BtAudio.FlagMicrophone : 0, r[3]);
+            for (int i = 4; i < 74; i++)
+                Assert.Equal(i == 23 && armed ? Ds4BtAudio.MicGainMax : 0, r[i]);
+            uint crc = (uint)(r[74] | r[75] << 8 | r[76] << 16 | r[77] << 24);
+            Assert.Equal(Ds4BtAudio.Crc32(0xA2, r.AsSpan(0, 74)), crc);
+        }
+
+        [Fact]
+        public void TheModeReportEnablesOnlyTheMicrophoneGain()
+        {
+            AssertModeReport(Ds4BtAudio.BuildMicModeReport(true), armed: true);
+            AssertModeReport(Ds4BtAudio.BuildMicModeReport(false), armed: false);
+        }
+
+        [Fact]
+        public async Task AVoiceOnlyPadWithNoDispatcherKeepsItsMicrophoneArmed()
+        {
+            var type = typeof(AudioPassthroughService);
+            Guid pad = Guid.NewGuid();
+            int wanted = 1;
+            var previous = AudioPassthroughService.VoiceLanePadMicWanted;
+            AudioPassthroughService.VoiceLanePadMicWanted = g => g == pad ? Volatile.Read(ref wanted) == 1 : previous(g);
+            string name = "PadForge-ds4-voice-mic-" + Guid.NewGuid().ToString("N");
+            var server = new NamedPipeServerStream(name, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+            var laneType = type.GetNestedType("VoiceMicLane", Static)!;
+            object lane = Activator.CreateInstance(laneType, nonPublic: true)!;
+            laneType.GetField("Pad")!.SetValue(lane, pad);
+            laneType.GetField("Path")!.SetValue(lane, @"\\.\pipe\" + name);
+            laneType.GetField("IsDs4")!.SetValue(lane, true);
+            var connected = server.WaitForConnectionAsync();
+            var thread = new Thread(() => type.GetMethod("Ds4VoiceBtMicLoop", Static)!.Invoke(null, [lane])) { IsBackground = true };
+            using var stop = new CancellationTokenSource();
+            var written = new List<(long At, byte[] Report)>();
+            var clock = System.Diagnostics.Stopwatch.StartNew();
+            Task feeder = Task.CompletedTask, reader = Task.CompletedTask;
+            try
+            {
+                thread.Start();
+                await connected.WaitAsync(TimeSpan.FromSeconds(5));
+                // The pad's input: a state-bearing report whose status byte
+                // shows a microphone, fifty times a second.
+                byte[] status = Ds4BtAudioTests.InputReport(0x11, state: true, audio: false,
+                                                            status: Ds4BtAudio.StatusMicrophone)[..78];
+                long start = clock.ElapsedMilliseconds;
+                feeder = Task.Run(async () =>
+                {
+                    while (!stop.IsCancellationRequested)
+                    {
+                        await server.WriteAsync(status, stop.Token);
+                        await Task.Delay(20, stop.Token);
+                    }
+                });
+                reader = Task.Run(async () =>
+                {
+                    var pending = new List<byte>();
+                    var buf = new byte[256];
+                    while (!stop.IsCancellationRequested)
+                    {
+                        int n = await server.ReadAsync(buf, stop.Token);
+                        if (n <= 0) break;
+                        pending.AddRange(buf.AsSpan(0, n).ToArray());
+                        while (pending.Count >= Ds4BtAudio.ControlReportSize)
+                        {
+                            byte[] r = pending.GetRange(0, Ds4BtAudio.ControlReportSize).ToArray();
+                            pending.RemoveRange(0, Ds4BtAudio.ControlReportSize);
+                            lock (written) written.Add((clock.ElapsedMilliseconds, r));
+                        }
+                    }
+                });
+
+                async Task<(long At, byte[] Report)?> Next(long after, byte mode, long withinMs)
+                {
+                    long until = clock.ElapsedMilliseconds + withinMs;
+                    while (true)
+                    {
+                        lock (written)
+                            foreach (var w in written)
+                                if (w.At > after && w.Report[2] == mode) return w;
+                        if (clock.ElapsedMilliseconds > until) return null;
+                        await Task.Delay(10);
+                    }
+                }
+
+                var first = await Next(-1, Ds4BtAudio.ModeMicrophone, 1500);
+                Assert.True(first.HasValue, "no 0xA1 report within 1.5 s of the first status report");
+                Assert.InRange(first.Value.At - start, 0, 1500);
+                AssertModeReport(first.Value.Report, armed: true);
+                var second = await Next(first.Value.At, Ds4BtAudio.ModeMicrophone, 1500);
+                Assert.True(second.HasValue, "no second 0xA1 report within 1.5 s of the first");
+                AssertModeReport(second.Value.Report, armed: true);
+
+                // The voice session lets go: once the two-second hold runs
+                // out the lane returns the pad to 0xA0 with nothing enabled.
+                long released = clock.ElapsedMilliseconds;
+                Volatile.Write(ref wanted, 0);
+                var off = await Next(released, Ds4BtAudio.ModeSpeaker, 3500);
+                Assert.True(off.HasValue, "no 0xA0 report after the microphone was released");
+                AssertModeReport(off.Value.Report, armed: false);
+            }
+            finally
+            {
+                laneType.GetField("Stop")!.SetValue(lane, true);
+                stop.Cancel();
+                try { await Task.WhenAll(feeder, reader); } catch (OperationCanceledException) { }
+                server.Dispose();
+                Assert.True(thread.Join(5000));
+                AudioPassthroughService.VoiceLanePadMicWanted = previous;
+                ((IDictionary)type.GetField("_ds4Mic", Static)!.GetValue(null)).Remove(pad);
+                ((ConcurrentDictionary<Guid, bool>)type.GetField("s_padJackState", Static)!.GetValue(null)).TryRemove(pad, out _);
+            }
+        }
+
+        [Fact]
+        public void TheMicrophoneWakesTheSlotThatWritesThePad()
+        {
+            var g = Guid.NewGuid();
+            var rows = new List<PadForge.Engine.Data.UserSetting>
+            {
+                new() { InstanceGuid = g, MapTo = 0 },
+                new() { InstanceGuid = g, MapTo = 1 },
+            };
+            // Slot 0 has no virtual controller, so no dispatcher: slot 1 writes.
+            Assert.Equal(1, AudioPassthroughService.Ds4MicWriterSlot(rows, g, s => s == 1));
+            Assert.Equal(0, AudioPassthroughService.Ds4MicWriterSlot(rows, g, s => true));
+            Assert.Equal(-1, AudioPassthroughService.Ds4MicWriterSlot(rows, g, s => false));
+            Assert.Equal(-1, AudioPassthroughService.Ds4MicWriterSlot(rows, Guid.NewGuid(), s => true));
+
+            // Both lanes note the armed microphone under that slot.
+            string src = File.ReadAllText(Path.Combine(RepoRoot(), "PadForge.App", "Common", "Input",
+                                                       "AudioPassthroughService.Ds4Bluetooth.cs"));
+            Assert.DoesNotContain("ResolveVoiceMicSlot(", src);
+            Assert.DoesNotContain("SetDs4MicWanted(pad, feed.Slot", src);
+            Assert.Contains("SetDs4MicWanted(pad, slot, persona: true, wanted);", src);
+            Assert.Contains("SetDs4MicWanted(lane.Pad, slot, persona: false, wanted);", src);
+            // The definition, then each lane's first lookup and its refresh.
+            Assert.Equal(5, src.Split("ResolveDs4MicWriterSlot(").Length - 1);
+        }
+
+        private static string RepoRoot()
+        {
+            var dir = new DirectoryInfo(AppContext.BaseDirectory);
+            while (dir != null && !File.Exists(Path.Combine(dir.FullName, "PadForge.sln")))
+                dir = dir.Parent;
+            Assert.NotNull(dir);
+            return dir.FullName;
+        }
+    }
+
+    /// <summary>A persona Bluetooth microphone reader whose open fails gives
+    /// the pad up until the jack watch's retry deadline, so the jack watch
+    /// and the voice lane are not kept off by a lane that is not reading, and
+    /// the reconcile starts a fresh reader once the deadline passes.</summary>
+    [Collection("AudioProfileLifecycle")]
+    public sealed class BtMicOpenRetryTests
+    {
+        private const BindingFlags Static = BindingFlags.Static | BindingFlags.NonPublic;
+
+        [Theory]
+        [InlineData("BtMicLoop")]
+        [InlineData("Ds4BtMicLoop")]
+        public void AFailedOpenClearsThePadAndSetsARetryDeadline(string loop)
+        {
+            Guid pad = Guid.NewGuid();
+            var feed = new AudioPassthroughService.PersonaFeed
+            {
+                Owner = new(), Slot = 15, Published = true,
+                RouteGeneration = 1, BtMicGen = 1, BtMicPadGuid = pad,
+            };
+            long before = Environment.TickCount64;
+            // A path in the device namespace: the test host refuses the open.
+            typeof(AudioPassthroughService).GetMethod(loop, Static)!
+                .Invoke(null, [feed, @"\\?\hid#padforge-test-no-such-pad", 1, 1]);
+            Assert.Equal(Guid.Empty, feed.BtMicPadGuid);
+            Assert.Equal(pad, feed.BtMicRetryPad);
+            Assert.InRange(feed.BtMicRetryAfterTick, before + 5000, Environment.TickCount64 + 5000);
+
+            // A lane that was stopped while it opened leaves the feed alone.
+            var stale = new AudioPassthroughService.PersonaFeed
+            {
+                Owner = new(), Slot = 15, Published = true,
+                RouteGeneration = 1, BtMicGen = 2, BtMicPadGuid = pad,
+            };
+            typeof(AudioPassthroughService).GetMethod(loop, Static)!
+                .Invoke(null, [stale, @"\\?\hid#padforge-test-no-such-pad", 1, 1]);
+            Assert.Equal(pad, stale.BtMicPadGuid);
+            Assert.Equal(Guid.Empty, stale.BtMicRetryPad);
+        }
+
+        /// <summary>The USB jack reader beside the microphone lane follows
+        /// the same rule: a failed open stops claiming the pad, so the sink's
+        /// jack watch reads it meanwhile, and the reconcile retries after the
+        /// deadline.</summary>
+        [Fact]
+        public void AFailedUsbJackOpenClearsThePadAndSetsARetryDeadline()
+        {
+            Guid pad = Guid.NewGuid();
+            var feed = new AudioPassthroughService.PersonaFeed
+            {
+                Owner = new(), Slot = 15, Published = true,
+                RouteGeneration = 1, UsbJackGen = 1, UsbJackPadGuid = pad,
+            };
+            long before = Environment.TickCount64;
+            typeof(AudioPassthroughService).GetMethod("UsbJackLoop", Static)!
+                .Invoke(null, [feed, @"\\?\hid#padforge-test-no-such-pad", 1, 1]);
+            Assert.Equal(Guid.Empty, feed.UsbJackPadGuid);
+            Assert.Equal(pad, feed.UsbJackRetryPad);
+            Assert.InRange(feed.UsbJackRetryAfterTick, before + 5000, Environment.TickCount64 + 5000);
+
+            var dir = new DirectoryInfo(AppContext.BaseDirectory);
+            while (dir != null && !File.Exists(Path.Combine(dir.FullName, "PadForge.sln")))
+                dir = dir.Parent;
+            Assert.NotNull(dir);
+            string src = File.ReadAllText(Path.Combine(dir.FullName, "PadForge.App", "Common", "Input",
+                                                       "AudioPassthroughService.cs"));
+            Assert.Contains("if (PersonaLaneRestarts(usbJackPad, feed.UsbJackPadGuid, feed.UsbJackRetryPad,", src);
+            Assert.DoesNotContain("if (usbJackPad != feed.UsbJackPadGuid)", src);
+        }
+
+        [Fact]
+        public void TheReconcileRetriesTheFailedPadAfterTheDeadline()
+        {
+            Guid a = Guid.NewGuid(), b = Guid.NewGuid();
+            // Inside the deadline the failed pad waits.
+            Assert.False(AudioPassthroughService.PersonaLaneRestarts(a, Guid.Empty, a, 2000, 1000));
+            // At the deadline it starts again.
+            Assert.True(AudioPassthroughService.PersonaLaneRestarts(a, Guid.Empty, a, 2000, 2000));
+            // Another pad, or no pad, never waits on it.
+            Assert.True(AudioPassthroughService.PersonaLaneRestarts(b, Guid.Empty, a, 2000, 1000));
+            Assert.True(AudioPassthroughService.PersonaLaneRestarts(Guid.Empty, b, a, 2000, 1000));
+            // A running lane on the wanted pad stays.
+            Assert.False(AudioPassthroughService.PersonaLaneRestarts(a, a, Guid.Empty, 0, 1000));
+
+            var dir = new DirectoryInfo(AppContext.BaseDirectory);
+            while (dir != null && !File.Exists(Path.Combine(dir.FullName, "PadForge.sln")))
+                dir = dir.Parent;
+            Assert.NotNull(dir);
+            string src = File.ReadAllText(Path.Combine(dir.FullName, "PadForge.App", "Common", "Input",
+                                                       "AudioPassthroughService.cs"));
+            Assert.Contains("if (PersonaLaneRestarts(btMicPad, feed.BtMicPadGuid, feed.BtMicRetryPad,", src);
+            Assert.DoesNotContain("if (btMicPad != feed.BtMicPadGuid)", src);
+        }
+    }
+
+    /// <summary>A Remote Link peer's copy of a pad offers the voice phrases its
+    /// owner offers. A DualShock 4's answer rests on its Bluetooth path, which
+    /// a peer:// copy never has, so the owner's answer crosses in the device
+    /// list's v13 tail, the way the v12 tail carries the capacitive sensors
+    /// (2ef2be16). An older owner sends none, and the copy keeps today's
+    /// answer.</summary>
+    public sealed class RemoteVoicePhrasesTests
+    {
+        private static PadForge.Engine.RemoteLink.RemotePeerDeviceInfo Pad(string id, ushort vid, ushort pid, bool? voice) => new()
+        {
+            Slot = 0,
+            PeerLocalDeviceId = id,
+            Name = "pad",
+            VendorId = vid,
+            ProductId = pid,
+            NumAxes = 6,
+            NumButtons = 22,
+            RawButtonCount = 22,
+            SupportedButtonIndices = Enumerable.Range(0, 18).ToArray(),
+            SupportedAxisIndices = Enumerable.Range(0, 6).ToArray(),
+            InputDeviceType = PadForge.Engine.InputDeviceType.Gamepad,
+            HasVoicePhrases = voice,
+        };
+
+        private static int TailStart(IEnumerable<PadForge.Engine.RemoteLink.RemotePeerDeviceInfo> devices)
+            => PadForge.Engine.RemoteLink.LinkConnection.EncodeDeviceList(devices.Select(d =>
+            {
+                var bare = d.CloneForSlot(d.Slot);
+                bare.HasVoicePhrases = null;
+                return bare;
+            }).ToList(), "").Length;
+
+        [Fact]
+        public void TheOwnersVoicePhrasesCrossTheWire()
+        {
+            var devices = new[]
+            {
+                Pad("ds4", 0x054C, 0x09CC, true),
+                Pad("switch", 0x057E, 0x2009, false),
+                Pad("ds5", 0x054C, 0x0CE6, true),
+            };
+            var payload = PadForge.Engine.RemoteLink.LinkConnection.EncodeDeviceList(devices, "");
+            var list = PadForge.Engine.RemoteLink.LinkConnection.DecodeDeviceList(payload);
+            Assert.True(list[0].HasVoicePhrases);
+            Assert.Null(list[1].HasVoicePhrases);
+            Assert.True(list[2].HasVoicePhrases);
+
+            // The tail is the last thing on the wire: an older owner stops
+            // before it, and every row keeps today's answer.
+            int start = TailStart(devices);
+            Assert.Equal(0xEE, payload[start]);
+            var older = PadForge.Engine.RemoteLink.LinkConnection.DecodeDeviceList(payload.Take(start).ToArray());
+            Assert.Equal(3, older.Count);
+            Assert.All(older, d => Assert.Null(d.HasVoicePhrases));
+
+            // A record naming a row past the list is refused whole.
+            var broken = (byte[])payload.Clone();
+            broken[start + 2] = 9;
+            var refused = PadForge.Engine.RemoteLink.LinkConnection.DecodeDeviceList(broken);
+            Assert.Equal(3, refused.Count);
+            Assert.All(refused, d => Assert.Null(d.HasVoicePhrases));
+
+            // No row with phrases, no tail: the list is what it was before.
+            var none = new[] { Pad("switch", 0x057E, 0x2009, false) };
+            Assert.Equal(TailStart(none), PadForge.Engine.RemoteLink.LinkConnection.EncodeDeviceList(none, "").Length);
+        }
+
+        [Theory]
+        [InlineData(true, true)]   // the owner reads the DualShock 4's microphone
+        [InlineData(false, false)] // an older owner: a peer:// path is not Bluetooth
+        public void APeersCopyOfADualShock4OffersItsOwnersPhrases(bool fromOwner, bool expected)
+        {
+            var sent = Pad("ds4", 0x054C, 0x09CC, fromOwner ? true : null);
+            var info = PadForge.Engine.RemoteLink.LinkConnection.DecodeDeviceList(
+                PadForge.Engine.RemoteLink.LinkConnection.EncodeDeviceList(new[] { sent }, "")).Single();
+            info.PeerFingerprintHex = "0123456789abcdef0123456789abcdef";
+            using var copy = new PadForge.Engine.RemoteLink.RemotePeerDevice(info);
+            var row = new PadForge.Engine.Data.UserDevice();
+            row.LoadFromExternalDevice(copy);
+            Assert.StartsWith("peer://", row.DevicePath);
+            Assert.Equal(expected, row.HasVoicePhrases);
+        }
+
+        [Fact]
+        public void TheOwnerSendsItsAnswerAndThePeerRefreshesIt()
+        {
+            var dir = new DirectoryInfo(AppContext.BaseDirectory);
+            while (dir != null && !File.Exists(Path.Combine(dir.FullName, "PadForge.sln")))
+                dir = dir.Parent;
+            Assert.NotNull(dir);
+            string service = File.ReadAllText(Path.Combine(dir.FullName, "PadForge.App", "Services", "InputService.cs"));
+            Assert.Contains("HasVoicePhrases = ud.HasVoicePhrases ? true : null,", service);
+            string server = File.ReadAllText(Path.Combine(dir.FullName, "PadForge.Engine", "RemoteLink", "LinkServer.cs"));
+            int reconcile = server.IndexOf("private void ReconcileRemoteDevices(", StringComparison.Ordinal);
+            int end = server.IndexOf("private const string ListTooLarge", reconcile, StringComparison.Ordinal);
+            Assert.True(reconcile >= 0 && end > reconcile, "the reconcile moved");
+            Assert.Contains("existing.Info.HasVoicePhrases = info.HasVoicePhrases;", server[reconcile..end]);
         }
     }
 

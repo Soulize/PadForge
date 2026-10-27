@@ -136,6 +136,14 @@ namespace PadForge.Views
             // A text box that still has focus has not pushed its value.
             if (System.Windows.Input.Keyboard.FocusedElement is System.Windows.Controls.TextBox box)
                 box.GetBindingExpression(System.Windows.Controls.TextBox.TextProperty)?.UpdateSource();
+            // Nor has a NumberBox, which reads what was typed only when it
+            // loses focus (wpfui NumberBox.OnLostFocus) or on Enter's key up,
+            // and Enter on the default button or a screen reader's Invoke
+            // clicks Save with the box still focused. Taking focus to Save
+            // commits it. The second call moves the window's logical focus
+            // when the window does not have the keyboard.
+            SaveButton.Focus();
+            System.Windows.Input.FocusManager.SetFocusedElement(this, SaveButton);
             string problem = Problem(_formats);
             if (problem != null)
             {

@@ -302,6 +302,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Funktionéiert mat Mods, déi fir DSX gemaach goufen, wéi déi fir GTA V, Red Dead Redemption 2, Skyrim a Forza. Soulaang de Server lauschtert, schreift PadForge säi Port dohin, wou dës Mods en sichen.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Lauschtert op :{0}. {1} schéckt un de virtuelle Controller {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Lauschtert op :{0}. {1} schéckt, mee keen virtuelle Controller huet e PlayStation-Controller drop.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Lauschtert op :{0}. {1} schéckt un de Controller-Index {2}, an et gëtt kee virtuelle Controller mat engem PlayStation-Controller drop, deen dësen Index huet.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Port {0} gëtt vun engem anere Programm benotzt, wéi zum Beispill DSX. Maacht en zou oder wielt en anere Port.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>E Spill-Mod</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Funktionéiert mat OpenTrack an all Tracker, deen seng UDP-Ausgab schéckt oder an de gemeinsame Späicher vu FreeTrack 2.0 schreift, a mat enger OpenXR-Runtime op dësem Computer, déi eng Sessioun am Hannergrond lafe loosse kann.</value></data>
@@ -4083,7 +4084,7 @@ Soll PadForge se elo desinstalléieren? Dat brauch Administratorrechter a ka e M
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Waart op Daten am gedeelte FreeTrack-Späicher.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>De gedeelte FreeTrack-Späicher ass net disponibel.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Steierwénkel-Vibratioun</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Setzt eng kontinuéierlech Vibratioun derbäi, wa sech déi gewielte virtuell Stick-Achs vun der Mëtt ewech beweegt. Benotzt déi zougeuerdent Ausgab vun alle zougewisene Quellen. Mat „No Richtung opgedeelt“ dreift negativ Beweegung de lénke Motor un a positiv Beweegung de rietsen. „Motor lénks“ oder „Motor riets“ leet béid Richtungen op dee jeeweilege Motor. Fir Xbox- a PlayStation-Ausgab mat Vibratiounsapparater. D'Force Feedback vum Steierrad selwer ass ausgeschloss.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Setzt eng kontinuéierlech Vibratioun derbäi, wa sech déi gewielte virtuell Stick-Achs vun der Mëtt ewech beweegt. Benotzt déi zougeuerdent Ausgab vun alle zougewisene Quellen. Mat „No Richtung opgedeelt“ dreift negativ Beweegung de lénke Motor un a positiv Beweegung de rietsen. „Motor lénks“ oder „Motor riets“ leet béid Richtungen op dee jeeweilege Motor. Fir Xbox- a PlayStation-Ausgab mat Vibratiounsapparater. Steierrieder, aner Apparater mat konstantem Force Feedback a Fanatec-Pedalen ginn ausgelooss.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Steierwénkel-Vibratioun aktivéieren</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Virtuell Achs</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Lénke Stick X</value></data>
@@ -4286,6 +4287,7 @@ Soll PadForge se elo desinstalléieren? Dat brauch Administratorrechter a ka e M
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>direkt um {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>WinUSB gëtt un den Écran vum G19 gebonnen</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>den Écran vum G19 ass op engem aneren Treiber ({0}), dofir d'Logitech Gaming Software starten</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>den Écran vum G19 ass um Treiber vun engem anere Programm ({0}), deen PadForge a Rou léisst</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>brauch Logitech Gaming Software 8.52 oder méi nei</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>Logitech Gaming Software starten</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>waart op en Handy mat Arx Control</value></data>
@@ -4357,6 +4359,7 @@ Soll PadForge se elo desinstalléieren? Dat brauch Administratorrechter a ka e M
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Grëff</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} setzt d'Trigger vun dësem Controller.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} setzt d'Luuchte vun dësem Controller.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} setzt d'Luuchte vun dësem Apparat.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} setzt d'Trigger an d'Luuchte vun dësem Controller.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} spillt Trigger-Vibratiounen op den Impulse-Trigger vun dësem Controller of.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Mod-Effekter läschen</value></data>
@@ -4364,10 +4367,10 @@ Soll PadForge se elo desinstalléieren? Dat brauch Administratorrechter a ka e M
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Lénks/Riets</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Erop/Erof</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Eran/Eraus</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Knäppchen {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, geluede vun {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Déi dhd64.dll, déi Dir gewielt hutt, gouf net gelueden, dofir benotzt PadForge d'Kopie hei uewen.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>D'Bibliothéik vu Force Dimension leeft just an der x64-Versioun vu PadForge.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>dhd64.dll gouf fonnt, mä et konnt net geluede ginn.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Dës dhd64.dll ass net d'Bibliothéik vu Force Dimension, déi PadForge erwaart.</value></data>
@@ -4376,11 +4379,12 @@ Soll PadForge se elo desinstalléieren? Dat brauch Administratorrechter a ka e M
   <data name="Falcon_Status_Rate_Format" xml:space="preserve"><value>leeft mat {0:0.0} kHz</value></data>
   <data name="Falcon_Status_Open" xml:space="preserve"><value>opgemaach</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>E Falcon ass an engem anere Programm op, wéi FalconJoyForce oder d'Tools vu Force Dimension. Maacht en do zou.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>De Falcon ass um eegenen Treiber vu Force Dimension, an d'Bibliothéik vu Force Dimension konnt en net opmaachen: {0}. Kontrolléiert de Stroum an den USB-Kabel.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>E Falcon ass ouni Treiber ugeschloss. „Falcon-Treiber installéieren“ installéiert him deen vu Force Dimension.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>E Falcon ass ouni Treiber ugeschloss, an am SDK-Dossier ass kee Treiberpaket, fir him een ze ginn. Installéiert d'SDK vu Force Dimension nei.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Kee Falcon fonnt. Schléisst de Stroum an den USB-Kabel un.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>dhd64.dll wielen…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Luet dës Kopie vun der Bibliothéik vu Force Dimension virun allen aneren. D'Kopien, déi d'SDK installéiert, ginn och ouni dat fonnt.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Luet dës Kopie vun der Bibliothéik vu Force Dimension amplaz vun all anerer. E Falcon, deen op enger anerer Kopie op ass, gëtt zougemaach an op dëser nei opgemaach. D'Kopien, déi d'SDK installéiert, ginn och ouni dat fonnt.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Bibliothéiken (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Falcon-Treiber installéieren</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Installéiert den Treiber vu Force Dimension aus dem SDK-Dossier op engem Falcon, deen nach keen huet. Windows freet eventuell virdrun, ob et Force Dimension vertraue soll.</value></data>
@@ -4397,7 +4401,7 @@ Soll PadForge se elo desinstalléieren? Dat brauch Administratorrechter a ka e M
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Spillt Spiller mat engem Novint Falcon iwwer d'SDK vu Force Dimension, dat Dir vu Force Dimension installéiert. De Grëff ass e Stick, déi véier Knäppercher um Grëff sinn Knäppercher, a PadForge setzt d'Vibratioun an d'Effekter vum Spill als Kraaft op de Grëff. Den Tab Force Feedback vun all Slot leet fest, wéi de Falcon sech ufillt.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Novint Falcon ustéieren</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Mécht all Falcon iwwer d'dhd64.dll vu Force Dimension op. En oppene Falcon gehéiert just PadForge, dofir kënne FalconJoyForce an d'Tools vu Force Dimension en net opmaachen, soulaang dat hei un ass. Wann et aus ass, mécht PadForge all Falcon zou.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon-Bibliothéik op {0} gesat. Eng Kopie, déi scho benotzt gëtt, bleift, bis PadForge nei start.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon-Bibliothéik op {0} gesat. PadForge luet se bannent e puer Sekonnen, an e Falcon, deen op enger anerer Kopie op ass, gëtt op dëser nei opgemaach.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>De Falcon-Treiber vu Force Dimension gëtt installéiert…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>D'Falcon-Treiberpaket vu Force Dimension oder säi Katalog feelt: {0}. Installéiert d'SDK vu Force Dimension nei.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Et ass kee Falcon ugeschloss.</value></data>

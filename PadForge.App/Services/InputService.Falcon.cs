@@ -53,6 +53,34 @@ namespace PadForge.Services
             ps.FalconForceCap = padVm.FalconForceCap.ToString(ic);
         }
 
+        /// <summary>Whether a relayed frame is one this PC applies: anything
+        /// to a device that is no Falcon, and to a Falcon a Vibration frame
+        /// only with the peer slot's settings (#521). A peer from before the
+        /// settings rode the frame sends none.</summary>
+        internal static bool TakesRemoteFalconFrame(ISdlInputDevice source, PadForge.Engine.RemoteLink.OutputEffectCodec.OutputEffect effect)
+            => source is not FalconDevice
+               || (effect.Kind == PadForge.Engine.RemoteLink.OutputEffectCodec.Kind.Vibration && effect.Falcon.HasValue);
+
+        /// <summary>The owner's half of a Falcon shared over Remote Link
+        /// (#521, #138): the peer's combined force goes to the haptic thread
+        /// with the peer slot's settings, or the Falcon is let go when the
+        /// peer's slots let it go. The hand-off is built here, off the poll
+        /// thread's caches, since this runs on the link's receive
+        /// thread.</summary>
+        internal static void ApplyRemoteFalcon(FalconDevice falcon, PadForge.Engine.RemoteLink.OutputEffectCodec.OutputEffect effect)
+        {
+            if (effect.Falcon is not { } tail || effect.Vibration == null) return;
+            if (!tail.Assigned)
+            {
+                falcon.Handoff = FalconHandoff.Unassigned;
+                return;
+            }
+            var settings = FalconSettings.FromWire(tail);
+            var v = effect.Vibration;
+            falcon.Handoff = new FalconHandoff(settings,
+                FalconGameForce.From(v, v.LeftMotorSpeed, v.RightMotorSpeed, settings.Overall), true);
+        }
+
         /// <summary>The open Falcon with this row's identity, or null.</summary>
         internal FalconDevice FindFalcon(Guid instanceGuid)
             => _inputManager?.FalconRows.FirstOrDefault(f => f.InstanceGuid == instanceGuid);
@@ -78,6 +106,7 @@ namespace PadForge.Services
                     case "":
                         lines.Add(string.Format(culture, s.Falcon_Status_Library_Format,
                             string.IsNullOrEmpty(sweep.SdkVersion) ? "?" : sweep.SdkVersion, sweep.LibraryPath));
+                        if (sweep.PickNotLoaded) lines.Add(s.Falcon_Status_PickNotLoaded);
                         break;
                     case "platform":
                         lines.Add(s.Falcon_Status_Arm64);
@@ -94,26 +123,42 @@ namespace PadForge.Services
                 }
 
                 var rows = im.FalconRows;
-                // The Install button: a Falcon with no driver, and an SDK
-                // folder that holds Force Dimension's package, which the
-                // sweep found on its worker.
-                canInstall = rows.Count == 0 && sweep.HasDriverlessNode && sweep.OtherDrivers.Length == 0
-                    && sweep.DriverPackage != null;
+                canInstall = FalconCanInstall(sweep, rows.Count);
                 if (rows.Count == 0 && sweep.LibraryReason.Length == 0)
-                {
-                    if (sweep.InUse > 0) lines.Add(s.Falcon_Status_InUse);
-                    else if (sweep.OtherDrivers.Length > 0)
-                        lines.Add(string.Format(culture, s.Falcon_Status_OtherDriver_Format, sweep.OtherDrivers));
-                    else if (sweep.HasDriverlessNode)
-                        lines.Add(canInstall ? s.Falcon_Status_NoDriver : s.Falcon_Status_NoDriverNoPackage);
-                    else lines.Add(s.Falcon_Status_NotFound);
-                }
+                    lines.Add(FalconNoRowLine(sweep, canInstall));
                 status = string.Join(Environment.NewLine, lines);
             }
             settings.FalconCanInstallDriver = canInstall;
             if (string.Equals(_falconStatusLast, status, StringComparison.Ordinal)) return;
             _falconStatusLast = status;
             settings.FalconStatus = status;
+        }
+
+        /// <summary>The Install button: no Falcon open, a Falcon with no
+        /// driver, none on any driver (the install stops on one), and an SDK
+        /// folder that holds Force Dimension's package, which the sweep found
+        /// on its worker.</summary>
+        internal static bool FalconCanInstall(FalconSweepStatus sweep, int rows)
+            => rows == 0 && sweep.HasDriverlessNode && sweep.OtherDrivers.Length == 0
+               && sweep.OwnDriverNodes == 0 && sweep.DriverPackage != null;
+
+        /// <summary>Why no Falcon opened, with the library loaded. A Falcon
+        /// on Force Dimension's own driver that did not open gets the
+        /// library's reason, since installing that driver again would change
+        /// nothing.</summary>
+        internal static string FalconNoRowLine(FalconSweepStatus sweep, bool canInstall)
+        {
+            var s = Strings.Instance;
+            var culture = CultureInfo.CurrentCulture;
+            if (sweep.InUse > 0) return s.Falcon_Status_InUse;
+            if (sweep.OtherDrivers.Length > 0)
+                return string.Format(culture, s.Falcon_Status_OtherDriver_Format, sweep.OtherDrivers);
+            if (sweep.OwnDriverNodes > 0)
+                return string.Format(culture, s.Falcon_Status_OwnDriverNotOpen_Format,
+                    string.IsNullOrEmpty(sweep.OpenError) ? "?" : sweep.OpenError);
+            if (sweep.HasDriverlessNode)
+                return canInstall ? s.Falcon_Status_NoDriver : s.Falcon_Status_NoDriverNoPackage;
+            return s.Falcon_Status_NotFound;
         }
 
         /// <summary>

@@ -35,7 +35,7 @@ namespace PadForge.Common.Input
         /// <summary>Phase 1j2 (issue #519). A row per present screen while
         /// the feature is on, recreated when the user removes one from the
         /// Devices page while its screen is still there, the G-key row's
-        /// rule. Off with nothing to retire: two volatile reads and
+        /// rule. Off with nothing to retire: three volatile reads and
         /// out.</summary>
         private bool UpdateKeyboardScreenDevices()
         {

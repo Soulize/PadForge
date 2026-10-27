@@ -304,6 +304,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>يعمل مع التعديلات المصممة لبرنامج DSX، مثل تعديلات GTA V وRed Dead Redemption 2 وSkyrim وForza. أثناء استماع الخادم، يكتب PadForge منفذه في المكان الذي تبحث عنه تلك التعديلات.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>يستمع على :{0}. يرسل {1} إلى وحدة التحكم الظاهرية {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>يستمع على :{0}. يرسل {1}، لكن لا توجد وحدة تحكم ظاهرية عليها وحدة تحكم PlayStation.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>يستمع على :{0}. يرسل {1} إلى فهرس وحدة التحكم {2}، ولا توجد وحدة تحكم ظاهرية عليها وحدة تحكم PlayStation بهذا الفهرس.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>المنفذ {0} قيد الاستخدام من برنامج آخر، مثل DSX. أغلقه أو اختر منفذا آخر.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>تعديل لعبة</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>يعمل مع OpenTrack وأي متتبع يرسل مخرجاته عبر UDP أو يكتب في الذاكرة المشتركة FreeTrack 2.0، ومع وقت تشغيل OpenXR على هذا الجهاز يستطيع تشغيل جلسة في الخلفية.</value></data>
@@ -4108,7 +4109,7 @@
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>بانتظار بيانات الذاكرة المشتركة FreeTrack.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>الذاكرة المشتركة FreeTrack غير متوفرة.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>اهتزاز زاوية التوجيه</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>يضيف اهتزازا مستمرا كلما ابتعد محور العصا الظاهرية المحدد عن المركز. يستخدم المخرج المعين من كل المصادر المعينة. مع تقسيم حسب الاتجاه، تشغّل الحركة السالبة المحرك الأيسر والموجبة الأيمن. اختيار المحرك الأيسر أو المحرك الأيمن يضع الاتجاهين على ذلك المحرك وحده. لإخراج Xbox وPlayStation مع أجهزة تدعم الاهتزاز. ردود فعل القوة الأصلية لعجلات القيادة مستثناة.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>يضيف اهتزازا مستمرا كلما ابتعد محور العصا الظاهرية المحدد عن المركز. يستخدم المخرج المعين من كل المصادر المعينة. مع تقسيم حسب الاتجاه، تشغّل الحركة السالبة المحرك الأيسر والموجبة الأيمن. اختيار المحرك الأيسر أو المحرك الأيمن يضع الاتجاهين على ذلك المحرك وحده. لإخراج Xbox وPlayStation مع أجهزة تدعم الاهتزاز. يتخطى العجلات والأجهزة الأخرى ذات ردود فعل القوة الثابتة ودواسات Fanatec.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>تفعيل اهتزاز زاوية التوجيه</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>المحور الظاهري</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>العصا اليسرى X</value></data>
@@ -4311,6 +4312,7 @@
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>مباشرة على {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>ربط WinUSB بشاشة G19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>شاشة G19 تعمل ببرنامج تشغيل آخر ({0})، لذا شغّل Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>شاشة G19 على برنامج تشغيل تابع لبرنامج آخر ({0})، ويتركه PadForge كما هو</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>يتطلب Logitech Gaming Software الإصدار 8.52 أو أحدث</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>شغّل Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>في انتظار هاتف يحمل Arx Control</value></data>
@@ -4382,6 +4384,7 @@
   <data name="Devices_FalconHandle" xml:space="preserve"><value>المقبض</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} يضبط أزندة وحدة التحكم هذه.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} يضبط أضواء وحدة التحكم هذه.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} يضبط أضواء هذا الجهاز.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} يضبط أزندة وحدة التحكم هذه وأضواءها.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} يشغّل اهتزازات الأزندة على الأزندة النبضية في وحدة التحكم هذه.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>مسح تأثيرات التعديل</value></data>
@@ -4389,10 +4392,10 @@
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>يسار/يمين</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>أعلى/أسفل</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>داخل/خارج</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>الزر {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}، تم التحميل من {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>لم يتم تحميل ملف dhd64.dll الذي اخترته، لذا يستخدم PadForge النسخة المذكورة أعلاه.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>تعمل مكتبة Force Dimension في إصدار x64 من PadForge فقط.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>تم العثور على dhd64.dll لكن تعذر تحميله.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>ملف dhd64.dll هذا ليس مكتبة Force Dimension التي يتوقعها PadForge.</value></data>
@@ -4402,11 +4405,12 @@
   <data name="Falcon_Status_Open" xml:space="preserve"><value>مفتوح</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>جهاز Falcon مفتوح في برنامج آخر، مثل FalconJoyForce أو أدوات Force Dimension نفسها. أغلقه هناك.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>جهاز Falcon يستخدم برنامج تشغيل آخر ({0})، لذا لا تستطيع مكتبة Force Dimension فتحه. في إدارة الأجهزة، حدّث برنامج تشغيل Falcon من المجلد drivers\usb داخل مجلد SDK الخاص بـ Force Dimension.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>جهاز Falcon يستخدم برنامج تشغيل Force Dimension، ولم تستطع مكتبة Force Dimension فتحه: {0}. تحقق من الطاقة وكابل USB.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>جهاز Falcon موصول بلا برنامج تشغيل. يزوّده «تثبيت برنامج تشغيل Falcon» ببرنامج تشغيل Force Dimension.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>جهاز Falcon موصول بلا برنامج تشغيل، ولا توجد في مجلد SDK حزمة برنامج تشغيل لتثبيتها. أعد تثبيت Force Dimension SDK.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>لم يُعثر على Falcon. وصّل كابل الطاقة وكابل USB.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>اختيار dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>يحمّل هذه النسخة من مكتبة Force Dimension قبل أي نسخة أخرى. النسخ التي يثبّتها SDK يُعثر عليها من دونه.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>يحمّل هذه النسخة من مكتبة Force Dimension بدلا من أي نسخة أخرى. جهاز Falcon المفتوح على نسخة أخرى يُغلق ثم يُفتح من جديد على هذه النسخة. النسخ التي يثبّتها SDK يُعثر عليها من دونه.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|المكتبات (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>تثبيت برنامج تشغيل Falcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>يثبّت برنامج تشغيل Force Dimension، من مجلد SDK، على جهاز Falcon لا برنامج تشغيل له. قد يسأل Windows أولاً هل تثق بـ Force Dimension.</value></data>
@@ -4423,7 +4427,7 @@
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>يتيح لعب الألعاب بجهاز Novint Falcon عبر Force Dimension SDK الذي تثبّته من Force Dimension. المقبض عصا، وأزرار القبضة الأربعة أزرار، ويطبّق PadForge اهتزاز اللعبة ومؤثراتها على المقبض على هيئة قوة. تحدد علامة تبويب ردود فعل القوة في كل خانة إحساس Falcon.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>تشغيل Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>يفتح كل جهاز Falcon عبر dhd64.dll من Force Dimension. يصبح الجهاز المفتوح ملكًا لـ PadForge وحده، فلا يستطيع FalconJoyForce ولا أدوات Force Dimension فتحه ما دام هذا الخيار مفعّلًا. عند إيقافه يغلق PadForge كل أجهزة Falcon.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>تم تعيين مكتبة Falcon إلى {0}. تبقى النسخة المستخدمة حاليًا حتى يبدأ PadForge من جديد.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>تم تعيين مكتبة Falcon إلى {0}. يحمّلها PadForge خلال بضع ثوانٍ، ويُفتح جهاز Falcon المفتوح على نسخة أخرى من جديد على هذه النسخة.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>جارٍ تثبيت برنامج تشغيل Falcon من Force Dimension…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>حزمة برنامج تشغيل Falcon من Force Dimension أو الفهرس الخاص بها مفقودة: {0}. أعد تثبيت Force Dimension SDK.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>لا يوجد جهاز Falcon موصول.</value></data>

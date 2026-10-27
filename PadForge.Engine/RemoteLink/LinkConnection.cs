@@ -351,6 +351,16 @@ namespace PadForge.Engine.RemoteLink
         // Encoding: [magic][records], then per record [record index][mask].
         private const byte DeviceListExtV12Magic = 0xED;
 
+        // Thirteenth extension tail (#528 over the wire): the rows whose pad
+        // carries voice phrases on the owner, the owner's
+        // UserDevice.HasVoicePhrases. A Bluetooth DualShock 4 carries them by
+        // its path, which the peer's peer:// copy never has, so the copy
+        // offered none while its voice buttons already crossed in the input
+        // codec. Written only when some row carries phrases and the list with
+        // it fits the old peers' budget. Encoding: [magic][records], then per
+        // record [record index].
+        private const byte DeviceListExtV13Magic = 0xEE;
+
         /// <summary>The longest identity the v11 tail accepts: twelve hex
         /// digits, "/node:", a driver release and "/cal" fit with room to
         /// spare.</summary>
@@ -395,7 +405,7 @@ namespace PadForge.Engine.RemoteLink
             for (int i = count - 2; i >= 0; i--)
                 after[i] = after[i + 1] + MandatoryMetadataBytes(devices[i + 1]);
 
-            // The v9 to v12 tails are metadata, as the names are, and ride
+            // The v9 to v13 tails are metadata, as the names are, and ride
             // only while the list with them fits the budget without a single
             // name: they must never push a list an older peer could read past
             // what it can. Only the connect-time list can reach one, so a
@@ -404,22 +414,26 @@ namespace PadForge.Engine.RemoteLink
             // first, since they change how a trigger reads, then the
             // DualShock 3 identities, which decide what a calibration takes,
             // then the capacitive sensor masks, which decide what the automap
-            // binds, where a key list changes only what the picker offers.
+            // binds, where the voice phrase rows and a key list change only
+            // what the picker offers.
             var keyOrders = EncodeKeyOrderTail(devices, count);
             var restMasks = EncodeRestMaskTail(devices, count);
             var identities = EncodeDs3IdentityTail(devices, count);
             var capSense = EncodeCapSenseTail(devices, count);
+            var voice = EncodeVoicePhraseTail(devices, count);
             int required = buf.Count + 1 + tail.Count + (count > 0 ? after[0] + MandatoryMetadataBytes(devices[0]) : 0);
-            var fit = FitOptionalTails(required, tailBudget, restMasks.Count, identities.Count, capSense.Count, keyOrders.Count);
+            var fit = FitOptionalTails(required, tailBudget, restMasks.Count, identities.Count, capSense.Count,
+                voice.Count, keyOrders.Count);
             // The names get the room the older budget leaves them whichever
             // budget the tails ride in, so a tail only a full-list peer takes
             // never costs a device its names.
             int namesTail = tail.Count + FitOptionalTails(required, OldPeerPayloadBudget,
-                restMasks.Count, identities.Count, capSense.Count, keyOrders.Count).Bytes;
+                restMasks.Count, identities.Count, capSense.Count, voice.Count, keyOrders.Count).Bytes;
             if (fit.KeyOrders) tail.AddRange(keyOrders);
             if (fit.Masks) tail.AddRange(restMasks);
             if (fit.Identities) tail.AddRange(identities);
             if (fit.CapSense) tail.AddRange(capSense);
+            if (fit.Voice) tail.AddRange(voice);
 
             // Metadata extension (one section per v1 record, same order), so
             // a remote device's mapping picker and Devices-page preview show
@@ -656,11 +670,11 @@ namespace PadForge.Engine.RemoteLink
             return tail;
         }
 
-        /// <summary>Which of the v10, v11, v12 and v9 tails fit in
+        /// <summary>Which of the v10, v11, v12, v13 and v9 tails fit in
         /// <paramref name="budget"/> after <paramref name="required"/> bytes,
         /// taken in that order, and the bytes they add.</summary>
-        private static (bool Masks, bool Identities, bool CapSense, bool KeyOrders, int Bytes) FitOptionalTails(
-            int required, int budget, int masks, int identities, int capSense, int keyOrders)
+        private static (bool Masks, bool Identities, bool CapSense, bool Voice, bool KeyOrders, int Bytes) FitOptionalTails(
+            int required, int budget, int masks, int identities, int capSense, int voice, int keyOrders)
         {
             bool m = masks > 0 && required + masks <= budget;
             if (m) required += masks;
@@ -668,8 +682,27 @@ namespace PadForge.Engine.RemoteLink
             if (id) required += identities;
             bool c = capSense > 0 && required + capSense <= budget;
             if (c) required += capSense;
+            bool v = voice > 0 && required + voice <= budget;
+            if (v) required += voice;
             bool k = keyOrders > 0 && required + keyOrders <= budget;
-            return (m, id, c, k, (m ? masks : 0) + (id ? identities : 0) + (c ? capSense : 0) + (k ? keyOrders : 0));
+            return (m, id, c, v, k, (m ? masks : 0) + (id ? identities : 0) + (c ? capSense : 0)
+                + (v ? voice : 0) + (k ? keyOrders : 0));
+        }
+
+        /// <summary>The v13 tail, the rows whose pad carries voice phrases on
+        /// the owner, or nothing when none does.</summary>
+        private static List<byte> EncodeVoicePhraseTail(IReadOnlyList<RemotePeerDeviceInfo> devices, int count)
+        {
+            var tail = new List<byte>();
+            int rows = 0;
+            for (int i = 0; i < count; i++)
+                if (devices[i].HasVoicePhrases == true) rows++;
+            if (rows == 0) return tail;
+            tail.Add(DeviceListExtV13Magic);
+            tail.Add((byte)rows);
+            for (int i = 0; i < count; i++)
+                if (devices[i].HasVoicePhrases == true) tail.Add((byte)i);
+            return tail;
         }
 
         /// <summary>The v12 tail, the capacitive sensors of each pad that has
@@ -1164,6 +1197,34 @@ namespace PadForge.Engine.RemoteLink
                 catch
                 {
                     foreach (var info in list) info.CapSenseChannelMask = 0;
+                    v1ExtOk = false; // cursor unreliable: do not read v13
+                }
+            }
+
+            // v13 tail: the rows with voice phrases. Same guarantees as v9.
+            if (v1ExtOk)
+            {
+                try
+                {
+                    if (o < data.Length && data[o] == DeviceListExtV13Magic)
+                    {
+                        o++;
+                        int records = data[o++];
+                        var voice = new bool[count];
+                        for (int r = 0; r < records; r++)
+                        {
+                            int index = data[o++];
+                            if (index >= count || voice[index])
+                                throw new InvalidOperationException("voice phrase record");
+                            voice[index] = true;
+                        }
+                        for (int i = 0; i < count; i++)
+                            if (voice[i]) list[i].HasVoicePhrases = true;
+                    }
+                }
+                catch
+                {
+                    foreach (var info in list) info.HasVoicePhrases = null;
                 }
             }
             return list;

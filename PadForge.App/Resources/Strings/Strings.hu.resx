@@ -319,6 +319,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>A DSX-hez készült modokkal működik, például a GTA V, a Red Dead Redemption 2, a Skyrim és a Forza modjaival. Amíg a kiszolgáló figyel, a PadForge oda írja a portját, ahol a modok keresik.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Figyel a :{0} porton. {1} a(z) {2}. virtuális kontrollerre küld.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Figyel a :{0} porton. {1} küld, de egyik virtuális kontrolleren sincs PlayStation kontroller.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Figyel a :{0} porton. {1} a(z) {2}. indexű kontrollerre küld, és egyetlen PlayStation kontrollerrel rendelkező virtuális kontrollernek sincs ilyen indexe.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>A(z) {0} portot egy másik program használja, például a DSX. Zárja be, vagy válasszon másik portot.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Egy játékmod</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Együttműködik az OpenTrack programmal és minden olyan követővel, amely elküldi az UDP-kimenetét vagy FreeTrack 2.0 megosztott memóriába ír, valamint a gépen lévő olyan OpenXR-futtatókörnyezettel, amely a háttérben is tud munkamenetet futtatni.</value></data>
@@ -4127,7 +4128,7 @@ Szeretné, hogy a PadForge most eltávolítsa őket? Ehhez rendszergazdai jogosu
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Várakozás a FreeTrack megosztott memória adataira.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>A FreeTrack megosztott memória nem érhető el.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Kormányszögtől függő rezgés</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Folyamatos rezgést ad, ahogy a kiválasztott virtuális kartengely eltávolodik a középponttól. Az összes hozzárendelt forrás hozzárendelt kimenetét használja. Az Irányonként külön beállításnál a negatív irányú mozgás a bal, a pozitív a jobb motort hajtja. A Bal motor vagy a Jobb motor mindkét irányt arra az egy motorra teszi. Rezgésre képes eszközökkel rendelkező Xbox és PlayStation kimenethez. A kormányok natív erő-visszacsatolása nem tartozik ide.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Folyamatos rezgést ad, ahogy a kiválasztott virtuális kartengely eltávolodik a középponttól. Az összes hozzárendelt forrás hozzárendelt kimenetét használja. Az Irányonként külön beállításnál a negatív irányú mozgás a bal, a pozitív a jobb motort hajtja. A Bal motor vagy a Jobb motor mindkét irányt arra az egy motorra teszi. Rezgésre képes eszközökkel rendelkező Xbox és PlayStation kimenethez. Kihagyja a kormányokat, az állandó erő-visszacsatolású egyéb eszközöket és a Fanatec pedálokat.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Kormányszögtől függő rezgés engedélyezése</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Virtuális tengely</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Bal kar X</value></data>
@@ -4330,6 +4331,7 @@ Szeretné, hogy a PadForge most eltávolítsa őket? Ehhez rendszergazdai jogosu
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>közvetlenül itt: {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>a WinUSB kötése a G19 képernyőjéhez</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>a G19 képernyője másik illesztőprogramot használ ({0}), ezért indítsa el a Logitech Gaming Software-t</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>a G19 képernyője egy másik program illesztőprogramját használja ({0}), amelyet a PadForge nem érint</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>Logitech Gaming Software 8.52 vagy újabb szükséges</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>indítsa el a Logitech Gaming Software-t</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>várakozás egy Arx Control alkalmazást futtató telefonra</value></data>
@@ -4401,6 +4403,7 @@ Szeretné, hogy a PadForge most eltávolítsa őket? Ehhez rendszergazdai jogosu
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Fogantyú</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} beállítja ennek a kontrollernek a ravaszait.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} beállítja ennek a kontrollernek a fényeit.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} beállítja ennek az eszköznek a fényeit.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} beállítja ennek a kontrollernek a ravaszait és fényeit.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} vibrációkat játszik le ennek a kontrollernek az impulzusravaszain.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Modeffektusok törlése</value></data>
@@ -4408,10 +4411,10 @@ Szeretné, hogy a PadForge most eltávolítsa őket? Ehhez rendszergazdai jogosu
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Bal/Jobb</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Fel/Le</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Be/Ki</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>{0}. gomb</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, betöltve innen: {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>A kiválasztott dhd64.dll nem töltődött be, ezért a PadForge a fenti másolatot használja.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>A Force Dimension könyvtára csak a PadForge x64-es változatában fut.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>A dhd64.dll megvan, de nem sikerült betölteni.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Ez a dhd64.dll nem az a Force Dimension-könyvtár, amelyet a PadForge vár.</value></data>
@@ -4421,11 +4424,12 @@ Szeretné, hogy a PadForge most eltávolítsa őket? Ehhez rendszergazdai jogosu
   <data name="Falcon_Status_Open" xml:space="preserve"><value>megnyitva</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Egy Falcon-eszköz meg van nyitva egy másik programban, például a FalconJoyForce-ban vagy a Force Dimension saját eszközeiben. Zárja be ott.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>A Falcon-eszköz másik illesztőprogramot használ ({0}), ezért a Force Dimension könyvtára nem tudja megnyitni. Az Eszközkezelőben frissítse a Falcon illesztőprogramját a Force Dimension SDK mappájának drivers\usb mappájából.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>A Falcon a Force Dimension illesztőprogramját használja, és a Force Dimension könyvtára nem tudta megnyitni: {0}. Ellenőrizze a tápellátását és az USB-kábelét.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>A Falcon-eszköz csatlakoztatva van, de nincs hozzá illesztőprogram. A Falcon-illesztőprogram telepítése a Force Dimension illesztőprogramját telepíti hozzá.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>A Falcon-eszköz csatlakoztatva van, de nincs hozzá illesztőprogram, és az SDK mappájában nincs telepíthető illesztőprogram-csomag. Telepítse újra a Force Dimension SDK-ját.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Nem található Falcon-eszköz. Csatlakoztassa a tápellátását és az USB-kábelét.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>A dhd64.dll kiválasztása…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>A Force Dimension könyvtárának ezt a másolatát tölti be elsőként. Az SDK által telepített másolatok enélkül is megtalálhatók.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>A Force Dimension könyvtárának ezt a másolatát tölti be bármelyik másik helyett. Ha egy Falcon másik másolaton van megnyitva, bezárul, és ezen nyílik meg újra. Az SDK által telepített másolatok enélkül is megtalálhatók.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Könyvtárak (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Falcon-illesztőprogram telepítése</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Telepíti a Force Dimension illesztőprogramját az SDK mappájából egy olyan Falcon-eszközre, amelyhez még nincs illesztőprogram. A Windows előbb megkérdezheti, megbízik-e a Force Dimension-ben.</value></data>
@@ -4442,7 +4446,7 @@ Szeretné, hogy a PadForge most eltávolítsa őket? Ehhez rendszergazdai jogosu
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Játék Novint Falcon eszközzel a Force Dimension SDK-ján keresztül, amelyet a Force Dimension oldaláról kell telepíteni. A fogantyú egy kar, a markolat négy gombja gomb, a PadForge pedig a játék rezgését és effektjeit erőként juttatja a fogantyúra. Az egyes foglalatok Erő-visszacsatolás lapján állítható be, milyen érzetet ad a Falcon.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Novint Falcon vezérlése</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Minden Falcon-eszközt megnyit a Force Dimension dhd64.dll fájlján keresztül. A megnyitott Falcon kizárólag a PadForge-é, ezért amíg ez be van kapcsolva, a FalconJoyForce és a Force Dimension eszközei nem tudják megnyitni. Kikapcsolva a PadForge minden Falcon-eszközt bezár.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>A Falcon-könyvtár új helye: {0}. A már használatban lévő másolat a PadForge újraindításáig marad.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>A Falcon-könyvtár új helye: {0}. A PadForge néhány másodpercen belül betölti, és a másik másolaton megnyitott Falcon ezen nyílik meg újra.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>A Force Dimension Falcon-illesztőprogramjának telepítése…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>A Force Dimension Falcon-illesztőprogram-csomagja vagy katalógusa hiányzik: {0}. Telepítse újra a Force Dimension SDK-ját.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Nincs csatlakoztatva Falcon-eszköz.</value></data>

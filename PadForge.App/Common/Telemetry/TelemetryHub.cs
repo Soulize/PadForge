@@ -113,7 +113,7 @@ namespace PadForge.Common.Telemetry
             new ScsTruckTelemetrySource(),               // ETS2/ATS shared memory (plugin)
             new MadnessTelemetrySource(),                // AMS2 / Project CARS 2-3 shared memory
             new RFactor1TelemetrySource(),               // rFactor 1 / AMS1 / GSCE shared memory (plugin)
-            new CodemastersUdpTelemetrySource(),         // UDP 20777: F1 23/24 + DiRT/GRID
+            new CodemastersUdpTelemetrySource(),         // UDP 20777: F1 22 to 25 + DiRT/GRID
             new OutGaugeTelemetrySource(),               // UDP 4444: BeamNG + Live for Speed
             new GameTelemetryRowSource(learnedMax: true),  // the row again, a max RPM it learned
         };

@@ -304,6 +304,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>DSXrako egindako modekin dabil, hala nola GTA V, Red Dead Redemption 2, Skyrim eta Forza jokoetarakoekin. Zerbitzariak entzuten duen bitartean, PadForge-k bere ataka mod horiek bilatzen duten tokian idazten du.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Entzuten (:{0}). {1} {2}. kontrolagailu birtualera bidaltzen ari da.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Entzuten (:{0}). {1} bidaltzen ari da, baina ez dago PlayStation kontrolagailurik duen kontrolagailu birtualik.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Entzuten (:{0}). {1} {2}. kontrolagailu-indizera bidaltzen ari da, eta PlayStation kontrolagailu bat duen kontrolagailu birtualik ez dago indize horrekin.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>{0} ataka beste programa batek erabiltzen du, DSX adibidez. Itxi programa hori edo aukeratu beste ataka bat.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Joko-mod bat</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>OpenTrack-ekin funtzionatzen du, baita UDP irteera bidaltzen duen edo FreeTrack 2.0 memoria partekatuan idazten duen edozein jarraitzailerekin ere, eta ordenagailu honetan saio bat atzeko planoan exekuta dezakeen OpenXR exekuzio-ingurune batekin.</value></data>
@@ -4099,7 +4100,7 @@ PadForge-k orain desinstalatzea nahi duzu? Horrek administratzaile-baimenak beha
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>FreeTrack-en memoria partekatuko datuen zain.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>FreeTrack-en memoria partekatua ez dago erabilgarri.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Gidatze-angeluaren bibrazioa</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Bibrazio jarraitua gehitzen du hautatutako palanka birtualaren ardatza erditik urruntzen den neurrian. Esleitutako iturri guztien esleitutako irteera erabiltzen du. «Banatu norabidearen arabera» aukeran, mugimendu negatiboak ezkerreko motorra gidatzen du eta positiboak eskuinekoa. «Ezkerreko motorra» edo «Eskuineko motorra» aukerak bi norabideak motor horretan jartzen ditu. Xbox eta PlayStation irteerarako, bibrazio-gailuekin. Bolanteen jatorrizko indar-atzeraelikadura baztertuta dago.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Bibrazio jarraitua gehitzen du hautatutako palanka birtualaren ardatza erditik urruntzen den neurrian. Esleitutako iturri guztien esleitutako irteera erabiltzen du. «Banatu norabidearen arabera» aukeran, mugimendu negatiboak ezkerreko motorra gidatzen du eta positiboak eskuinekoa. «Ezkerreko motorra» edo «Eskuineko motorra» aukerak bi norabideak motor horretan jartzen ditu. Xbox eta PlayStation irteerarako, bibrazio-gailuekin. Bolanteak, indar-atzeraelikadura konstantea duten beste gailuak eta Fanatec pedalak saltatzen ditu.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Gaitu gidatze-angeluaren bibrazioa</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Ardatz birtuala</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Ezkerreko palanka X</value></data>
@@ -4302,6 +4303,7 @@ PadForge-k orain desinstalatzea nahi duzu? Horrek administratzaile-baimenak beha
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>zuzenean hemen: {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>WinUSB G19ren pantailari lotzen</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>G19ren pantaila beste kontrolatzaile batean dago ({0}), beraz abiarazi Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>G19ren pantaila beste programa baten kontrolatzailean dago ({0}), eta PadForge-k ez du ukitzen</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>Logitech Gaming Software 8.52 edo berriagoa behar du</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>abiarazi Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>Arx Control duen telefono baten zain</value></data>
@@ -4373,6 +4375,7 @@ PadForge-k orain desinstalatzea nahi duzu? Horrek administratzaile-baimenak beha
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Heldulekua</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} kontrolagailu honen katuak ezartzen ari da.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} kontrolagailu honen argiak ezartzen ari da.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} gailu honen argiak ezartzen ari da.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} kontrolagailu honen katuak eta argiak ezartzen ari da.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} katu-bibrazioak erreproduzitzen ari da kontrolagailu honen inpultso-katuetan.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Garbitu moden efektuak</value></data>
@@ -4380,10 +4383,10 @@ PadForge-k orain desinstalatzea nahi duzu? Horrek administratzaile-baimenak beha
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Ezker/Eskuin</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Gora/Behera</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Barrura/Kanpora</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>{0}. botoia</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, hemendik kargatua: {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Aukeratu duzun dhd64.dll ez da kargatu, beraz PadForge-k goiko kopia erabiltzen du.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Force Dimension-en liburutegiak PadForge-ren x64 bertsioan soilik funtzionatzen du.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>dhd64.dll aurkitu da, baina ezin izan da kargatu.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>dhd64.dll hori ez da PadForge-k espero duen Force Dimension liburutegia.</value></data>
@@ -4393,11 +4396,12 @@ PadForge-k orain desinstalatzea nahi duzu? Horrek administratzaile-baimenak beha
   <data name="Falcon_Status_Open" xml:space="preserve"><value>irekita</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Falcon bat irekita dago beste programa batean, hala nola FalconJoyForce edo Force Dimension-en tresnetan. Itxi hor.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon beste kontrolatzaile batean dago ({0}), eta horregatik Force Dimension-en liburutegiak ezin du ireki. Gailu-kudeatzailean, eguneratu Falcon-aren kontrolatzailea Force Dimension-en SDK karpetako drivers\usb karpetatik.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon Force Dimension-en kontrolatzailean dago, eta Force Dimension-en liburutegiak ezin izan du ireki: {0}. Egiaztatu bere korrontea eta USB kablea.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Falcon bat konektatuta dago, kontrolatzailerik gabe. Instalatu Falcon kontrolatzailea botoiak Force Dimension-ena ematen dio.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Falcon bat konektatuta dago kontrolatzailerik gabe, eta SDK karpetan ez dago hari emateko kontrolatzaile-paketerik. Instalatu berriro Force Dimension-en SDK.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Ez da Falcon-ik aurkitu. Konektatu bere korrontea eta USB kablea.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Aukeratu dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Force Dimension-en liburutegiaren kopia hau beste edozein baino lehen kargatzen du. SDK-k instalatzen dituen kopiak hura gabe ere aurkitzen dira.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Force Dimension-en liburutegiaren kopia hau erabiltzen du beste edozeinen ordez. Beste kopia batean irekita dagoen Falcon bat itxi egiten da, eta kopia honekin berriro irekitzen da. SDK-k instalatzen dituen kopiak hura gabe ere aurkitzen dira.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Liburutegiak (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Instalatu Falcon kontrolatzailea</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Force Dimension-en kontrolatzailea instalatzen du, SDK karpetatik, kontrolatzailerik ez duen Falcon batean. Windows-ek Force Dimension-en fidatzen zaren galdetu dezake lehenik.</value></data>
@@ -4414,7 +4418,7 @@ PadForge-k orain desinstalatzea nahi duzu? Horrek administratzaile-baimenak beha
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Novint Falcon-ekin jolasten du Force Dimension-en SDK bidez, zeina Force Dimension-etik instalatzen baituzu. Heldulekua palanka bat da, heldulekuko lau botoiak botoiak dira, eta PadForge-k jokoaren bibrazioa eta efektuak indar gisa jartzen ditu heldulekuan. Zirrikitu bakoitzaren Indar-atzeraelikadura fitxak ezartzen du Falcon-ak nolako sentsazioa duen.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Kontrolatu Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Falcon bakoitza Force Dimension-en dhd64.dll bidez irekitzen du. Irekitako Falcon bat PadForge-rena soilik da, beraz FalconJoyForce-k eta Force Dimension-en tresnek ezin dute ireki hau aktibo dagoen bitartean. Desaktibatuta, PadForge-k Falcon guztiak ixten ditu.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon liburutegia {0} gisa ezarri da. Erabiltzen ari den kopiak bere horretan jarraitzen du PadForge berriro abiarazi arte.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon liburutegia {0} gisa ezarri da. PadForge-k segundo gutxi barru kargatzen du, eta beste kopia batean irekita dagoen Falcon bat kopia honekin berriro irekitzen da.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Force Dimension-en Falcon kontrolatzailea instalatzen…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Force Dimension-en Falcon kontrolatzaile-paketea edo bere katalogoa falta da: {0}. Instalatu berriro Force Dimension-en SDK.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Ez dago Falcon-ik konektatuta.</value></data>

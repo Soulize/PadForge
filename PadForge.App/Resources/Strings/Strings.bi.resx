@@ -169,6 +169,7 @@
   <data name="Dashboard_GameModPort" xml:space="preserve"><value>Pot blong ol mod blong gem</value></data>
   <data name="Dashboard_GameModStandIn_Tooltip" xml:space="preserve"><value>Sam mod, olsem DualSense4GTAV, oli stopem olgeta sapos wan program we nem blong hem DSX i no stap ron. Samting ia i ronem wan smol program wetem sem nem ia blong tekem ples blong hem, taem server i stap lesin.</value></data>
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>I wok wetem ol mod we oli mekem blong DSX, olsem olgeta blong GTA V, Red Dead Redemption 2, Skyrim mo Forza. Taem server i stap lesin, PadForge i raetem pot blong hem long ples we ol mod ia oli stap lukaotem.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>I stap lisin long :{0}. {1} i stap sendem i go long kontrola namba {2}, be i no gat wan virtual kontrola wetem wan PlayStation kontrola long hem we i gat namba ia.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Narafala program, olsem DSX, i yusum pot {0} finis. Klosem hem o jusum narafala pot.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Wan mod blong gem</value></data>
   <data name="Settings_AnalogKeyboardsStatus_None" xml:space="preserve"><value>I no faenem wan analog kiboad we PadForge i save ridim.</value></data>
@@ -1356,7 +1357,7 @@
   <data name="RemoteLink_AssignmentBusy" xml:space="preserve">
     <value>Stap wet long narafala PC...</value>
   </data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>I givim seksek we i no stop taem aksis blong virtual stik we yu jusum i muv i go longwe long medel. I yusum aotput blong mapping blong evri divaes we i stap long slot ia. Wetem "Seraotem folem daereksen", muvmen long saed blong negatif i mekem lef mota i wok, mo muvmen long saed blong positif i mekem raet mota i wok. "Lef mota" o "Raet mota" i putum tufala daereksen long wan mota ia nomo. Blong Xbox mo PlayStation aotput wetem ol divaes we i gat seksek. Force feedback blong wil hemwan i no stap insaed.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>I givim seksek we i no stop taem aksis blong virtual stik we yu jusum i muv i go longwe long medel. I yusum aotput blong mapping blong evri divaes we i stap long slot ia. Wetem "Seraotem folem daereksen", muvmen long saed blong negatif i mekem lef mota i wok, mo muvmen long saed blong positif i mekem raet mota i wok. "Lef mota" o "Raet mota" i putum tufala daereksen long wan mota ia nomo. Blong Xbox mo PlayStation aotput wetem ol divaes we i gat seksek. I no wok long ol wil, ol narafala divaes we force feedback blong olgeta i stap oltaem, mo ol pedal blong Fanatec.</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Virtual aksis</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Lef stik X</value></data>
   <data name="Pad_SteeringAngleRumble_LY" xml:space="preserve"><value>Lef stik Y</value></data>
@@ -1428,6 +1429,7 @@
   <data name="KeyboardScreens_Status_Off" xml:space="preserve"><value>of</value></data>
   <data name="KeyboardScreens_Status_Lgs" xml:space="preserve"><value>tru long Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>stret long {0}</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>skrin blong G19 i stap long draeva blong narafala program ({0}), mo PadForge i livim hem nomo</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>i nidim Logitech Gaming Software 8.52 o wan we i niu moa</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>statem Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>i stap wet long wan fon we i gat Arx Control</value></data>
@@ -1466,6 +1468,7 @@
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Hanel</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} i stap setem ol triga blong kontrola ia.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} i stap setem ol laet blong kontrola ia.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} i stap setem ol laet blong divaes ia.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} i stap setem ol triga mo ol laet blong kontrola ia.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} i stap pleiem seksek long ol impulse triga blong kontrola ia.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Tekemaot efek blong mod</value></data>
@@ -1473,20 +1476,22 @@
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Lef/Raet</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Antap/Daon</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Insaed/Aotsaed</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Baton {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, i lod i kam long {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>dhd64.dll we yu jusum i no lod, ale PadForge i yusum kopi we i stap antap.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>PadForge i faenem dhd64.dll be i no save lodem.</value></data>
   <data name="Falcon_Status_NoSdk" xml:space="preserve"><value>I nogat Force Dimension SDK long PC ia. Tekem long pej blong daonlod blong Force Dimension, no jusum dhd64.dll blong hem.</value></data>
   <data name="Falcon_Status_Home" xml:space="preserve"><value>pulum hanel i go aotsaed olgeta, afta pusum i go insaed olgeta, blong mekem i lanem ples blong hem</value></data>
   <data name="Falcon_Status_Rate_Format" xml:space="preserve"><value>i ron long {0:0.0} kHz</value></data>
   <data name="Falcon_Status_Open" xml:space="preserve"><value>i open</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Wan Falcon i open long wan narafala program, olsem FalconJoyForce no ol tul blong Force Dimension. Klosem long ples ia.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon i stap long draeva blong Force Dimension, mo laebri blong Force Dimension i no save openem: {0}. Jekem paoa mo USB kebol blong hem.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Wan Falcon i plag i stap be i nogat draeva. Instolem draeva blong Falcon i givim draeva blong Force Dimension long hem.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Wan Falcon i plag i stap be i nogat draeva, mo SDK folda i nogat draeva pakej blong givim long hem. Instolem bakegen SDK blong Force Dimension.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>I no faenem wan Falcon. Plagem paoa mo USB kebol blong hem.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Jusum dhd64.dll…</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>I lodem kopi ia blong laebri blong Force Dimension long ples blong eni narafala kopi. Wan Falcon we i open long narafala kopi bambae i klos mo i open bakegen long kopi ia. Program i faenem ol kopi we SDK i instolem, i no nidim baton ia.</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Instolem draeva blong Falcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Instolem draeva blong Force Dimension, we i kam long SDK folda, long wan Falcon we i nogat draeva. Fastaem, Windows i save askem sapos yu trastem Force Dimension.</value></data>
   <data name="Falcon_OpenDownload" xml:space="preserve"><value>Tekem SDK blong Force Dimension</value></data>
@@ -1502,6 +1507,7 @@
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Plei ol gem wetem wan Novint Falcon tru long SDK blong Force Dimension, we yu instolem i kam long Force Dimension. Hanel i wan stik, fo baton long hanel oli ol baton, mo PadForge i putum seksek mo ol efek blong gem long hanel olsem fos. Force Feedback tab blong wanwan slot i setem fasin blong Falcon.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Kontrolem Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Openem wanwan Falcon tru long dhd64.dll blong Force Dimension. Wan Falcon we i open i blong PadForge nomo, ale FalconJoyForce mo ol tul blong Force Dimension oli no save openem taem samting ia i on. Taem i of, PadForge i klosem evri Falcon.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Laebri blong Falcon i stap long {0} naoia. PadForge bambae i lodem insaed long sam sekon, mo wan Falcon we i open long narafala kopi bambae i open bakegen long kopi ia.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>I stap instolem draeva blong Falcon blong Force Dimension…</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>I nogat Falcon we i plag i stap.</value></data>
   <data name="Status_FalconOnAnotherDriver_Format" xml:space="preserve"><value>Falcon i stap long wan narafala draeva ({0}), ale PadForge i livim hem. Device Manager i save jenisim i go long draeva blong Force Dimension.</value></data>

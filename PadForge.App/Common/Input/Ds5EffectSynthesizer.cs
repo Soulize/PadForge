@@ -47,7 +47,12 @@ namespace PadForge.Common.Input
     /// PadForge adds none of its own bits there, so the pad never
     /// alternates between the game's mode and PadForge's, and a release
     /// the game signaled by clearing the bits is not undone by the next
-    /// pass frame (#434). An idle frame claims no rumble at all. The
+    /// pass frame (#434). An idle frame claims no rumble at all. While
+    /// PadForge authors the rumble on a pad the pass-through lane also
+    /// writes, the dispatcher publishes this frame's rumble half
+    /// (<see cref="ResolveRumble"/>) and the lane writes it into every game
+    /// frame that leaves haptics select clear, so the game's audio haptics
+    /// frames do not cancel it. The
     /// dispatcher computes audio-mix + per-device gain in
     /// <c>InputService.SlotRumbleForDeviceProvider</c> and feeds those
     /// bytes here.</para>
@@ -181,6 +186,35 @@ namespace PadForge.Common.Input
         // a noticeable buzz across the trigger's range without feeling too sharp.
         private const byte ImpulseAtVibrationFrequency = 15;
 
+        /// <summary>The rumble half of one DualSense effect frame: the
+        /// validFlag0 rumble bits (bit 0 and bit 1), the validFlag2 improved
+        /// emulation bit, the right motor (payload byte 2) and the left motor
+        /// (payload byte 3), and whether the values mirror a game's.</summary>
+        internal readonly record struct RumbleState(
+            byte Flag0Bits, byte Flag2Bits, byte Right, byte Left, bool External);
+
+        /// <summary>The rumble half of the frame <see cref="BuildFields"/>
+        /// builds from the same arguments, so the dispatcher can tell the
+        /// pass-through lane what its frame asserts without decoding the
+        /// field dictionary. While a game's rumble is mirrored it carries the
+        /// game's bits and motors. While PadForge authors rumble it carries
+        /// haptics select, the original emulation and the improved emulation
+        /// with PadForge's motors, and with no assert it carries no bits.
+        /// Pure.</summary>
+        internal static RumbleState ResolveRumble(byte rumbleRight, byte rumbleLeft,
+            bool assertRumbleEnable, in UserEffectsDispatcher.ExternalSubsystemOverrides overrides)
+        {
+            if (overrides.RumbleRight.HasValue && overrides.RumbleLeft.HasValue)
+                return new RumbleState(
+                    (byte)(overrides.RumbleFlag0Bits & 0x03),
+                    (byte)(overrides.RumbleFlag2Bits & EnableImprovedRumbleEmulation),
+                    overrides.RumbleRight.Value, overrides.RumbleLeft.Value, External: true);
+            return assertRumbleEnable
+                ? new RumbleState((byte)(HapticsSelect | LegacyRumbleEmulation),
+                    EnableImprovedRumbleEmulation, rumbleRight, rumbleLeft, External: false)
+                : new RumbleState(0, 0, rumbleRight, rumbleLeft, External: false);
+        }
+
         /// <summary>Builds the parsed-field dictionary for one DualSense
         /// effect packet. Pass to <c>HMOutputEncoder.Encode</c> with either
         /// the USB (Report 0x02) or BT (Report 0x31) DualSense profile —
@@ -273,21 +307,11 @@ namespace PadForge.Common.Input
             // select, the original emulation and the improved emulation)
             // while rumble is on plus one drop frame (the caller's
             // assertRumbleEnable). Idle frames claim nothing.
-            bool rumbleExternal = overrides.RumbleRight.HasValue && overrides.RumbleLeft.HasValue;
-            byte effectiveRumbleR = rumbleExternal ? overrides.RumbleRight.Value : rumbleRight;
-            byte effectiveRumbleL = rumbleExternal ? overrides.RumbleLeft.Value  : rumbleLeft;
-            byte rumbleFlag0Bits = 0, rumbleFlag2Bits = 0;
-            if (rumbleExternal)
-            {
-                rumbleFlag0Bits = (byte)(overrides.RumbleFlag0Bits & 0x03);
-                rumbleFlag2Bits = (byte)(overrides.RumbleFlag2Bits & EnableImprovedRumbleEmulation);
-            }
-            else if (assertRumbleEnable)
-            {
-                rumbleFlag0Bits = (byte)(HapticsSelect | LegacyRumbleEmulation);
-                rumbleFlag2Bits = EnableImprovedRumbleEmulation;
-            }
-            enableBits |= rumbleFlag0Bits;
+            var rumble = ResolveRumble(rumbleRight, rumbleLeft, assertRumbleEnable, overrides);
+            byte effectiveRumbleR = rumble.Right;
+            byte effectiveRumbleL = rumble.Left;
+            byte rumbleFlag2Bits = rumble.Flag2Bits;
+            enableBits |= rumble.Flag0Bits;
 
             // Snapshot the override window once so the rest of the function
             // sees a single time-of-check. Intensity is 1.0 for Sticky,

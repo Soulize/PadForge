@@ -304,6 +304,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>ដំណើរការជាមួយម៉ូដដែលបង្កើតសម្រាប់ DSX ដូចជាម៉ូដសម្រាប់ GTA V, Red Dead Redemption 2, Skyrim និង Forza។ ខណៈម៉ាស៊ីនមេកំពុងស្ដាប់ PadForge សរសេរច្រករបស់វា នៅកន្លែងដែលម៉ូដទាំងនោះស្វែងរកវា។</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>កំពុងស្ដាប់នៅ :{0}។ {1} កំពុងផ្ញើទៅឧបករណ៍បញ្ជានិម្មិត {2}។</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>កំពុងស្ដាប់នៅ :{0}។ {1} កំពុងផ្ញើ ប៉ុន្តែគ្មានឧបករណ៍បញ្ជានិម្មិតណាមានឧបករណ៍បញ្ជា PlayStation នៅលើវាទេ។</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>កំពុងស្ដាប់នៅ :{0}។ {1} កំពុងផ្ញើទៅលេខរៀងឧបករណ៍បញ្ជា {2} ប៉ុន្តែគ្មានឧបករណ៍បញ្ជានិម្មិតណាដែលមានឧបករណ៍បញ្ជា PlayStation នៅលើវា មានលេខរៀងនោះទេ។</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>ច្រក {0} កំពុងត្រូវបានប្រើដោយកម្មវិធីផ្សេង ដូចជា DSX។ បិទវា ឬជ្រើសរើសច្រកផ្សេង។</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>ម៉ូដហ្គេមមួយ</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>ដំណើរការជាមួយ OpenTrack និងកម្មវិធីតាមដានណាមួយដែលផ្ញើលទ្ធផល UDP របស់វា ឬសរសេរអង្គចងចាំរួម FreeTrack 2.0 ហើយជាមួយកម្មវិធីដំណើរការ OpenXR នៅលើម៉ាស៊ីននេះ ដែលអាចដំណើរការវគ្គមួយនៅផ្ទៃខាងក្រោយ។</value></data>
@@ -4102,7 +4103,7 @@
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>កំពុងរង់ចាំទិន្នន័យអង្គចងចាំរួម FreeTrack។</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>អង្គចងចាំរួម FreeTrack មិនអាចប្រើបានទេ។</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>ការញ័រតាមមុំចង្កូត</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>បន្ថែមការញ័របន្តបន្ទាប់ ខណៈអ័ក្សដងបញ្ជានិម្មិតដែលបានជ្រើសរើសផ្លាស់ទីឆ្ងាយពីកណ្ដាល។ ប្រើលទ្ធផលដែលបានម៉ាបពីប្រភពដែលបានចាត់តាំងទាំងអស់។ នៅពេលជ្រើស «បែងចែកតាមទិសដៅ» ចលនាអវិជ្ជមានបើកម៉ូទ័រឆ្វេង ហើយចលនាវិជ្ជមានបើកម៉ូទ័រស្ដាំ។ «ម៉ូទ័រឆ្វេង» ឬ «ម៉ូទ័រស្ដាំ» ដាក់ទិសទាំងពីរលើម៉ូទ័រតែមួយនោះ។ សម្រាប់លទ្ធផល Xbox និង PlayStation ជាមួយឧបករណ៍ដែលមានការញ័រ។ កម្លាំងតបដើមរបស់ចង្កូតមិនត្រូវបានរាប់បញ្ចូលទេ។</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>បន្ថែមការញ័របន្តបន្ទាប់ ខណៈអ័ក្សដងបញ្ជានិម្មិតដែលបានជ្រើសរើសផ្លាស់ទីឆ្ងាយពីកណ្ដាល។ ប្រើលទ្ធផលដែលបានម៉ាបពីប្រភពដែលបានចាត់តាំងទាំងអស់។ នៅពេលជ្រើស «បែងចែកតាមទិសដៅ» ចលនាអវិជ្ជមានបើកម៉ូទ័រឆ្វេង ហើយចលនាវិជ្ជមានបើកម៉ូទ័រស្ដាំ។ «ម៉ូទ័រឆ្វេង» ឬ «ម៉ូទ័រស្ដាំ» ដាក់ទិសទាំងពីរលើម៉ូទ័រតែមួយនោះ។ សម្រាប់លទ្ធផល Xbox និង PlayStation ជាមួយឧបករណ៍ដែលមានការញ័រ។ វារំលងចង្កូត ឧបករណ៍ផ្សេងទៀតដែលមានកម្លាំងតបថេរ និងឈ្នាន់ Fanatec។</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>បើកការញ័រតាមមុំចង្កូត</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>អ័ក្សនិម្មិត</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>ដងបញ្ជាឆ្វេង X</value></data>
@@ -4305,6 +4306,7 @@
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>ផ្ទាល់លើ {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>កំពុងភ្ជាប់ WinUSB ទៅអេក្រង់របស់ G19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>អេក្រង់របស់ G19 ប្រើដ្រាយវ័រផ្សេង ({0}) ដូច្នេះសូមបើក Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>អេក្រង់របស់ G19 ប្រើដ្រាយវ័ររបស់កម្មវិធីផ្សេង ({0}) ដែល PadForge មិនប៉ះពាល់</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>ត្រូវការ Logitech Gaming Software 8.52 ឬថ្មីជាងនេះ</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>សូមបើក Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>កំពុងរង់ចាំទូរស័ព្ទដែលមាន Arx Control</value></data>
@@ -4376,6 +4378,7 @@
   <data name="Devices_FalconHandle" xml:space="preserve"><value>ដៃកាន់</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} កំពុងកំណត់ទ្រីហ្គឺរបស់ឧបករណ៍បញ្ជានេះ។</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} កំពុងកំណត់ភ្លើងរបស់ឧបករណ៍បញ្ជានេះ។</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} កំពុងកំណត់ភ្លើងរបស់ឧបករណ៍នេះ។</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} កំពុងកំណត់ទ្រីហ្គឺ និងភ្លើងរបស់ឧបករណ៍បញ្ជានេះ។</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} កំពុងលេងការញ័រទ្រីហ្គឺ លើទ្រីហ្គឺ Impulse របស់ឧបករណ៍បញ្ជានេះ។</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>សម្អាតបែបផែនម៉ូដ</value></data>
@@ -4383,10 +4386,10 @@
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>ឆ្វេង/ស្ដាំ</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>លើ/ក្រោម</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>ចូល/ចេញ</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>ប៊ូតុង {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}៖ {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0} បានផ្ទុកពី {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>dhd64.dll ដែលអ្នកបានជ្រើស មិនបានផ្ទុកទេ ដូច្នេះ PadForge ប្រើច្បាប់ចម្លងខាងលើ។</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>បណ្ណាល័យរបស់ Force Dimension ដំណើរការតែក្នុងកំណែ x64 នៃ PadForge ប៉ុណ្ណោះ។</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>បានរកឃើញ dhd64.dll ប៉ុន្តែមិនអាចផ្ទុកវាបានទេ។</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>dhd64.dll នោះមិនមែនជាបណ្ណាល័យ Force Dimension ដែល PadForge រំពឹងទុកទេ។</value></data>
@@ -4396,11 +4399,12 @@
   <data name="Falcon_Status_Open" xml:space="preserve"><value>បានបើក</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Falcon មួយកំពុងបើកក្នុងកម្មវិធីផ្សេង ដូចជា FalconJoyForce ឬឧបករណ៍ផ្ទាល់របស់ Force Dimension។ សូមបិទវានៅទីនោះ។</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon កំពុងប្រើដ្រាយវ័រផ្សេង ({0}) ដូច្នេះបណ្ណាល័យរបស់ Force Dimension មិនអាចបើកវាបានទេ។ នៅក្នុងកម្មវិធីគ្រប់គ្រងឧបករណ៍ សូមធ្វើបច្ចុប្បន្នភាពដ្រាយវ័ររបស់ Falcon ពីថត drivers\usb ក្នុងថត SDK របស់ Force Dimension។</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon កំពុងប្រើដ្រាយវ័ររបស់ Force Dimension ប៉ុន្តែបណ្ណាល័យរបស់ Force Dimension មិនអាចបើកវាបានទេ៖ {0}។ សូមពិនិត្យខ្សែភ្លើង និងខ្សែ USB របស់វា។</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Falcon មួយត្រូវបានដោតដោយគ្មានដ្រាយវ័រ។ «ដំឡើងដ្រាយវ័រ Falcon» នឹងដំឡើងដ្រាយវ័ររបស់ Force Dimension ឱ្យវា។</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Falcon មួយត្រូវបានដោតដោយគ្មានដ្រាយវ័រ ហើយថត SDK គ្មានកញ្ចប់ដ្រាយវ័រសម្រាប់ដំឡើងឱ្យវាទេ។ សូមដំឡើង SDK របស់ Force Dimension ឡើងវិញ។</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>រកមិនឃើញ Falcon ទេ។ សូមដោតខ្សែភ្លើង និងខ្សែ USB របស់វា។</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>ជ្រើស dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>ផ្ទុកច្បាប់ចម្លងនេះនៃបណ្ណាល័យរបស់ Force Dimension មុនច្បាប់ចម្លងផ្សេងទៀត។ ច្បាប់ចម្លងដែល SDK ដំឡើង ត្រូវបានរកឃើញដោយមិនចាំបាច់ប្រើវា។</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>ផ្ទុកច្បាប់ចម្លងនេះនៃបណ្ណាល័យរបស់ Force Dimension ជំនួសច្បាប់ចម្លងផ្សេងទៀតទាំងអស់។ Falcon ដែលកំពុងបើកលើច្បាប់ចម្លងផ្សេង នឹងបិទ ហើយបើកម្ដងទៀតលើច្បាប់ចម្លងនេះ។ ច្បាប់ចម្លងដែល SDK ដំឡើង ត្រូវបានរកឃើញដោយមិនចាំបាច់ប្រើវា។</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|បណ្ណាល័យ (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>ដំឡើងដ្រាយវ័រ Falcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>ដំឡើងដ្រាយវ័ររបស់ Force Dimension ពីថត SDK លើ Falcon ដែលគ្មានដ្រាយវ័រ។ Windows អាចសួរជាមុនថាតើត្រូវទុកចិត្ត Force Dimension ឬទេ។</value></data>
@@ -4417,7 +4421,7 @@
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>លេងហ្គេមជាមួយ Novint Falcon តាមរយៈ SDK របស់ Force Dimension ដែលអ្នកដំឡើងពី Force Dimension។ ដៃកាន់ជាដងបញ្ជា ប៊ូតុងទាំងបួននៅលើដៃកាន់ជាប៊ូតុង ហើយ PadForge បំប្លែងការញ័រ និងបែបផែនរបស់ហ្គេមទៅជាកម្លាំងលើដៃកាន់។ ផ្ទាំង «កម្លាំងតប» នៃរន្ធនីមួយៗ កំណត់អារម្មណ៍នៃ Falcon។</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>បញ្ជា Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>បើក Falcon នីមួយៗតាមរយៈ dhd64.dll របស់ Force Dimension។ Falcon ដែលបានបើកជារបស់ PadForge តែមួយគត់ ដូច្នេះ FalconJoyForce និងឧបករណ៍របស់ Force Dimension មិនអាចបើកវាបានទេ ខណៈពេលការកំណត់នេះបើក។ ពេលបិទ PadForge បិទ Falcon ទាំងអស់។</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>បានកំណត់បណ្ណាល័យ Falcon ទៅ {0}។ ច្បាប់ចម្លងដែលកំពុងប្រើស្រាប់ នៅដដែលរហូតដល់ PadForge ចាប់ផ្ដើមម្ដងទៀត។</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>បានកំណត់បណ្ណាល័យ Falcon ទៅ {0}។ PadForge ផ្ទុកវាក្នុងរយៈពេលពីរបីវិនាទី ហើយ Falcon ដែលកំពុងបើកលើច្បាប់ចម្លងផ្សេង នឹងបើកម្ដងទៀតលើច្បាប់ចម្លងនេះ។</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>កំពុងដំឡើងដ្រាយវ័រ Falcon របស់ Force Dimension…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>កញ្ចប់ដ្រាយវ័រ Falcon របស់ Force Dimension ឬកាតាឡុករបស់វា បាត់៖ {0}។ សូមដំឡើង SDK របស់ Force Dimension ឡើងវិញ។</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>មិនមាន Falcon ណាត្រូវបានដោតទេ។</value></data>

@@ -885,7 +885,8 @@ namespace PadForge
             // The Keyboard Screens card (#519).
             WireKeyboardScreens();
 
-            // The Novint Falcon card and the pad page's Calibrate (#521).
+            // The Novint Falcon card and a Falcon row's Calibrate Reach on
+            // the Devices page (#521).
             WireFalcon();
 
             // Wire device service events (assign to slot, hide, etc.).

@@ -278,6 +278,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Ta funshoná ku mods hasí pa DSX, manera esnan pa GTA V, Red Dead Redemption 2, Skyrim i Forza. Miéntras e server ta skucha, PadForge ta skirbi su pòrt kaminda e mods ei ta buské.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Ta skucha riba :{0}. {1} ta manda na kontrol virtual {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Ta skucha riba :{0}. {1} ta manda, pero ningun kontrol virtual no tin un kontrol PlayStation riba dje.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Ta skucha riba :{0}. {1} ta manda na kontrol number {2}, i no tin ningun kontrol virtual ku un kontrol di PlayStation riba dje ku tin e number ei.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Pòrt {0} ta na uso dor di otro programa, manera DSX. Sera e programa òf skohe otro pòrt.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Un mod di wega</value></data>
   <data name="Settings_GKeys" xml:space="preserve"><value>Lesa teklanan G di Logitech</value></data>
@@ -2165,7 +2166,7 @@
   <data name="RemoteLink_AssignmentBusy" xml:space="preserve">
     <value>Ta warda riba e otro PC...</value>
   </data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Ta agregá vibrashon kontinuo segun e eje virtual selekshoná ta move leu for di sentro. Ta usa e output asigná di tur fuente asigná. Ku "Dividí pa direkshon", movementu negativo ta aktivá e motor robes i movementu positivo e motor drechi. "Motor robes" òf "Motor drechi" ta pone tur dos direkshon riba e motor ei so. Pa output di Xbox i PlayStation ku aparato ku vibrashon. No ta inkluí force feedback nativo di stür.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Ta agregá vibrashon kontinuo segun e eje virtual selekshoná ta move leu for di sentro. Ta usa e output asigná di tur fuente asigná. Ku "Dividí pa direkshon", movementu negativo ta aktivá e motor robes i movementu positivo e motor drechi. "Motor robes" òf "Motor drechi" ta pone tur dos direkshon riba e motor ei so. Pa output di Xbox i PlayStation ku aparato ku vibrashon. No ta inkluí stür, otro aparato ku force feedback konstante, ni pedal di Fanatec.</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Eje virtual</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Stick robes X</value></data>
   <data name="Pad_SteeringAngleRumble_LY" xml:space="preserve"><value>Stick robes Y</value></data>
@@ -2252,6 +2253,7 @@
   <data name="KeyboardScreens_Status_Off" xml:space="preserve"><value>pagá</value></data>
   <data name="KeyboardScreens_Status_Lgs" xml:space="preserve"><value>via Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>direktamente riba e {0}</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>e pantaya di e G19 ta riba e driver di otro programa ({0}), ku PadForge ta laga trankil</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>mester Logitech Gaming Software 8.52 òf mas nobo</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>habri Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>ta warda un telefòn ku Arx Control</value></data>
@@ -2302,16 +2304,17 @@
   <data name="DeviceType_NovintFalcon" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} ta kambia e triggernan di e kontrol aki.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} ta kambia e lusnan di e kontrol aki.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} ta kambia e lusnan di e aparato aki.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} ta kambia e triggernan i lusnan di e kontrol aki.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Kita efektonan di mod</value></data>
   <data name="Devices_ClearModEffects_Tooltip" xml:space="preserve"><value>Ta kaba ku loke mods di wega a pone riba e kontrol aki. Su propio konfigurashon ta bolbe te ora un mod manda atrobe.</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Robes/Drechi</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Ariba/Abou</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Aden/Afó</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Botòn {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, kargá for di {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>E dhd64.dll ku bo a skohe no a karga, pues PadForge ta usa e kopia ariba.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>E biblioteka di Force Dimension ta funshoná so den e version x64 di PadForge.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>A haña dhd64.dll, pero no por a karg'é.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>E dhd64.dll ei no ta e biblioteka di Force Dimension ku PadForge ta spera.</value></data>
@@ -2320,11 +2323,12 @@
   <data name="Falcon_Status_Open" xml:space="preserve"><value>habrí</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Un Falcon ta habrí den otro programa, manera FalconJoyForce òf e programanan di Force Dimension mes. Sera'é aya.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>E Falcon ta riba otro driver ({0}), pues e biblioteka di Force Dimension no por habri'é. Den Device Manager, aktualisá e driver di e Falcon for di e mapa drivers\usb den e mapa di SDK di Force Dimension.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>E Falcon ta riba e driver di Force Dimension, i e biblioteka di Force Dimension no por a habri'é: {0}. Kontrolá su koriente i su kabel USB.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Un Falcon ta konektá sin driver. Instalá driver di Falcon ta dun'é esun di Force Dimension.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Un Falcon ta konektá sin driver, i e mapa di SDK no tin un pakete di driver pa dun'é. Instalá e SDK di Force Dimension di nobo.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>No a haña ningun Falcon. Konektá su koriente i su kabel USB.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Skohe dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Ta karga e kopia aki di e biblioteka di Force Dimension promé ku kualke otro. E kopianan ku e SDK ta instalá ta wòrdu hañá sin esaki.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Ta karga e kopia aki di e biblioteka di Force Dimension na lugá di kualke otro. Un Falcon habrí riba otro kopia ta sera i ta habri di nobo riba esaki. E kopianan ku e SDK ta instalá ta wòrdu hañá sin esaki.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Bibliotekanan (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Instalá driver di Falcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Ta instalá e driver di Force Dimension, for di e mapa di SDK, riba un Falcon ku no tin ningun. Windows por puntra promé si e mester konfia den Force Dimension.</value></data>
@@ -2338,7 +2342,7 @@
   <data name="Settings_Falcon_Title" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Kontrolá Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Ta habri kada Falcon via dhd64.dll di Force Dimension. Un Falcon habrí ta pertenesé na PadForge so, pues FalconJoyForce i e programanan di Force Dimension no por habri'é miéntras esaki ta aktivá. Desaktivá, PadForge ta sera tur Falcon.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Biblioteka di Falcon kambiá pa {0}. Un kopia ku ta den uso kaba ta keda te ora PadForge kuminsá di nobo.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Biblioteka di Falcon kambiá pa {0}. PadForge ta karg'é den un par di sekònde, i un Falcon habrí riba otro kopia ta habri di nobo riba esaki.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Ta instalá e driver di Falcon di Force Dimension…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>E pakete di driver di Falcon di Force Dimension, òf su katálogo, ta falta: {0}. Instalá e SDK di Force Dimension di nobo.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>No tin ningun Falcon konektá.</value></data>

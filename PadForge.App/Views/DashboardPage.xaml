@@ -2330,7 +2330,9 @@
                         </StackPanel>
                         <TextBlock Grid.Row="1" Text="{Binding Dashboard_Port, Source={x:Static strings:Strings.Instance}}" VerticalAlignment="Center"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,8,8"/>
-                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,8">
+                        <!-- Off while Assetto Corsa is picked: it is read from
+                             shared memory, with no socket and no copy on. -->
+                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,8" IsEnabled="{Binding GameTelemetryReadsUdp}">
                             <ui:NumberBox Value="{Binding GameTelemetryPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=1000}"
                                           Minimum="1024" Maximum="65535"
                                           SpinButtonPlacementMode="Inline" Width="200"/>
@@ -2338,7 +2340,7 @@
                         </StackPanel>
                         <TextBlock Grid.Row="2" Text="{Binding Dashboard_GameTelemetryForwardPort, Source={x:Static strings:Strings.Instance}}" VerticalAlignment="Center"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,8,8"/>
-                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,8">
+                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,8" IsEnabled="{Binding GameTelemetryReadsUdp}">
                             <ui:NumberBox Value="{Binding GameTelemetryForwardPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=1000}"
                                           Minimum="0" Maximum="65535"
                                           SpinButtonPlacementMode="Inline" Width="200"

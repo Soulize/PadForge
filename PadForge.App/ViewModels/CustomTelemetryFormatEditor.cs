@@ -234,11 +234,17 @@ namespace PadForge.ViewModels
             set { if (!double.IsInfinity(value)) SetProperty(ref _max, value); }
         }
 
+        /// <summary>The axis the field's variable keeps
+        /// (<see cref="CustomTelemetryField.Axis"/>), carried through the
+        /// edit unseen, so a renamed variable keeps its old name's axis.</summary>
+        public int Axis { get; set; } = -1;
+
         public static TelemetryFieldEdit From(CustomTelemetryField field, CustomTelemetryKind kind) => new()
         {
             Target = field.Target,
             Kind = kind,
             Name = field.Name,
+            Axis = field.Axis,
             Offset = field.Offset,
             Type = field.Type,
             Key = field.Key,
@@ -251,6 +257,7 @@ namespace PadForge.ViewModels
         {
             Target = Target,
             Name = Name.Trim(),
+            Axis = Axis,
             Offset = Offset,
             Type = Type,
             Key = Key.Trim(),

@@ -146,6 +146,7 @@
   <data name="Dashboard_EnableGameMods" xml:space="preserve"><value>Gba àwọn mod eré DSX</value></data>
   <data name="Dashboard_GameModPort" xml:space="preserve"><value>Pọ́ọ̀tì mod eré</value></data>
   <data name="Dashboard_GameModStandIn" xml:space="preserve"><value>Mú àrọ́pò DSX.exe ṣiṣẹ́</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Ń gbọ́ lórí :{0}. {1} ń fi ránṣẹ́ sí nọ́mbà ẹ̀rọ ìdarí {2}, kò sì sí ẹ̀rọ ìdarí àfarawé tí ẹ̀rọ ìdarí PlayStation wà lórí rẹ̀ tí ó ní nọ́mbà yẹn.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Pọ́ọ̀tì {0} ti wà ní lílò lọ́wọ́ ìṣàfilọ́lẹ̀ mìíràn, bíi DSX. Pa á tàbí yan pọ́ọ̀tì mìíràn.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Mod eré kan</value></data>
   <data name="RemoteLink_Connect" xml:space="preserve"><value>Sopọ̀</value></data>
@@ -1587,7 +1588,7 @@
   <data name="RemoteLink_AssignmentBusy" xml:space="preserve">
     <value>Ń dúró de PC kejì...</value>
   </data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Ó ń fi ìmìtìtì tí kò dáwọ́ dúró kún un bí ákísì ọ̀pá àfarawé tí a yàn ṣe ń kúrò ní àárín. Ó ń lo àbájáde ìsopọ̀ láti gbogbo orísun tí a yàn sí i. Pẹ̀lú “Pín nípa ìhà”, yíyí sí òsì ń mi mọ́tò òsì, yíyí sí ọ̀tún sì ń mi mọ́tò ọ̀tún. “Mọ́tò òsì” tàbí “Mọ́tò ọ̀tún” ń fi ìhà méjèèjì sórí mọ́tò kan náà. Fún àbájáde Xbox àti PlayStation pẹ̀lú àwọn ẹ̀rọ tí ó ní ìmìtìtì. Force feedback àbínibí ti kẹ̀kẹ́ ìdarí kò sí nínú rẹ̀.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Ó ń fi ìmìtìtì tí kò dáwọ́ dúró kún un bí ákísì ọ̀pá àfarawé tí a yàn ṣe ń kúrò ní àárín. Ó ń lo àbájáde ìsopọ̀ láti gbogbo orísun tí a yàn sí i. Pẹ̀lú “Pín nípa ìhà”, yíyí sí òsì ń mi mọ́tò òsì, yíyí sí ọ̀tún sì ń mi mọ́tò ọ̀tún. “Mọ́tò òsì” tàbí “Mọ́tò ọ̀tún” ń fi ìhà méjèèjì sórí mọ́tò kan náà. Fún àbájáde Xbox àti PlayStation pẹ̀lú àwọn ẹ̀rọ tí ó ní ìmìtìtì. Kò kan àwọn kẹ̀kẹ́ ìdarí, àwọn ẹ̀rọ mìíràn tí ó ní force feedback tí kò dáwọ́ dúró, àti àwọn pẹ́dà Fanatec.</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Ọ̀pá òsì X</value></data>
   <data name="Pad_SteeringAngleRumble_LY" xml:space="preserve"><value>Ọ̀pá òsì Y</value></data>
   <data name="Pad_SteeringAngleRumble_RX" xml:space="preserve"><value>Ọ̀pá ọ̀tún X</value></data>
@@ -1669,6 +1670,7 @@
   <data name="KeyboardScreens_Status_Lgs" xml:space="preserve"><value>nípasẹ̀ Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>tààrà lórí {0}</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>ìbòjú G19 wà lórí awakọ̀ míràn ({0}), nítorí náà ṣí Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>ìbòjú G19 wà lórí awakọ̀ ìṣàfilọ́lẹ̀ mìíràn ({0}), èyí tí PadForge kò fọwọ́ kàn</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>ó nílò Logitech Gaming Software 8.52 tàbí èyí tó tuntun jù</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>ṣí Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>ń dúró de fóònù tí ó ní Arx Control</value></data>
@@ -1710,6 +1712,7 @@
   <data name="DeviceType_NovintFalcon" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} ń ṣètò àwọn tírígà ẹ̀rọ ìdarí yìí.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} ń ṣètò àwọn ìmọ́lẹ̀ ẹ̀rọ ìdarí yìí.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} ń ṣètò àwọn ìmọ́lẹ̀ ẹ̀rọ yìí.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} ń ṣètò àwọn tírígà àti ìmọ́lẹ̀ ẹ̀rọ ìdarí yìí.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} ń mú ìmìtìtì tírígà ṣiṣẹ́ lórí àwọn impulse trigger ẹ̀rọ ìdarí yìí.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Pa ipa àwọn mod rẹ́</value></data>
@@ -1717,17 +1720,20 @@
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Òsì/Ọ̀tún</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Òkè/Ìsàlẹ̀</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Inú/Òde</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Bọ́tìnnì {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>A kò lè gbé dhd64.dll tí o yàn wọlé, nítorí náà PadForge ń lo ẹ̀dà tí ó wà lókè.</value></data>
   <data name="Falcon_Status_Rate_Format" xml:space="preserve"><value>ń ṣiṣẹ́ ní {0:0.0} kHz</value></data>
   <data name="Falcon_Status_Open" xml:space="preserve"><value>ó ti ṣí</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon wà lórí awakọ̀ Force Dimension, ṣùgbọ́n ilé-ìkàwé Force Dimension kò lè ṣí i: {0}. Ṣàyẹ̀wò agbára iná rẹ̀ àti okùn USB rẹ̀.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Yan dhd64.dll…</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Ó ń gbé ẹ̀dà ilé-ìkàwé Force Dimension yìí wọlé dípò èyíkéyìí mìíràn. Falcon tí ó ṣí lórí ẹ̀dà mìíràn yóò tì, yóò sì tún ṣí lórí èyí. A máa ń rí àwọn ẹ̀dà tí SDK ń fi sórí ẹ̀rọ láìsí èyí.</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Fi awakọ̀ Falcon sórí ẹ̀rọ</value></data>
   <data name="Falcon_OpenDownload" xml:space="preserve"><value>Gba SDK ti Force Dimension</value></data>
   <data name="Falcon_Calibrate_Done_Format" xml:space="preserve"><value>Ìwọ̀ntúnwọ̀nsì ti parí. {0}</value></data>
   <data name="Settings_Falcon_Title" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Ṣàkóso Novint Falcon</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>A ti ṣètò ilé-ìkàwé Falcon sí {0}. PadForge yóò gbé e wọlé láàárín ìṣẹ́jú-àáyá díẹ̀, Falcon tí ó ṣí lórí ẹ̀dà mìíràn yóò sì tún ṣí lórí èyí.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Ń fi awakọ̀ Falcon ti Force Dimension sórí ẹ̀rọ…</value></data>
   <data name="Pad_Falcon_Header" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Pad_Falcon_ResetAll" xml:space="preserve"><value>Tún Novint Falcon tò</value></data>

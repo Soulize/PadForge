@@ -217,6 +217,7 @@
   <data name="Dashboard_GameModStandIn" xml:space="preserve"><value>Qalisa i-DSX.exe engumbambeli</value></data>
   <data name="Dashboard_GameModStandIn_Tooltip" xml:space="preserve"><value>Amanye ama-mod, njenge-DualSense4GTAV, ayazicisha uma uhlelo olubizwa ngokuthi i-DSX lungasebenzi. Lokhu kuqalisa uhlelo oluncane olunalelo gama ngesikhathi iseva ilalele.</value></data>
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Isebenza nama-mod enzelwe i-DSX, njengalawo enzelwe i-GTA V, i-Red Dead Redemption 2, i-Skyrim ne-Forza. Ngesikhathi iseva ilalele, i-PadForge ibhala imbobo yayo lapho lawo ma-mod ayifuna khona.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Kulalelwa embobeni :{0}. {1} ithumela kunombolo yesilawuli {2}, futhi asikho isilawuli esibonakalayo esinesilawuli se-PlayStation esinaleyo nombolo.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Imbobo {0} isetshenziswa ngolunye uhlelo, njenge-DSX. Luvale noma ukhethe enye imbobo.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>I-mod yomdlalo</value></data>
   <data name="Dashboard_WebController" xml:space="preserve"><value>Isilawuli sewebhu</value></data>
@@ -2065,7 +2066,7 @@
   <data name="RemoteLink_AssignmentNoSlots" xml:space="preserve">
     <value>Dala isilawuli esibonakalayo kwenye i-PC, bese uvuselela.</value>
   </data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Ingeza ukudlidliza okuqhubekayo njengoba i-eksisi yenduku ebonakalayo ekhethiwe isuka esikhungweni. Isebenzisa okukhiphayo okumephiwe kuyo yonke imithombo eyabelwe. Ngokuthi "Hlukanisa ngohlangothi", ukunyakaza okunegethivu kusebenzisa imoto engakwesokunxele, okuphozithivu kusebenzise imoto engakwesokudla. Ngokuthi "Imoto engakwesokunxele" noma "Imoto engakwesokudla", zombili izinhlangothi zisebenzisa leyo moto eyodwa. Okokuphuma kwe-Xbox ne-PlayStation kanye nezidivayisi ezidlidlizayo. Impendulo yamandla yesondo uqobo ayifakiwe.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Ingeza ukudlidliza okuqhubekayo njengoba i-eksisi yenduku ebonakalayo ekhethiwe isuka esikhungweni. Isebenzisa okukhiphayo okumephiwe kuyo yonke imithombo eyabelwe. Ngokuthi "Hlukanisa ngohlangothi", ukunyakaza okunegethivu kusebenzisa imoto engakwesokunxele, okuphozithivu kusebenzise imoto engakwesokudla. Ngokuthi "Imoto engakwesokunxele" noma "Imoto engakwesokudla", zombili izinhlangothi zisebenzisa leyo moto eyodwa. Okokuphuma kwe-Xbox ne-PlayStation kanye nezidivayisi ezidlidlizayo. Ayisebenzi kumasondo, kwezinye izidivayisi ezinempendulo yamandla engaguquki, nakumaphedali e-Fanatec.</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>I-eksisi ebonakalayo</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Induku yesobunxele X</value></data>
   <data name="Pad_SteeringAngleRumble_LY" xml:space="preserve"><value>Induku yesobunxele Y</value></data>
@@ -2156,6 +2157,7 @@
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>ngqo ku-{0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>kubekwa i-WinUSB esikrinini se-G19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>isikrini se-G19 sisebenzisa omunye umshayeli ({0}), ngakho qala i-Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>isikrini se-G19 sisebenzisa umshayeli wolunye uhlelo ({0}), i-PadForge engawuthinti</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>idinga i-Logitech Gaming Software 8.52 noma eyakamuva</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>qala i-Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>kulindwe ifoni ene-Arx Control</value></data>
@@ -2227,6 +2229,7 @@
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Isibambo</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} isetha amathrigha alesi silawuli.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} isetha izibani zalesi silawuli.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} isetha izibani zale divayisi.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} isetha amathrigha nezibani zalesi silawuli.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} idlala ukudlidliza kwamathrigha kuma-impulse trigger alesi silawuli.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Sula imiphumela ye-mod</value></data>
@@ -2234,10 +2237,10 @@
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Kwesokunxele/Kwesokudla</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Phezulu/Phansi</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Ngaphakathi/Ngaphandle</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Inkinobho {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, evela ku-{1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>I-dhd64.dll oyikhethile ayizange ilayishwe, ngakho i-PadForge isebenzisa ikhophi engenhla.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Umtapo we-Force Dimension usebenza kuphela kunguqulo ye-x64 ye-PadForge.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>I-dhd64.dll itholakele kodwa ayikwazanga ukulayishwa.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Le dhd64.dll akuwona umtapo we-Force Dimension olindelwe yi-PadForge.</value></data>
@@ -2246,11 +2249,12 @@
   <data name="Falcon_Status_Rate_Format" xml:space="preserve"><value>isebenza ku-{0:0.0} kHz</value></data>
   <data name="Falcon_Status_Open" xml:space="preserve"><value>ivuliwe</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>I-Falcon ivuliwe kolunye uhlelo, njenge-FalconJoyForce noma amathuluzi e-Force Dimension uqobo. Yivale lapho.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>I-Falcon isebenzisa umshayeli we-Force Dimension, kodwa umtapo we-Force Dimension awukwazanga ukuyivula: {0}. Hlola ugesi wayo nentambo yayo ye-USB.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>I-Falcon ixhunyiwe ingenamshayeli. Inkinobho ethi Faka umshayeli we-Falcon iyinika umshayeli we-Force Dimension.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>I-Falcon ixhunyiwe ingenamshayeli, futhi ifolda ye-SDK ayinayo iphakheji yomshayeli engayinika yona. Phinda ufake i-SDK ye-Force Dimension.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Ayikho i-Falcon etholakele. Xhuma ugesi wayo nentambo yayo ye-USB.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Khetha i-dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Ilayisha le khophi yomtapo we-Force Dimension ngaphambi kwanoma iyiphi enye. Amakhophi afakwa yi-SDK atholakala ngaphandle kwayo.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Ilayisha le khophi yomtapo we-Force Dimension esikhundleni sanoma iyiphi enye. I-Falcon evulwe kwenye ikhophi iyavaleka bese iphinde ivuleke kule. Amakhophi afakwa yi-SDK atholakala ngaphandle kwayo.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Imitapo (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Faka umshayeli we-Falcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Ifaka umshayeli we-Force Dimension, osuka kufolda ye-SDK, ku-Falcon engenawo. I-Windows ingase iqale ibuze ukuthi iyayethemba yini i-Force Dimension.</value></data>
@@ -2267,7 +2271,7 @@
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Idlala imidlalo nge-Novint Falcon ngokusebenzisa i-SDK ye-Force Dimension, oyifaka ivela ku-Force Dimension. Isibambo siyinduku, izinkinobho ezine zesibambo ziyizinkinobho, futhi i-PadForge iguqula ukudlidliza nemiphumela yegeyimu kube amandla esibanjweni. Ithebhu ethi Impendulo yamandla yesikhala ngasinye isetha ukuthi i-Falcon izwakala kanjani.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Lawula i-Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Ivula i-Falcon ngayinye nge-dhd64.dll ye-Force Dimension. I-Falcon evuliwe ingeye-PadForge kuphela, ngakho i-FalconJoyForce namathuluzi e-Force Dimension awakwazi ukuyivula ngesikhathi lokhu kuvuliwe. Uma kuvaliwe, i-PadForge ivala zonke izi-Falcon.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Umtapo we-Falcon usethelwe ku-{0}. Ikhophi esivele isetshenziswa ihlala ize i-PadForge iqale kabusha.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Umtapo we-Falcon usethelwe ku-{0}. I-PadForge izowulayisha phakathi kwemizuzwana embalwa, futhi i-Falcon evulwe kwenye ikhophi izophinde ivuleke kule.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Kufakwa umshayeli we-Falcon we-Force Dimension…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Iphakheji yomshayeli we-Falcon we-Force Dimension, noma ikhathalogi yayo, ayikho: {0}. Phinda ufake i-SDK ye-Force Dimension.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Ayikho i-Falcon exhunyiwe.</value></data>

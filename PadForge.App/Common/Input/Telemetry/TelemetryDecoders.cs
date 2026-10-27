@@ -97,39 +97,63 @@ namespace PadForge.Common.Input.Telemetry
             public float MaxRpm;
         }
 
-        /// <summary>F1 22's packet sizes by id, from vAzhure F12022.cs. F1 22
-        /// has no year byte, so a packet must have one of these sizes too.</summary>
+        /// <summary>Each format's packet sizes by id, so a packet must have
+        /// one of its format's sizes. F1 22's from vAzhure F12022.cs, the
+        /// others from F12023.cs, F12024.cs and F12025.cs, and 2024's match
+        /// the f1-24-udp README's "Size:" lines.</summary>
         private static readonly int[] F1_22Sizes =
             { 1464, 632, 972, 40, 1257, 1102, 1347, 1058, 1015, 1191, 948, 1155 };
+        private static readonly int[] F1_23Sizes =
+            { 1349, 644, 1131, 45, 1306, 1107, 1352, 1239, 1020, 1218, 953, 1460, 231, 217 };
+        private static readonly int[] F1_24Sizes =
+            { 1349, 753, 1285, 45, 1350, 1133, 1352, 1239, 1020, 1306, 953, 1460, 231, 237, 101 };
+        private static readonly int[] F1_25Sizes =
+            { 1349, 753, 1285, 45, 1284, 1133, 1352, 1239, 1042, 954, 1041, 1460, 231, 273, 101, 1131 };
+
+        /// <summary>The size of packet <paramref name="id"/> in F1 UDP format
+        /// <paramref name="format"/> (2022 to 2025), or -1 for an id or a
+        /// format there is none of. Shared with the RPM lights' own F1
+        /// listener.</summary>
+        internal static int F1PacketSize(int format, int id)
+        {
+            int[] sizes = F1Sizes(format);
+            return sizes != null && id >= 0 && id < sizes.Length ? sizes[id] : -1;
+        }
+
+        private static int[] F1Sizes(int format) => format switch
+        {
+            2022 => F1_22Sizes,
+            2023 => F1_23Sizes,
+            2024 => F1_24Sizes,
+            2025 => F1_25Sizes,
+            _ => null,
+        };
 
         /// <summary>
         /// F1's UDP (MacManley/f1-24-udp PHeader.h, PacketCarTelemetryData.h,
         /// PacketCarStatusData.h, and vAzhure F12022.cs to F12025.cs). The
-        /// year at byte 0. F1 22's header is 24 bytes (packet id at 5, player
-        /// car at 22), and later years add the year byte at 2 for 29 bytes
-        /// (packet id at 6, player car at 27). Car Telemetry (6) holds 22
-        /// entries of 60 bytes. Car Status (7) entries are 47 bytes in F1 22
-        /// and 55 later, max RPM at 17. Every F1 packet is claimed, so a
-        /// packet of another type never falls through to a rule that only
-        /// knows lengths (F1 24's Motion Ex is 237 bytes, EA Sports WRC's
-        /// length).
+        /// packet format at byte 0. F1 22's header is 24 bytes (packet id at
+        /// 5, player car at 22), and later formats add the game year at 2
+        /// for 29 bytes (packet id at 6, player car at 27). The game year is
+        /// not checked: F1 24 and F1 25 also send the two formats before
+        /// their own (f1-24-udp README, "Will my old app still work"), and
+        /// then the byte names the game or reads 0. It names the game on the
+        /// status line when it is not 0. Car Telemetry (6) holds
+        /// 22 entries of 60 bytes. Car Status (7) entries are 47 bytes in
+        /// F1 22 and 55 later, max RPM at 17. Every F1 packet is claimed, so
+        /// a packet of another type never falls through to a rule that only
+        /// knows lengths (format 2024's Motion Ex is 237 bytes, EA SPORTS
+        /// WRC's length).
         /// </summary>
         internal static TelemetryDecode TryF1(ReadOnlySpan<byte> p, F1State state, TelemetryFrame f)
         {
             if (p.Length < 24) return TelemetryDecode.No;
             int year = BinaryPrimitives.ReadUInt16LittleEndian(p);
-            if (year < 2022 || year > 2025) return TelemetryDecode.No;
+            int[] sizes = F1Sizes(year);
+            if (sizes == null || Array.IndexOf(sizes, p.Length) < 0) return TelemetryDecode.No;
             int header, idAt, carAt, statusEntry;
-            if (year == 2022)
-            {
-                if (Array.IndexOf(F1_22Sizes, p.Length) < 0) return TelemetryDecode.No;
-                header = 24; idAt = 5; carAt = 22; statusEntry = 47;
-            }
-            else
-            {
-                if (p.Length < 29 || p[2] != year - 2000) return TelemetryDecode.No;
-                header = 29; idAt = 6; carAt = 27; statusEntry = 55;
-            }
+            if (year == 2022) { header = 24; idAt = 5; carAt = 22; statusEntry = 47; }
+            else { header = 29; idAt = 6; carAt = 27; statusEntry = 55; }
             int id = p[idAt];
             if (id > 15) return TelemetryDecode.No;
             if (state.Year != year)
@@ -148,7 +172,10 @@ namespace PadForge.Common.Input.Telemetry
             if (id != 6 || p.Length < header + 22 * 60) return TelemetryDecode.Claimed;
             int e = header + car * 60;
             f.Source = TelemetrySource.F1;
-            f.F1Year = year;
+            // The game, for the status line: formats 2023 and later carry
+            // its year at byte 2, which reads 0 from some games on an older
+            // format. The layout above follows the format alone.
+            f.F1Year = year >= 2023 && p[2] != 0 ? 2000 + p[2] : year;
             f.SpeedMs = U16(p, e) / 3.6f;
             f.Throttle = F32(p, e + 2);
             f.Steering = F32(p, e + 6);

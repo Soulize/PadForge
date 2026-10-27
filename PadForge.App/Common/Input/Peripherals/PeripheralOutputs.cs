@@ -307,14 +307,17 @@ namespace PadForge.Common.Input.Peripherals
         }
 
         /// <summary>The HID++ worker's latest units, for a tab naming the
-        /// device its row reaches.</summary>
+        /// device its row reaches. The worker builds a new snapshot on every
+        /// scan and liveness check, so only one that differs raises
+        /// <see cref="StatusChanged"/>.</summary>
         public static HidppSnapshot Hidpp
         {
             get => Volatile.Read(ref s_hidpp);
             set
             {
                 var next = value ?? HidppSnapshot.Empty;
-                if (!ReferenceEquals(Interlocked.Exchange(ref s_hidpp, next), next)) RaiseStatusChanged();
+                var previous = Interlocked.Exchange(ref s_hidpp, next);
+                if (!next.SameAs(previous)) RaiseStatusChanged();
             }
         }
 
@@ -714,6 +717,10 @@ namespace PadForge.Common.Input.Peripherals
                 if (key.Device == device) return true;
             return false;
         }
+
+        /// <summary>Whether <paramref name="slot"/>'s effects dispatcher
+        /// lit the row on its last pass: it holds a claim on it.</summary>
+        public static bool IsLitBy(Guid device, int slot) => s_claims.ContainsKey((device, slot));
 
         private static void BumpLighting()
         {

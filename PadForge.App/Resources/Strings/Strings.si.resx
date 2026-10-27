@@ -304,6 +304,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>GTA V, Red Dead Redemption 2, Skyrim සහ Forza සඳහා වූ මොඩ් වැනි, DSX සඳහා සාදන ලද මොඩ් සමඟ ක්‍රියා කරයි. සේවාදායකය සවන් දෙන අතරතුර, PadForge සිය තොට එම මොඩ් එය සොයන ස්ථානයේ ලියයි.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>:{0} හි සවන් දෙමින්. {1} අතථ්‍ය පාලකය {2} වෙත යවමින් සිටී.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>:{0} හි සවන් දෙමින්. {1} යවමින් සිටී, නමුත් කිසිදු අතථ්‍ය පාලකයක PlayStation පාලකයක් නැත.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>:{0} හි සවන් දෙමින්. {1} පාලක අංකය {2} වෙත යවමින් සිටින නමුත්, PlayStation පාලකයක් සහිත කිසිදු අතථ්‍ය පාලකයකට එම අංකය නොමැත.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>තොට {0} DSX වැනි වෙනත් වැඩසටහනක් භාවිත කරයි. එය වසන්න හෝ වෙනත් තොටක් තෝරන්න.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>ක්‍රීඩා මොඩ් එකක්</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>OpenTrack සමඟ සහ එහි UDP ප්‍රතිදානය යවන හෝ FreeTrack 2.0 හවුල් මතකයට ලියන ඕනෑම ට්‍රැකරයක් සමඟ ද, පසුබිමේ සැසියක් ධාවනය කළ හැකි මෙම පරිගණකයේ OpenXR ධාවන කාලයක් සමඟ ද ක්‍රියා කරයි.</value></data>
@@ -4063,7 +4064,7 @@ PadForge විසින් ඒවා දැන් අස්ථාපනය ක�
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>FreeTrack හවුල් මතක දත්ත සඳහා රැඳී සිටිමින්.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>FreeTrack හවුල් මතකය ලබා ගත නොහැක.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>සුක්කානම් කෝණ කම්පනය</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>තෝරාගත් අතථ්‍ය ස්ටික් අක්ෂය මධ්‍යයෙන් ඉවතට යන විට අඛණ්ඩ කම්පනයක් එක් කරයි. පවරා ඇති සියලු මූලාශ්‍රවලින් සිතියම්ගත ප්‍රතිදානය භාවිත කරයි. "දිශාව අනුව බෙදීම" තෝරා ඇති විට, සෘණ චලනය වම් මෝටරය ධාවනය කරන අතර, ධන චලනය දකුණු මෝටරය ධාවනය කරයි. "වම් මෝටරය" හෝ "දකුණු මෝටරය" දිශා දෙකම එම එක් මෝටරයට යොමු කරයි. කම්පන උපාංග සහිත Xbox සහ PlayStation ප්‍රතිදානය සඳහා. ස්වදේශීය සුක්කානම් බල ප්‍රතිපෝෂණය ඇතුළත් නොවේ.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>තෝරාගත් අතථ්‍ය ස්ටික් අක්ෂය මධ්‍යයෙන් ඉවතට යන විට අඛණ්ඩ කම්පනයක් එක් කරයි. පවරා ඇති සියලු මූලාශ්‍රවලින් සිතියම්ගත ප්‍රතිදානය භාවිත කරයි. "දිශාව අනුව බෙදීම" තෝරා ඇති විට, සෘණ චලනය වම් මෝටරය ධාවනය කරන අතර, ධන චලනය දකුණු මෝටරය ධාවනය කරයි. "වම් මෝටරය" හෝ "දකුණු මෝටරය" දිශා දෙකම එම එක් මෝටරයට යොමු කරයි. කම්පන උපාංග සහිත Xbox සහ PlayStation ප්‍රතිදානය සඳහා. සුක්කානම්, නියත බල ප්‍රතිපෝෂණය සහිත වෙනත් උපාංග සහ Fanatec පැඩල මෙය මඟ හරියි.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>සුක්කානම් කෝණ කම්පනය සක්‍රිය කරන්න</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>අතථ්‍ය අක්ෂය</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>වම් ස්ටික් X</value></data>
@@ -4266,6 +4267,7 @@ PadForge විසින් ඒවා දැන් අස්ථාපනය ක�
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>{0} මත සෘජුවම</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>G19 හි තිරයට WinUSB බඳිමින්</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>G19 හි තිරය වෙනත් ධාවකයක ({0}) ඇත, එබැවින් Logitech Gaming Software අරඹන්න</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>G19 හි තිරය වෙනත් වැඩසටහනක ධාවකයක ({0}) ඇත, PadForge එයට අත නොතබයි</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>Logitech Gaming Software 8.52 හෝ ඊට පසු අනුවාදයක් අවශ්‍යයි</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>Logitech Gaming Software අරඹන්න</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>Arx Control ඇති දුරකථනයක් සඳහා රැඳී සිටිමින්</value></data>
@@ -4337,6 +4339,7 @@ PadForge විසින් ඒවා දැන් අස්ථාපනය ක�
   <data name="Devices_FalconHandle" xml:space="preserve"><value>හසුරුව</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} මෙම පාලකයේ ට්‍රිගර සකසමින් සිටී.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} මෙම පාලකයේ ආලෝක සකසමින් සිටී.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} මෙම උපාංගයේ ආලෝක සකසමින් සිටී.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} මෙම පාලකයේ ට්‍රිගර සහ ආලෝක සකසමින් සිටී.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} මෙම පාලකයේ ආවේග ට්‍රිගර මත ට්‍රිගර කම්පන වාදනය කරමින් සිටී.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>මොඩ් ප්‍රයෝග ඉවත් කරන්න</value></data>
@@ -4344,10 +4347,10 @@ PadForge විසින් ඒවා දැන් අස්ථාපනය ක�
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>වම/දකුණ</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>ඉහළ/පහළ</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>ඇතුළට/පිටතට</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>බොත්තම {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, {1} වෙතින් පූරණය කරන ලදී</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>ඔබ තෝරාගත් dhd64.dll පූරණය නොවූ බැවින් PadForge ඉහත සඳහන් පිටපත භාවිත කරයි.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Force Dimension හි පුස්තකාලය ධාවනය වන්නේ PadForge හි x64 අනුවාදයේ පමණි.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>dhd64.dll හමු වූ නමුත් එය පූරණය කළ නොහැකි විය.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>එම dhd64.dll, PadForge බලාපොරොත්තු වන Force Dimension පුස්තකාලය නොවේ.</value></data>
@@ -4357,11 +4360,12 @@ PadForge විසින් ඒවා දැන් අස්ථාපනය ක�
   <data name="Falcon_Status_Open" xml:space="preserve"><value>විවෘතයි</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Falcon එකක් වෙනත් වැඩසටහනක විවෘතව ඇත, උදාහරණයක් ලෙස FalconJoyForce හෝ Force Dimension හි මෙවලම්. එය එහි වසන්න.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon වෙනත් ධාවකයක ({0}) ඇති බැවින් Force Dimension හි පුස්තකාලයට එය විවෘත කළ නොහැක. උපාංග කළමනාකරු තුළ, Force Dimension හි SDK ෆෝල්ඩරයේ ඇති drivers\usb ෆෝල්ඩරයෙන් Falcon හි ධාවකය යාවත්කාලීන කරන්න.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon Force Dimension හි ධාවකයේ ඇතත්, Force Dimension හි පුස්තකාලයට එය විවෘත කළ නොහැකි විය: {0}. එහි බල සැපයුම සහ USB කේබලය පරීක්ෂා කරන්න.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Falcon එකක් ධාවකයක් නොමැතිව සම්බන්ධ කර ඇත. “Falcon ධාවකය ස්ථාපනය කරන්න” මගින් එයට Force Dimension හි ධාවකය ලබා දේ.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Falcon එකක් ධාවකයක් නොමැතිව සම්බන්ධ කර ඇති අතර, SDK ෆෝල්ඩරයේ එයට ලබා දීමට ධාවක පැකේජයක් නැත. Force Dimension හි SDK නැවත ස්ථාපනය කරන්න.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Falcon එකක් හමු නොවීය. එහි බල සැපයුම සහ USB කේබලය සම්බන්ධ කරන්න.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>dhd64.dll තෝරන්න…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Force Dimension හි පුස්තකාලයේ මෙම පිටපත අන් සියල්ලට පෙර පූරණය කරයි. SDK ස්ථාපනය කරන පිටපත් මෙය නොමැතිවම සොයා ගැනේ.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Force Dimension හි පුස්තකාලයේ මෙම පිටපත වෙනත් ඕනෑම පිටපතක් වෙනුවට පූරණය කරයි. වෙනත් පිටපතක විවෘතව ඇති Falcon එකක් වැසී මෙම පිටපතෙන් නැවත විවෘත වේ. SDK ස්ථාපනය කරන පිටපත් මෙය නොමැතිවම සොයා ගැනේ.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|පුස්තකාල (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Falcon ධාවකය ස්ථාපනය කරන්න</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>ධාවකයක් නොමැති Falcon එකකට SDK ෆෝල්ඩරයෙන් Force Dimension හි ධාවකය ස්ථාපනය කරයි. Force Dimension විශ්වාස කළ යුතුද යන්න Windows මුලින් විමසිය හැක.</value></data>
@@ -4378,7 +4382,7 @@ PadForge විසින් ඒවා දැන් අස්ථාපනය ක�
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>ඔබ Force Dimension වෙතින් ස්ථාපනය කරන Force Dimension හි SDK හරහා Novint Falcon එකකින් ක්‍රීඩා කරයි. හසුරුව ස්ටික් එකක් වේ, ග්‍රහණයේ බොත්තම් හතර බොත්තම් වේ, සහ PadForge ක්‍රීඩාවේ කම්පනය සහ ප්‍රයෝග හසුරුව මත බලයක් ලෙස යොදයි. Falcon දැනෙන ආකාරය එක් එක් ස්ලොට් එකේ බල ප්‍රතිපෝෂණය ටැබය මගින් සකසයි.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Novint Falcon පාලනය කරන්න</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>එක් එක් Falcon එක Force Dimension හි dhd64.dll හරහා විවෘත කරයි. විවෘත Falcon එකක් PadForge සතු පමණක් වන බැවින්, මෙය සක්‍රිය අතරතුර FalconJoyForce සහ Force Dimension හි මෙවලම්වලට එය විවෘත කළ නොහැක. අක්‍රිය කළ විට, PadForge සියලුම Falcon වසා දමයි.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon පුස්තකාලය {0} ලෙස සකසා ඇත. දැනටමත් භාවිතයේ ඇති පිටපතක් PadForge නැවත ආරම්භ වන තෙක් පවතී.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon පුස්තකාලය {0} ලෙස සකසා ඇත. PadForge තත්පර කිහිපයක් ඇතුළත එය පූරණය කරන අතර, වෙනත් පිටපතක විවෘතව ඇති Falcon එකක් මෙම පිටපතෙන් නැවත විවෘත වේ.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Force Dimension හි Falcon ධාවකය ස්ථාපනය කරමින්…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Force Dimension හි Falcon ධාවක පැකේජය හෝ එහි කැටලොගය නැත: {0}. Force Dimension හි SDK නැවත ස්ථාපනය කරන්න.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>කිසිදු Falcon එකක් සම්බන්ධ කර නැත.</value></data>

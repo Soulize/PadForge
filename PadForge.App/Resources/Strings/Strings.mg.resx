@@ -148,6 +148,7 @@
   <data name="FirstRun_Next" xml:space="preserve"><value>Manaraka</value></data>
   <data name="FirstRun_Done" xml:space="preserve"><value>Vita</value></data>
   <data name="Pad_ScopeDevice" xml:space="preserve"><value>Fitaovana</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Mihaino amin'ny :{0}. Mandefa any amin'ny contrôleur laharana {2} ny {1}, nefa tsy misy contrôleur virtoaly misy contrôleur PlayStation manana io laharana io.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Ampiasain'ny programa hafa, toy ny DSX, ny port {0}. Akatony izy na mifidiana port hafa.</value></data>
   <data name="Dashboard_WebPlainLocalOnly" xml:space="preserve"><value>Ity PC ity ihany</value></data>
   <data name="Dashboard_WebNewAccessCode" xml:space="preserve"><value>Kaody vaovao</value></data>
@@ -1791,6 +1792,7 @@
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>mivantana eo amin'ny {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>mampifandray ny WinUSB amin'ny efijerin'ny G19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>mampiasa pilote hafa ({0}) ny efijerin'ny G19, koa atombohy ny Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>mampiasa ny pilote an'ny programa hafa ({0}) ny efijerin'ny G19, ary tsy kasihin'ny PadForge izany</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>mila Logitech Gaming Software 8.52 na vaovao kokoa</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>atombohy ny Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>miandry finday misy Arx Control</value></data>
@@ -1846,14 +1848,15 @@
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Tahony</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} no mandrindra ny gâchette an'ity contrôleur ity.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} no mandrindra ny jiron'ity contrôleur ity.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} no mandrindra ny jiron'ity fitaovana ity.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} no mandrindra ny gâchette sy ny jiron'ity contrôleur ity.</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Havia/Havanana</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Ambony/Ambany</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Anatiny/Ivelany</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Bokotra {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, nampidirina avy ao amin'ny {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Tsy tafiditra ny dhd64.dll nofidinao, ka ny kopia etsy ambony no ampiasain'ny PadForge.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Ny bibliothèque an'ny Force Dimension dia tsy mandeha afa-tsy amin'ny version x64 an'ny PadForge.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>Hita ny dhd64.dll fa tsy afaka nampidirina.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Io dhd64.dll io dia tsy ilay bibliothèque Force Dimension andrasan'ny PadForge.</value></data>
@@ -1863,11 +1866,12 @@
   <data name="Falcon_Status_Open" xml:space="preserve"><value>misokatra</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Misy Falcon misokatra ao amin'ny programa hafa, toy ny FalconJoyForce na ny programan'ny Force Dimension. Akatony any.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Amin'ny pilote hafa ({0}) ny Falcon, ka tsy afaka manokatra azy ny bibliothèque an'ny Force Dimension. Ao amin'ny Gestionnaire de périphériques, havaozy ny pilote an'ny Falcon avy amin'ny dossier drivers\usb ao amin'ny dossier SDK an'ny Force Dimension.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Amin'ny pilote an'ny Force Dimension ny Falcon, nefa tsy afaka nanokatra azy ny bibliothèque an'ny Force Dimension: {0}. Hamarino ny herinaratra sy ny tariby USB.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Misy Falcon mifandray tsy misy pilote. Ny "Apetraho ny pilote Falcon" no manome azy ny an'ny Force Dimension.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Misy Falcon mifandray tsy misy pilote, ary tsy misy package pilote homena azy ao amin'ny dossier SDK. Apetraho indray ny SDK an'ny Force Dimension.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Tsy nahitana Falcon. Ampifandraiso amin'ny herinaratra sy amin'ny tariby USB izy.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Misafidiana dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Ity kopia ity amin'ny bibliothèque an'ny Force Dimension no ampidirina voalohany. Ireo kopia apetraky ny SDK dia hita na tsy misy izany aza.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Ity kopia ity amin'ny bibliothèque an'ny Force Dimension no ampidirina hisolo ny hafa rehetra. Ny Falcon misokatra amin'ny kopia hafa dia mikatona ary misokatra indray amin'ity kopia ity. Ireo kopia apetraky ny SDK dia hita na tsy misy izany aza.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Bibliothèques (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Apetraho ny pilote Falcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Mametraka ny pilote an'ny Force Dimension, avy amin'ny dossier SDK, amin'ny Falcon tsy manana pilote. Mety hanontany aloha ny Windows raha hatoky ny Force Dimension.</value></data>
@@ -1884,7 +1888,7 @@
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Milalao lalao amin'ny Novint Falcon amin'ny alalan'ny SDK an'ny Force Dimension, izay apetrakao avy amin'ny Force Dimension. Stick ny tahony, bokotra ny bokotra efatra eo amin'ny fihazonana, ary avadik'ny PadForge ho hery eo amin'ny tahony ny vibration sy ny effets an'ny lalao. Ny onglet Force feedback an'ny slot tsirairay no mamaritra ny fahatsapana ny Falcon.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Ampiasao ny Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Manokatra ny Falcon tsirairay amin'ny alalan'ny dhd64.dll an'ny Force Dimension. An'ny PadForge irery ny Falcon misokatra, ka tsy afaka manokatra azy ny FalconJoyForce sy ny programan'ny Force Dimension raha alefa ity. Raha vonoina, akaton'ny PadForge ny Falcon rehetra.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Napetraka ho {0} ny bibliothèque Falcon. Ny kopia efa ampiasaina dia mijanona mandra-panombohana indray ny PadForge.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Napetraka ho {0} ny bibliothèque Falcon. Ampidirin'ny PadForge ao anatin'ny segondra vitsy izy, ary ny Falcon misokatra amin'ny kopia hafa dia misokatra indray amin'ity kopia ity.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Mametraka ny pilote Falcon an'ny Force Dimension…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Tsy hita ny package pilote Falcon an'ny Force Dimension, na ny catalogue-ny: {0}. Apetraho indray ny SDK an'ny Force Dimension.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Tsy misy Falcon mifandray.</value></data>

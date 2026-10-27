@@ -258,6 +258,15 @@ namespace PadForge.Common.Input
         /// source. Poll thread only.</summary>
         internal long MacroPassTick;
 
+        /// <summary>Ends every effect whose owner is no longer an enabled
+        /// macro of the slot. Its own method so the predicate's closure is
+        /// made only while an effect is held: a lambda over a loop local
+        /// allocates its closure at the top of every iteration, guarded or
+        /// not, which was 16 objects per pass on the poll thread.</summary>
+        private static void ReleaseEffectsOfMacrosGone(MacroTriggerEffectState heldEffects, MacroItem[] macros)
+            => heldEffects.ReleaseOwnersNotIn(owner => owner is MacroItem m && m.IsEnabled
+                && macros != null && Array.IndexOf(macros, m) >= 0);
+
         /// <summary>
         /// Step 4b: Evaluate macros for all pad slots.
         /// Called after CombineOutputStates and before VirtualDevices.
@@ -299,8 +308,7 @@ namespace PadForge.Common.Input
                 // neither reaches the release hook again.
                 var heldEffects = MacroTriggerEffects[i];
                 if (heldEffects.AnyOwned)
-                    heldEffects.ReleaseOwnersNotIn(owner => owner is MacroItem m && m.IsEnabled
-                        && macros != null && Array.IndexOf(macros, m) >= 0);
+                    ReleaseEffectsOfMacrosGone(heldEffects, macros);
                 if (macros == null || macros.Length == 0)
                     continue;
 

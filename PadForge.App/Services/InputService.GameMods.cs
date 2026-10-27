@@ -19,6 +19,26 @@ namespace PadForge.Services
         private long _gameModLinesVersion = -1;
         private long _gameModLinesMs;
 
+        /// <summary>How often a server kept from its port by another
+        /// program tries the bind again: the game mod server, the motion
+        /// server and the web controller, on the dashboard tick.</summary>
+        internal const long PortInUseRetryMs = 3000;
+
+        /// <summary>Why the last start failed, with its port and when, or
+        /// Stopped when the server runs or was stopped. A language change
+        /// rebuilds the card's line from it (<see cref="GameModStoppedStatus"/>).
+        /// Written where the server starts and stops, on the threads those
+        /// run on.</summary>
+        private GameModServer.ServerState _gameModFailure = GameModServer.ServerState.Stopped;
+        private int _gameModFailurePort;
+        private long _gameModFailedMs;
+
+        /// <summary>The card's line while no server runs: why the last start
+        /// failed, or Stopped.</summary>
+        private string GameModStoppedStatus() => _gameModFailure == GameModServer.ServerState.Stopped
+            ? Strings.Instance.Common_Stopped
+            : GameModServer.FormatStatus(_gameModFailure, _gameModFailurePort, null, 0);
+
         /// <summary>Starts the server for DSX game mods when its switch is
         /// on and the engine runs, the motion server's rule.</summary>
         private void StartGameModServerIfEnabled()
@@ -37,6 +57,9 @@ namespace PadForge.Services
                 // The status the failed start raised stays on the card: the
                 // port in use or the bind that failed.
                 _gameModServer = null;
+                _gameModFailure = server.State;
+                _gameModFailurePort = port;
+                _gameModFailedMs = Environment.TickCount64;
                 string failed = server.FormatStatus();
                 server.Dispose();
                 _dispatcher.BeginInvoke(() =>
@@ -44,13 +67,29 @@ namespace PadForge.Services
                     _mainVm.Dashboard.GameModServerStatus = failed;
                     _mainVm.Dashboard.IsGameModServerRunning = false;
                 });
+                return;
             }
+            _gameModFailure = GameModServer.ServerState.Stopped;
         }
 
         private void StopGameModServer()
         {
+            _gameModFailure = GameModServer.ServerState.Stopped;
             var server = _gameModServer;
-            if (server == null) return;
+            if (server == null)
+            {
+                // A start that failed left its reason on the card, and no
+                // server runs to report the stop. Queued like that reason,
+                // so a start that follows at once (a port change) still
+                // shows its own line.
+                _dispatcher.BeginInvoke(() =>
+                {
+                    if (_gameModServer != null) return;
+                    _mainVm.Dashboard.GameModServerStatus = Strings.Instance.Common_Stopped;
+                    _mainVm.Dashboard.IsGameModServerRunning = false;
+                });
+                return;
+            }
             _gameModServer = null;
             server.Dispose();
             _dispatcher.BeginInvoke(() =>
@@ -78,19 +117,28 @@ namespace PadForge.Services
         /// <summary>The Dashboard line and the pad page lines, on the
         /// dashboard cadence. Rebuilt when what the mods hold changed, and
         /// once a second while they hold anything, since the virtual
-        /// controller a mod's index names moves with the pads. One read
-        /// when nothing moved.</summary>
+        /// controller a mod's index names moves with the pads. That
+        /// once-a-second order read also tells the virtual controllers when
+        /// the order moved (<see cref="GameModEffects.RefreshOrder"/>). One
+        /// read when nothing moved.</summary>
         private void UpdateGameModLines()
         {
             long version = GameModEffects.Version;
             long now = Environment.TickCount64;
+            // A port another program held, such as DSX: the bind is tried
+            // again every few seconds while the switch is on and the engine
+            // runs, so closing that program brings the server up. A start
+            // that fails again records the new time.
+            if (_gameModFailure == GameModServer.ServerState.PortInUse && _gameModServer == null
+                && now - _gameModFailedMs >= PortInUseRetryMs)
+                StartGameModServerIfEnabled();
             bool held = GameModEffects.AnyHeld;
             if (version == _gameModLinesVersion && !(held && now - _gameModLinesMs >= 1000)) return;
             _gameModLinesVersion = version;
             _gameModLinesMs = now;
 
             if (_gameModServer != null) RefreshGameModStatus();
-            int[] order = held ? GameModEffects.OrderedSlots() : Array.Empty<int>();
+            int[] order = held ? GameModEffects.RefreshOrder() : Array.Empty<int>();
             foreach (var pad in _mainVm.Pads)
             {
                 var hold = held ? GameModEffects.ForController(Array.IndexOf(order, pad.PadIndex)) : null;
@@ -123,9 +171,10 @@ namespace PadForge.Services
 
         /// <summary>What the mods hold on the virtual controllers this device
         /// feeds, as this device carries it: a DualSense's triggers and
-        /// lights, a DualShock 4's lightbar, or the vibrations an Xbox pad's
-        /// impulse triggers play with Translate Adaptive Trigger Vibrations
-        /// on. Empty when none of that reaches it.</summary>
+        /// lights, a DualShock 4's lightbar, the lightbar color on a mouse,
+        /// keyboard or lighting row the slot lights, or the vibrations an
+        /// Xbox pad's impulse triggers play with Translate Adaptive Trigger
+        /// Vibrations on. Empty when none of that reaches it.</summary>
         internal static string GameModDeviceLine(UserDevice ud)
         {
             if (ud == null || !GameModEffects.AnyHeld) return string.Empty;
@@ -148,7 +197,7 @@ namespace PadForge.Services
             bool sony = GameModEffects.IsSonyPad(ud.VendorId, ud.ProdId);
             bool dualSense = GameModEffects.IsDualSense(ud.VendorId, ud.ProdId);
             bool impulse = !sony && ud.Device != null && ud.Device.HasRumbleTriggers;
-            bool triggers = false, lights = false, impulseVibrations = false;
+            bool triggers = false, lights = false, peripheralLights = false, impulseVibrations = false;
             string name = null;
             foreach (var (slot, translate) in fed)
             {
@@ -165,10 +214,22 @@ namespace PadForge.Services
                     lights = true;
                     reached = true;
                 }
-                else if (impulse && translate && hold.HasTriggers)
+                else
                 {
-                    impulseVibrations = true;
-                    reached = true;
+                    // A mouse, keyboard or lighting row the slot lights
+                    // takes the mod's color where no game color is live
+                    // (UserEffectsDispatcher.LightPeripheral). The slot's
+                    // claim on the row is that dispatcher's own answer.
+                    if (hold.Lightbar != null && PadForge.Common.Input.Peripherals.PeripheralOutputs.IsLitBy(ud.InstanceGuid, slot))
+                    {
+                        peripheralLights = true;
+                        reached = true;
+                    }
+                    if (impulse && translate && hold.HasTriggers)
+                    {
+                        impulseVibrations = true;
+                        reached = true;
+                    }
                 }
                 if (reached) name ??= hold.SenderName;
             }
@@ -179,6 +240,8 @@ namespace PadForge.Services
             if (triggers && lights) return string.Format(culture, s.Devices_GameModTriggersAndLights_Format, name);
             if (triggers) return string.Format(culture, s.Devices_GameModTriggers_Format, name);
             if (lights) return string.Format(culture, s.Devices_GameModLights_Format, name);
+            // A mouse, keyboard or lighting row is no controller.
+            if (peripheralLights) return string.Format(culture, s.Devices_GameModPeripheralLights_Format, name);
             if (impulseVibrations) return string.Format(culture, s.Devices_GameModImpulse_Format, name);
             return string.Empty;
         }

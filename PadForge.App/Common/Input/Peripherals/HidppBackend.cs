@@ -28,6 +28,34 @@ namespace PadForge.Common.Input.Peripherals
             PendingContainers = pending;
             Scanned = scanned;
         }
+
+        /// <summary>True when both hold equal units in the same order, the
+        /// same pending containers and the same scan state, so publishing one
+        /// raises a status change only when a tab would read something new.
+        /// The worker builds a new snapshot on every scan and liveness check,
+        /// most of them the same as the last, as the direct backends'
+        /// <see cref="DirectSnapshot.SameAs"/> expects of its own.</summary>
+        public bool SameAs(HidppSnapshot other)
+        {
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null || other.Scanned != Scanned
+                || other.Units.Count != Units.Count
+                || other.PendingContainers.Count != PendingContainers.Count) return false;
+            for (int i = 0; i < Units.Count; i++)
+                if (!SameUnit(Units[i], other.Units[i])) return false;
+            foreach (var container in PendingContainers)
+                if (!other.PendingContainers.Contains(container)) return false;
+            return true;
+        }
+
+        /// <summary>A record compares its zone array by reference, and every
+        /// scan builds a new array, so the zones are compared by value.</summary>
+        private static bool SameUnit(HidppUnit a, HidppUnit b)
+        {
+            if (ReferenceEquals(a, b)) return true;
+            if (a == null || b == null) return false;
+            return a.Zones.AsSpan().SequenceEqual(b.Zones) && (a with { Zones = b.Zones }) == b;
+        }
     }
 
     /// <summary>

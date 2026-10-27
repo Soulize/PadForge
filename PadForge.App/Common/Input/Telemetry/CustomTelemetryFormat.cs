@@ -105,6 +105,17 @@ namespace PadForge.Common.Input.Telemetry
         [XmlAttribute] public string Name { get; set; } = string.Empty;
 
         [XmlAttribute] public int Offset { get; set; }
+
+        /// <summary>A variable's axis on the row, counted after the standard
+        /// axes, or -1 before one is given. The runtime gives a name an axis
+        /// once and keeps it while the name is in use, so deleting or
+        /// reordering a variable never moves another one's axis and a saved
+        /// mapping keeps reading its variable. Written here so the axis
+        /// survives a restart. A file from before has none, and its
+        /// variables take the axes in the order they are first used, which
+        /// is where they were.</summary>
+        [XmlAttribute] public int Axis { get; set; } = -1;
+        public bool ShouldSerializeAxis() => Target == CustomTelemetryTarget.Variable && Axis >= 0;
         [XmlAttribute] public CustomTelemetryType Type { get; set; } = CustomTelemetryType.F32;
 
         /// <summary>A JSON format's key, dots for nested objects.</summary>
@@ -139,8 +150,11 @@ namespace PadForge.Common.Input.Telemetry
     }
 
     /// <summary>A custom variable as the row and the expression source see
-    /// it: its name and the span its axis covers.</summary>
-    internal sealed record TelemetryVariable(string Name, double Min, double Max);
+    /// it: its name, the span its axis covers, and the axis it keeps on the
+    /// row, counted after the standard axes (0 is the row's axis 7), or -1
+    /// when every axis is taken and it reads as an expression channel
+    /// alone.</summary>
+    internal sealed record TelemetryVariable(string Name, double Min, double Max, int Slot);
 
     /// <summary>
     /// A custom format ready to read: each variable field already holds its
@@ -203,7 +217,9 @@ namespace PadForge.Common.Input.Telemetry
                 var field = fields[i];
                 if (field == null) continue;
                 int size = CustomTelemetryField.SizeOf(field.Type);
-                if (field.Offset < 0 || field.Offset + size > p.Length) continue;
+                // Subtracted, so an offset near int.MaxValue cannot overflow
+                // past the check.
+                if (field.Offset < 0 || field.Offset > p.Length - size) continue;
                 double raw = ReadBinary(p.Slice(field.Offset, size), field.Type, _format.BigEndian);
                 Apply(field, i, raw, f);
             }

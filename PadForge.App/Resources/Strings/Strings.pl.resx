@@ -319,6 +319,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Działa z modami stworzonymi dla DSX, na przykład do GTA V, Red Dead Redemption 2, Skyrim i Forza. Gdy serwer nasłuchuje, PadForge zapisuje swój port tam, gdzie mody go szukają.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Nasłuchuje na :{0}. {1} wysyła do wirtualnego kontrolera {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Nasłuchuje na :{0}. {1} wysyła dane, ale żaden wirtualny kontroler nie ma kontrolera PlayStation.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Nasłuchuje na :{0}. {1} wysyła do kontrolera o indeksie {2}, a żaden wirtualny kontroler z kontrolerem PlayStation nie ma takiego indeksu.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Port {0} jest zajęty przez inny program, na przykład DSX. Zamknij go lub wybierz inny port.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Mod do gry</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Działa z OpenTrack i każdym trackerem, który wysyła dane wyjściowe przez UDP lub zapisuje pamięć współdzieloną FreeTrack 2.0, a także ze środowiskiem uruchomieniowym OpenXR na tym komputerze, które potrafi prowadzić sesję w tle.</value></data>
@@ -4127,7 +4128,7 @@ Czy PadForge ma je teraz odinstalować? Wymaga to uprawnień administratora i mo
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Oczekiwanie na dane z pamięci współdzielonej FreeTrack.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>Pamięć współdzielona FreeTrack jest niedostępna.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Wibracje kąta skrętu</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Dodaje ciągłe wibracje, gdy wybrana oś wirtualnego drążka oddala się od środka. Używa zmapowanego wyjścia ze wszystkich przypisanych źródeł. Przy opcji Podział według kierunku ruch ujemny steruje lewym silnikiem, a dodatni prawym. Opcja Lewy silnik lub Prawy silnik kieruje oba kierunki na ten jeden silnik. Dla wyjścia Xbox i PlayStation z urządzeniami z wibracjami. Natywny force feedback kierownic jest wyłączony z tej funkcji.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Dodaje ciągłe wibracje, gdy wybrana oś wirtualnego drążka oddala się od środka. Używa zmapowanego wyjścia ze wszystkich przypisanych źródeł. Przy opcji Podział według kierunku ruch ujemny steruje lewym silnikiem, a dodatni prawym. Opcja Lewy silnik lub Prawy silnik kieruje oba kierunki na ten jeden silnik. Dla wyjścia Xbox i PlayStation z urządzeniami z wibracjami. Pomija kierownice, inne urządzenia ze stałym force feedback oraz pedały Fanatec.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Włącz wibracje kąta skrętu</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Oś wirtualna</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Lewy drążek X</value></data>
@@ -4330,6 +4331,7 @@ Czy PadForge ma je teraz odinstalować? Wymaga to uprawnień administratora i mo
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>bezpośrednio na ekranie: {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>wiązanie WinUSB z ekranem G19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>ekran G19 używa innego sterownika ({0}), więc uruchom Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>ekran G19 używa sterownika innego programu ({0}), którego PadForge nie rusza</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>wymaga Logitech Gaming Software 8.52 lub nowszego</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>uruchom Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>oczekiwanie na telefon z Arx Control</value></data>
@@ -4401,6 +4403,7 @@ Czy PadForge ma je teraz odinstalować? Wymaga to uprawnień administratora i mo
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Uchwyt</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} ustawia spusty tego kontrolera.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} ustawia podświetlenie tego kontrolera.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} ustawia podświetlenie tego urządzenia.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} ustawia spusty i podświetlenie tego kontrolera.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} odtwarza wibracje spustów na spustach impulsowych tego kontrolera.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Wyczyść efekty modów</value></data>
@@ -4408,10 +4411,10 @@ Czy PadForge ma je teraz odinstalować? Wymaga to uprawnień administratora i mo
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Lewo/prawo</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Góra/dół</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Do środka/na zewnątrz</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Przycisk {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, wczytany z {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Wybrany plik dhd64.dll nie został wczytany, więc PadForge używa kopii podanej wyżej.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Biblioteka Force Dimension działa tylko w wersji x64 programu PadForge.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>Znaleziono dhd64.dll, ale nie udało się go wczytać.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Ten plik dhd64.dll nie jest biblioteką Force Dimension, jakiej oczekuje PadForge.</value></data>
@@ -4421,11 +4424,12 @@ Czy PadForge ma je teraz odinstalować? Wymaga to uprawnień administratora i mo
   <data name="Falcon_Status_Open" xml:space="preserve"><value>otwarte</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Falcon jest otwarty w innym programie, na przykład FalconJoyForce lub w narzędziach Force Dimension. Zamknij go tam.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon korzysta z innego sterownika ({0}), więc biblioteka Force Dimension nie może go otworzyć. W Menedżerze urządzeń zaktualizuj sterownik Falcona z folderu drivers\usb w folderze SDK Force Dimension.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon korzysta ze sterownika Force Dimension, a biblioteka Force Dimension nie mogła go otworzyć: {0}. Sprawdź zasilanie i kabel USB.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Falcon jest podłączony, ale nie ma sterownika. Przycisk Zainstaluj sterownik Falcona instaluje sterownik Force Dimension.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Falcon jest podłączony bez sterownika, a w folderze SDK nie ma pakietu sterownika do zainstalowania. Zainstaluj ponownie Force Dimension SDK.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Nie znaleziono Falcona. Podłącz zasilanie i kabel USB.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Wybierz dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Wczytuje tę kopię biblioteki Force Dimension przed wszystkimi innymi. Kopie instalowane przez SDK są znajdowane także bez tego.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Wczytuje tę kopię biblioteki Force Dimension zamiast każdej innej. Falcon otwarty na innej kopii zamyka się i otwiera ponownie na tej. Kopie instalowane przez SDK są znajdowane także bez tego.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Biblioteki (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Zainstaluj sterownik Falcona</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Instaluje sterownik Force Dimension z folderu SDK na Falconie, który go nie ma. Windows może najpierw zapytać, czy ufać Force Dimension.</value></data>
@@ -4442,7 +4446,7 @@ Czy PadForge ma je teraz odinstalować? Wymaga to uprawnień administratora i mo
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Obsługa gier z użyciem Novint Falcon przez Force Dimension SDK, który należy zainstalować od Force Dimension. Uchwyt działa jak drążek, cztery przyciski uchwytu to przyciski, a PadForge przekazuje wibracje i efekty z gry na uchwyt jako siłę. Karta Force feedback każdego slotu ustawia, jak Falcon działa w dłoni.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Steruj urządzeniem Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Otwiera każdy Falcon przez dhd64.dll od Force Dimension. Otwarty Falcon należy wyłącznie do PadForge, więc gdy ta opcja jest włączona, FalconJoyForce i narzędzia Force Dimension nie mogą go otworzyć. Po wyłączeniu PadForge zamyka każdy Falcon.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Biblioteka Falcona ustawiona na {0}. Kopia, która jest już używana, pozostaje do ponownego uruchomienia PadForge.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Biblioteka Falcona ustawiona na {0}. PadForge wczyta ją w ciągu kilku sekund, a Falcon otwarty na innej kopii otworzy się ponownie na tej.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Instalowanie sterownika Falcona od Force Dimension…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Brakuje pakietu sterownika Falcona od Force Dimension lub jego katalogu: {0}. Zainstaluj ponownie Force Dimension SDK.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Żaden Falcon nie jest podłączony.</value></data>

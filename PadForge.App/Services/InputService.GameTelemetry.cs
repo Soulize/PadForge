@@ -99,7 +99,12 @@ namespace PadForge.Services
             return line;
         }
 
-        /// <summary>A game's own name, which no language translates.</summary>
+        /// <summary>The sender's name for the status line. A game's own name
+        /// is never translated. A format two games send with nothing in it
+        /// that tells them apart (Project
+        /// CARS 2's, which Automobilista 2 also sends, and the ETS2 plugin's,
+        /// which American Truck Simulator also loads) takes the picker's
+        /// entry, which names both.</summary>
         internal static string SourceName(TelemetryStatus status) => status.Source switch
         {
             TelemetrySource.ForzaSled => "Forza",
@@ -111,10 +116,10 @@ namespace PadForge.Services
             TelemetrySource.EaSportsWrc => "EA SPORTS WRC",
             TelemetrySource.BeamNg => "BeamNG.drive",
             TelemetrySource.LiveForSpeed => "Live for Speed",
-            TelemetrySource.ProjectCars2 => "Project CARS 2",
+            TelemetrySource.ProjectCars2 => Strings.Instance.Telemetry_Game_ProjectCars2,
             TelemetrySource.AssettoCorsa => "Assetto Corsa",
             TelemetrySource.AssettoCorsaCompetizione => "Assetto Corsa Competizione",
-            TelemetrySource.TruckSimulator => "Euro Truck Simulator 2",
+            TelemetrySource.TruckSimulator => Strings.Instance.Telemetry_Game_TruckSimulator,
             TelemetrySource.Custom => status.CustomName,
             _ => string.Empty,
         };

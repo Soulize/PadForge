@@ -437,8 +437,8 @@
 
             <!-- ═══ Keyboard Screens (issue #519) ═══
                  Off by default. On, PadForge draws the Logitech GamePanel
-                 screens, Arx Control and the S.T.R.I.K.E. 7, a line per kind
-                 says what draws it, and each kind has its own dialog. -->
+                 screens, Arx Control and the S.T.R.I.K.E. 7. Each screen's row
+                 on the Devices page says what draws it and opens its dialog. -->
             <Border Style="{StaticResource CardBorder}" Margin="0,0,0,20">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
@@ -456,8 +456,9 @@
                                   IsChecked="{Binding KeyboardScreensEnabled}"/>
                         <reset:SettingResetButton Command="{Binding ResetSettingCommand}" CommandParameter="KeyboardScreensEnabled" SettingLabel="{Binding Settings_KeyboardScreens, Source={x:Static strings:Strings.Instance}}" AutomationProperties.AutomationId="Reset_SettingsViewModel_KeyboardScreensEnabled_13109"/>
                     </StackPanel>
-                    <!-- A line per kind naming what draws it. Empty while the
-                         feature is off or the engine is stopped. -->
+                    <!-- The feature's lines: the vendor libraries and no
+                         screen found. Empty while the feature is off or the
+                         engine is stopped. -->
                     <TextBlock common:LiveText.Polite="True" Text="{Binding KeyboardScreensStatus}"
                                Visibility="{Binding KeyboardScreensStatus, Converter={StaticResource StringToVisibility}}"
                                TextWrapping="Wrap" Margin="0,0,0,8"
@@ -480,8 +481,9 @@
 
             <!-- ═══ Novint Falcon (issue #521) ═══
                  Off by default. On, PadForge opens each Falcon through Force
-                 Dimension's library, the user's own install of its SDK, and a
-                 line per Falcon says how it runs or why it did not open. -->
+                 Dimension's library, the user's own install of its SDK. The
+                 card says which library runs and, while no Falcon is open, why
+                 none opened. Each open Falcon's line is on its Devices panel. -->
             <Border Style="{StaticResource CardBorder}" Margin="0,0,0,20">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
@@ -498,8 +500,8 @@
                                   IsChecked="{Binding NovintFalconEnabled}"/>
                         <reset:SettingResetButton Command="{Binding ResetSettingCommand}" CommandParameter="NovintFalconEnabled" SettingLabel="{Binding Settings_Falcon, Source={x:Static strings:Strings.Instance}}" AutomationProperties.AutomationId="Reset_SettingsViewModel_NovintFalconEnabled_13110"/>
                     </StackPanel>
-                    <!-- The library's line, then a line per Falcon or why none
-                         opened. Empty while the switch is off or the engine is
+                    <!-- The library's line, then why no Falcon opened while none
+                         is open. Empty while the switch is off or the engine is
                          stopped. -->
                     <TextBlock common:LiveText.Polite="True" Text="{Binding FalconStatus}"
                                Visibility="{Binding FalconStatus, Converter={StaticResource StringToVisibility}}"

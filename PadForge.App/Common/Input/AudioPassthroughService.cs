@@ -1597,6 +1597,11 @@ namespace PadForge.Common.Input
             public System.Threading.Thread UsbJackThread;
             public volatile bool UsbJackStop;
             public Guid UsbJackPadGuid;
+            /// <summary>The pad whose USB jack reader last failed to open, and
+            /// when the reconcile may start it again (<see cref="PersonaLaneRestarts"/>).
+            /// Written under HidLaneLock.</summary>
+            public Guid UsbJackRetryPad;
+            public long UsbJackRetryAfterTick;
             public IntPtr UsbJackHandle;
             public PersonaReader UsbJackReader;
             public volatile bool BtMicStop;
@@ -1623,6 +1628,12 @@ namespace PadForge.Common.Input
                 public GuidBox(Guid v) { Value = v; }
             }
             public long BtMicRxFrames;
+            /// <summary>The pad whose Bluetooth microphone reader last failed
+            /// to open, and when the reconcile may start it again
+            /// (<see cref="PersonaLaneRestarts"/>). Written under
+            /// HidLaneLock.</summary>
+            public Guid BtMicRetryPad;
+            public long BtMicRetryAfterTick;
             /// <summary>The Bluetooth microphone pad is a DualShock 4 (#528):
             /// <see cref="Ds4BtMicLoop"/> reads it, and stopping it sends no
             /// DualSense session report.</summary>
@@ -2143,13 +2154,15 @@ namespace PadForge.Common.Input
             // lock is free.
             lock (feed.HidLaneLock)
             {
-                if (usbJackPad != feed.UsbJackPadGuid)
+                if (PersonaLaneRestarts(usbJackPad, feed.UsbJackPadGuid, feed.UsbJackRetryPad,
+                                        feed.UsbJackRetryAfterTick, Environment.TickCount64))
                 {
                     StopUsbJack(feed);
                     if (usbJackPad != Guid.Empty) StartUsbJack(feed, usbJackPad, usbJackPath, generation);
                 }
 
-                if (btMicPad != feed.BtMicPadGuid)
+                if (PersonaLaneRestarts(btMicPad, feed.BtMicPadGuid, feed.BtMicRetryPad,
+                                      feed.BtMicRetryAfterTick, Environment.TickCount64))
                 {
                     StopBtMic(feed);
                     if (btMicPad != Guid.Empty) StartBtMic(feed, btMicPad, btMicPath, generation, btMicIsDs4);
@@ -2211,6 +2224,59 @@ namespace PadForge.Common.Input
 
         internal static Action<PersonaFeed, bool> PersonaReaderOpening;
         internal static Action<PersonaFeed, bool, bool, byte[], int> PersonaReadBoundary;
+
+        /// <summary>Whether the reconcile restarts a feed's Bluetooth
+        /// microphone lane or USB jack lane: the wanted pad differs from the
+        /// one the lane reads, unless the lane gave that pad up after a failed
+        /// open and its retry deadline has not passed. The jack watch's rule
+        /// (<see cref="EnsureJackWatch"/>), so a reconcile every five seconds
+        /// cannot spin up a reader per pass.</summary>
+        internal static bool PersonaLaneRestarts(Guid wanted, Guid current, Guid failedPad,
+                                               long retryAfterTick, long now)
+            => wanted != current
+               && !(wanted != Guid.Empty && wanted == failedPad && now < retryAfterTick);
+
+        /// <summary>A Bluetooth microphone reader whose open failed gives the
+        /// lane up until <see cref="JackWatchRetryMs"/> has passed. With
+        /// BtMicPadGuid clear, the sink's jack watch and the voice lane may
+        /// take the pad meanwhile (<see cref="PersonaCoversJack"/>,
+        /// <see cref="IsBtMicLaneActive"/>), and the first reconcile after the
+        /// deadline starts a fresh reader. Only the first failure for a pad
+        /// is logged, as the jack watch does.</summary>
+        private static void NoteBtMicOpenFailed(PersonaFeed feed, int gen, int generation, string what)
+        {
+            bool first;
+            lock (feed.HidLaneLock)
+            {
+                if (feed.Retired || feed.RouteGeneration != generation || feed.BtMicGen != gen) return;
+                Guid pad = feed.BtMicPadGuid;
+                first = feed.BtMicRetryPad != pad;
+                feed.BtMicRetryPad = pad;
+                feed.BtMicRetryAfterTick = Environment.TickCount64 + JackWatchRetryMs;
+                feed.BtMicPadGuid = Guid.Empty;
+            }
+            if (first) Engine.SdlDiagLog.WriteLine("PERSONA " + what + " bt-reader open FAILED, retrying every "
+                                                   + JackWatchRetryMs / 1000 + " s");
+        }
+
+        /// <summary>The USB jack reader's twin of
+        /// <see cref="NoteBtMicOpenFailed"/>: with UsbJackPadGuid clear, the
+        /// sink's jack watch reads the pad until the reconcile retries.</summary>
+        private static void NoteUsbJackOpenFailed(PersonaFeed feed, int gen, int generation)
+        {
+            bool first;
+            lock (feed.HidLaneLock)
+            {
+                if (feed.Retired || feed.RouteGeneration != generation || feed.UsbJackGen != gen) return;
+                Guid pad = feed.UsbJackPadGuid;
+                first = feed.UsbJackRetryPad != pad;
+                feed.UsbJackRetryPad = pad;
+                feed.UsbJackRetryAfterTick = Environment.TickCount64 + JackWatchRetryMs;
+                feed.UsbJackPadGuid = Guid.Empty;
+            }
+            if (first) Engine.SdlDiagLog.WriteLine("PERSONA jack usb-reader open FAILED, retrying every "
+                                                   + JackWatchRetryMs / 1000 + " s");
+        }
 
         /// <summary>Start a synchronous reader for microphone input reports.
         /// The BT tick sends the open command through the sink's writer.</summary>
@@ -2287,7 +2353,7 @@ namespace PadForge.Common.Input
             IntPtr h = NativeMethods.OpenHidSync(hidPath);
             if (h == IntPtr.Zero || h == new IntPtr(-1))
             {
-                Engine.SdlDiagLog.WriteLine("PERSONA jack usb-reader open FAILED");
+                NoteUsbJackOpenFailed(feed, gen, generation);
                 return;
             }
             // A slow open can complete after this lane was retired (or
@@ -2302,6 +2368,7 @@ namespace PadForge.Common.Input
                 if (feed.Retired || feed.RouteGeneration != generation || feed.UsbJackGen != gen) { NativeMethods.CloseHandle(h); return; }
                 feed.UsbJackHandle = h;
                 feed.UsbJackReader = reader;
+                feed.UsbJackRetryPad = Guid.Empty;
                 padGuid = feed.UsbJackPadGuid;
             }
             try
@@ -2397,7 +2464,7 @@ namespace PadForge.Common.Input
             IntPtr h = NativeMethods.OpenHidSync(hidPath);
             if (h == IntPtr.Zero || h == new IntPtr(-1))
             {
-                Engine.SdlDiagLog.WriteLine("PERSONA mic bt-reader open FAILED");
+                NoteBtMicOpenFailed(feed, gen, generation, "mic");
                 return;
             }
             // Retired (or restarted) while our open was in flight: close
@@ -2411,6 +2478,7 @@ namespace PadForge.Common.Input
                 if (feed.Retired || feed.RouteGeneration != generation || feed.BtMicGen != gen) { NativeMethods.CloseHandle(h); return; }
                 feed.BtMicHandle = h;
                 feed.BtMicReader = reader;
+                feed.BtMicRetryPad = Guid.Empty;
                 padGuid = feed.BtMicPadGuid;
             }
             try
@@ -2476,7 +2544,7 @@ namespace PadForge.Common.Input
                     // endpoint mid-stream is served immediately rather than
                     // waiting for the next status poll. And if IsStreaming
                     // were ever wrong, a real drain empties the ring and
-                    // MicSubmitFits goes true, so the skip self-corrects
+                    // MicRingFits goes true, so the skip self-corrects
                     // instead of silencing the lane.
                     //
                     // The reader loop itself keeps running either way: the
@@ -2506,7 +2574,7 @@ namespace PadForge.Common.Input
                             Engine.SdlDiagLog.WriteLine("PERSONA mic IDLE decode skipped (no consumer)"
                                 + " rxFrames=" + feed.BtMicRxFrames
                                 + " blocksDropped=" + _micBlocksDropped
-                                + " buffered=" + mic.BufferedBytes + "/" + HmMicRingBytes
+                                + " buffered=" + mic.BufferedBytes + "/" + MicRingBytes(mic)
                                 + " padMuted=" + ((_btMicPadStatus & 0x04) != 0));
                         }
                         continue;
@@ -2651,7 +2719,7 @@ namespace PadForge.Common.Input
                         lastLog = now2;
                         int subRms = _subRmsCount > 0 ? (int)Math.Sqrt(_subRmsAcc / _subRmsCount) : 0;
                         Engine.SdlDiagLog.WriteLine("PERSONA mic blocksDropped=" + _micBlocksDropped
-                            + " buffered=" + mic.BufferedBytes + "/" + HmMicRingBytes);
+                            + " buffered=" + mic.BufferedBytes + "/" + MicRingBytes(mic));
                         Engine.SdlDiagLog.WriteLine("PERSONA mic SUBMITTED rms=" + subRms
                             + " peak=" + _subPeak + "  (normalized rms=" + (subRms / 32768.0).ToString("F4") + ")");
                         _subRmsAcc = 0; _subRmsCount = 0; _subPeak = 0;
@@ -2734,21 +2802,6 @@ namespace PadForge.Common.Input
         private static long _micBlocksDropped;
         private static readonly bool _micGuardDisabled =
             Environment.GetEnvironmentVariable("PADFORGE_MICNOGUARD") == "1";
-        /// <summary>HM's microphone ring capacity: UsbAudioEngine sizes it
-        /// micBytesPerInterval * 256, and the DualSense interval is
-        /// 48 samples * 2 ch * 2 bytes = 192.</summary>
-        internal const int HmMicRingBytes = 192 * 256;
-
-        /// <summary>True when a whole block fits HM's mic ring, so the
-        /// submit cannot be truncated mid-frame. HM computes its free
-        /// space as (capacity - 1 - buffered) and silently copies only
-        /// that many bytes, and the -1 makes the figure ODD, so a
-        /// truncated submit ends mid-sample and misaligns the ring for
-        /// good. Dropping a whole 10 ms block instead keeps every later
-        /// sample aligned.</summary>
-        internal static bool MicSubmitFits(int bufferedBytes, int blockBytes)
-            => HmMicRingBytes - 1 - bufferedBytes >= blockBytes;
-
         /// <summary>Finds the feed whose Bluetooth mic source is this pad.
         /// Sinks are few and this runs once per 10.667 ms tick, so a scan is
         /// fine.</summary>
@@ -3986,9 +4039,12 @@ namespace PadForge.Common.Input
                             // way to keep the controller's audio clock and FIFO
                             // running, and DS4-Sound-Link's notes say a stop
                             // pops the controller and switches its headphone
-                            // amplifier off. A sink exists only while the mirror,
+                            // amplifier off. So the pad receives a report of
+                            // silence about every 16 ms for the life of its
+                            // sink, by design. A sink exists while the mirror,
                             // controller-routed sound macros or an audio persona
-                            // want this pad, so an idle pad's radio still rests.
+                            // want this pad, and a pad none of them want gets no
+                            // audio reports at all.
                             if (s.IsDs4)
                             {
                                 Ds4BtTick(s, pull, inFrames);

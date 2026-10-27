@@ -215,33 +215,54 @@ namespace PadForge.Tests
         // instead of the sine. With the guard, the same tone captured
         // byte-exact at rms 0.0216.
 
-        [Fact]
-        public void MicSubmit_IsRefusedWhenAWholeBlockWouldNotFit()
+        // HIDMaestro sizes the ring at 256 one-ms intervals of the endpoint's
+        // own format (UsbAudioEngine.cs:239-246): 192 x 256 bytes for the
+        // DualSense's 48 kHz stereo, 32 x 256 for the virtual DualShock 4's
+        // 16 kHz mono. A 10 ms block is 1920 and 320 bytes.
+        [Theory]
+        [InlineData(48000, 2, 49152, 1920)]
+        [InlineData(16000, 1, 8192, 320)]
+        public void MicSubmit_IsRefusedWhenAWholeBlockWouldNotFit(int rate, int channels, int cap, int block)
         {
-            const int block = 1920;   // one 10 ms stereo block at 48 kHz
-            int cap = AudioPassthroughService.HmMicRingBytes;
+            Assert.Equal(cap, AudioPassthroughService.MicRingBytes(rate, channels));
 
-            Assert.True(AudioPassthroughService.MicSubmitFits(0, block));
-            Assert.True(AudioPassthroughService.MicSubmitFits(cap - 1 - block, block));
+            Assert.True(AudioPassthroughService.MicRingFits(cap, 0, block));
+            Assert.True(AudioPassthroughService.MicRingFits(cap, cap - 1 - block, block));
 
             // One byte tighter than a whole block: HM would copy a partial,
             // odd-length run and misalign the ring.
-            Assert.False(AudioPassthroughService.MicSubmitFits(cap - block, block));
-            Assert.False(AudioPassthroughService.MicSubmitFits(cap - 1, block));
-            Assert.False(AudioPassthroughService.MicSubmitFits(cap, block));
+            Assert.False(AudioPassthroughService.MicRingFits(cap, cap - block, block));
+            Assert.False(AudioPassthroughService.MicRingFits(cap, cap - 1, block));
+            Assert.False(AudioPassthroughService.MicRingFits(cap, cap, block));
         }
 
-        [Fact]
-        public void MicSubmit_NeverPermitsATruncationThatEndsMidFrame()
+        [Theory]
+        [InlineData(48000, 2, 1920)]
+        [InlineData(16000, 1, 320)]
+        public void MicSubmit_NeverPermitsATruncationThatEndsMidFrame(int rate, int channels, int block)
         {
-            const int block = 1920;
-            int cap = AudioPassthroughService.HmMicRingBytes;
+            int cap = AudioPassthroughService.MicRingBytes(rate, channels);
             for (int buffered = 0; buffered <= cap; buffered += 7)
             {
                 int free = cap - 1 - buffered;
-                if (AudioPassthroughService.MicSubmitFits(buffered, block))
+                if (AudioPassthroughService.MicRingFits(cap, buffered, block))
                     Assert.True(free >= block, $"buffered={buffered} admitted with free={free}");
             }
+        }
+
+        [Fact]
+        public void MicLogs_PrintTheRingTheGuardUses()
+        {
+            // A virtual DualShock 4's ring is 8192 bytes, so a log line that
+            // printed the DualSense's 49152 misstated every buffered figure.
+            var dir = new System.IO.DirectoryInfo(AppContext.BaseDirectory);
+            while (dir != null && !System.IO.File.Exists(System.IO.Path.Combine(dir.FullName, "PadForge.sln")))
+                dir = dir.Parent;
+            Assert.NotNull(dir);
+            string src = System.IO.File.ReadAllText(System.IO.Path.Combine(dir.FullName, "PadForge.App", "Common",
+                                                                           "Input", "AudioPassthroughService.cs"));
+            Assert.Equal(2, src.Split("\" buffered=\" + mic.BufferedBytes + \"/\" + MicRingBytes(mic)").Length - 1);
+            Assert.DoesNotContain("HmMicRingBytes", src);
         }
 
         // ── Speaker AND haptics in one tick (discussion #300) ──

@@ -6680,8 +6680,8 @@ namespace PadForge.Services
         [XmlElement]
         public bool KeyboardScreensEnabled { get; set; }
 
-        /// <summary>Each kind of keyboard screen's choices (#519). Null when
-        /// every kind is at its defaults.</summary>
+        /// <summary>Each keyboard screen's choices (#519), kept by the
+        /// screen's row. Null when every screen is at its defaults.</summary>
         [XmlArray("KeyboardScreens")]
         [XmlArrayItem("Screen")]
         public KeyboardScreenData[] KeyboardScreens { get; set; }

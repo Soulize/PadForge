@@ -319,6 +319,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Toimii DSX-ohjelmaa varten tehtyjen modien kanssa, esimerkiksi peleille GTA V, Red Dead Redemption 2, Skyrim ja Forza. Palvelimen kuunnellessa PadForge kirjoittaa sen portin sinne, mistä modit sitä etsivät.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Kuuntelee porttia :{0}. {1} lähettää virtuaaliohjaimelle {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Kuuntelee porttia :{0}. {1} lähettää, mutta millään virtuaaliohjaimella ei ole PlayStation-ohjainta.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Kuuntelee porttia :{0}. {1} lähettää ohjainindeksiin {2}, eikä yhdelläkään virtuaaliohjaimella, jolla on PlayStation-ohjain, ole sitä indeksiä.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Portti {0} on toisen ohjelman käytössä, esimerkiksi DSX-ohjelman. Sulje se tai valitse toinen portti.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Pelimodi</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Toimii OpenTrack-ohjelman ja minkä tahansa sellaisen seurantaohjelman kanssa, joka lähettää tulosteensa UDP:nä tai kirjoittaa FreeTrack 2.0 -muotoiseen jaettuun muistiin, sekä tämän koneen OpenXR-ajoympäristön kanssa, joka pystyy suorittamaan istunnon taustalla.</value></data>
@@ -4127,7 +4128,7 @@ Haluatko, että PadForge poistaa niiden asennuksen nyt? Tämä vaatii järjestel
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Odotetaan FreeTrack-jaetun muistin tietoja.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>FreeTrack-jaettu muisti ei ole käytettävissä.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Ohjauskulman tärinä</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Lisää jatkuvaa tärinää, kun valittu virtuaalisen sauvan akseli liikkuu pois keskeltä. Käyttää kaikkien liitettyjen lähteiden määritettyä lähtöä. Valinnalla Jaa suunnan mukaan negatiivinen liike ohjaa vasenta moottoria ja positiivinen oikeaa. Valinnalla Vasen moottori tai Oikea moottori molemmat suunnat toistuvat vain tällä moottorilla. Xbox- ja PlayStation-lähdölle tärinälaitteiden kanssa. Rattien oma voimapalaute ei sisälly.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Lisää jatkuvaa tärinää, kun valittu virtuaalisen sauvan akseli liikkuu pois keskeltä. Käyttää kaikkien liitettyjen lähteiden määritettyä lähtöä. Valinnalla Jaa suunnan mukaan negatiivinen liike ohjaa vasenta moottoria ja positiivinen oikeaa. Valinnalla Vasen moottori tai Oikea moottori molemmat suunnat toistuvat vain tällä moottorilla. Xbox- ja PlayStation-lähdölle tärinälaitteiden kanssa. Se ohittaa ratit, muut jatkuvaa voimapalautetta käyttävät laitteet ja Fanatec-polkimet.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Ota ohjauskulman tärinä käyttöön</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Virtuaaliakseli</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Vasen sauva X</value></data>
@@ -4330,6 +4331,7 @@ Haluatko, että PadForge poistaa niiden asennuksen nyt? Tämä vaatii järjestel
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>suoraan laitteessa {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>sidotaan WinUSB G19:n näyttöön</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>G19:n näyttö käyttää toista ajuria ({0}), joten käynnistä Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>G19:n näyttö käyttää toisen ohjelman ajuria ({0}), jota PadForge ei koske</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>vaatii Logitech Gaming Softwaren version 8.52 tai uudemman</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>käynnistä Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>odotetaan puhelinta, jossa on Arx Control</value></data>
@@ -4401,6 +4403,7 @@ Haluatko, että PadForge poistaa niiden asennuksen nyt? Tämä vaatii järjestel
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Kahva</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} asettaa tämän ohjaimen liipaisimia.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} asettaa tämän ohjaimen valoja.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} asettaa tämän laitteen valoja.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} asettaa tämän ohjaimen liipaisimia ja valoja.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} toistaa värinää tämän ohjaimen impulssiliipaisimilla.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Tyhjennä modien efektit</value></data>
@@ -4408,10 +4411,10 @@ Haluatko, että PadForge poistaa niiden asennuksen nyt? Tämä vaatii järjestel
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Vasen/oikea</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Ylös/alas</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Sisään/ulos</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Painike {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, ladattu sijainnista {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Valitsemasi dhd64.dll ei latautunut, joten PadForge käyttää yllä olevaa kopiota.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Force Dimensionin kirjasto toimii vain PadForge-ohjelman x64-versiossa.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>Tiedosto dhd64.dll löytyi, mutta sitä ei voitu ladata.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Tämä dhd64.dll ei ole se Force Dimension -kirjasto, jota PadForge odottaa.</value></data>
@@ -4421,11 +4424,12 @@ Haluatko, että PadForge poistaa niiden asennuksen nyt? Tämä vaatii järjestel
   <data name="Falcon_Status_Open" xml:space="preserve"><value>avattu</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Falcon on avoinna toisessa ohjelmassa, esimerkiksi FalconJoyForce-ohjelmassa tai Force Dimensionin omissa työkaluissa. Sulje se siellä.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon käyttää toista ajuria ({0}), joten Force Dimensionin kirjasto ei voi avata sitä. Päivitä Laitehallinnassa Falcon-laitteen ajuri Force Dimensionin SDK-kansion drivers\usb-kansiosta.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon käyttää Force Dimensionin ajuria, eikä Force Dimensionin kirjasto voinut avata sitä: {0}. Tarkista virta ja USB-kaapeli.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Falcon on kytketty, mutta sillä ei ole ajuria. Painike Asenna Falcon-ajuri asentaa sille Force Dimensionin ajurin.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Falcon on kytketty, mutta sillä ei ole ajuria, eikä SDK-kansiossa ole ajuripakettia, jonka sille voisi antaa. Asenna Force Dimensionin SDK uudelleen.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Falcon-laitetta ei löytynyt. Kytke siihen virta ja USB-kaapeli.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Valitse dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Lataa tämän Force Dimensionin kirjastokopion muiden edelle. SDK:n asentamat kopiot löytyvät ilman tätäkin.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Lataa tämän Force Dimensionin kirjastokopion muiden kopioiden tilalle. Toisessa kopiossa avoinna oleva Falcon suljetaan ja avataan uudelleen tällä kopiolla. SDK:n asentamat kopiot löytyvät ilman tätäkin.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Kirjastot (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Asenna Falcon-ajuri</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Asentaa Force Dimensionin ajurin SDK-kansiosta Falcon-laitteelle, jolla sitä ei vielä ole. Windows saattaa ensin kysyä, luotetaanko Force Dimensioniin.</value></data>
@@ -4442,7 +4446,7 @@ Haluatko, että PadForge poistaa niiden asennuksen nyt? Tämä vaatii järjestel
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Pelaa pelejä Novint Falcon -laitteella Force Dimensionin SDK:n kautta, jonka asennat Force Dimensionilta. Kahva toimii sauvana, kahvan neljä painiketta ovat painikkeita, ja PadForge siirtää pelin tärinän ja tehosteet kahvaan voimana. Kunkin paikan Voimapalaute-välilehti määrittää, miltä Falcon tuntuu.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Ohjaa Novint Falcon -laitetta</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Avaa jokaisen Falcon-laitteen Force Dimensionin dhd64.dll-kirjaston kautta. Avattu Falcon kuuluu vain PadForge-ohjelmalle, joten FalconJoyForce ja Force Dimensionin työkalut eivät voi avata sitä, kun tämä on päällä. Kun asetus on pois päältä, PadForge sulkee kaikki Falcon-laitteet.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon-kirjastoksi on asetettu {0}. Jo käytössä oleva kopio pysyy, kunnes PadForge käynnistetään uudelleen.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon-kirjastoksi on asetettu {0}. PadForge lataa sen muutamassa sekunnissa, ja toisessa kopiossa avoinna oleva Falcon avataan uudelleen tällä kopiolla.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Asennetaan Force Dimensionin Falcon-ajuria…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Force Dimensionin Falcon-ajuripaketti tai sen luettelotiedosto puuttuu: {0}. Asenna Force Dimensionin SDK uudelleen.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Falcon-laitetta ei ole kytketty.</value></data>

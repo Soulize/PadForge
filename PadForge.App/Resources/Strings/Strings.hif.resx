@@ -855,7 +855,6 @@
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Mod ke effect hatao</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Upar/Niche</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Andar/Bahar</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Button {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, {1} se load hoe gais</value></data>
@@ -864,6 +863,7 @@
   <data name="Falcon_Status_NoSdk" xml:space="preserve"><value>Ii PC me Force Dimension SDK nahi hai. Force Dimension ke download page se lo, nahi to iske dhd64.dll choose karo.</value></data>
   <data name="Falcon_Status_Rate_Format" xml:space="preserve"><value>{0:0.0} kHz pe chale hai</value></data>
   <data name="Falcon_Status_Open" xml:space="preserve"><value>khulaa hai</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon Force Dimension ke driver pe hai, aur Force Dimension ke library usko khol nahi sakis: {0}. Iske power aur USB cable check karo.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Koi Falcon nahi mila. Iske power aur USB cable lagao.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>dhd64.dll choose karo…</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Library (*.dll)|*.dll</value></data>

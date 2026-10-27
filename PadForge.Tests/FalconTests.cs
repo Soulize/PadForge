@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Xml.Serialization;
 using PadForge.Common;
@@ -10,6 +11,7 @@ using PadForge.Engine;
 using PadForge.Engine.Common;
 using PadForge.Engine.Common.ForceDimension;
 using PadForge.Engine.Data;
+using PadForge.Engine.RemoteLink;
 using PadForge.Services;
 using PadForge.ViewModels;
 using Xunit;
@@ -617,6 +619,86 @@ namespace PadForge.Tests
             }
         }
 
+        /// <summary>Reads that keep working between failed force writes
+        /// never reset the writes' count: a Falcon that takes no force
+        /// detaches, closes and logs the library's reason.</summary>
+        [Fact]
+        public void AFalconWhoseForceWritesFail_DetachesLogsWhyAndCloses()
+        {
+            var link = new ScriptedFalcon { ErrorText = "scripted force write failure (D1)" };
+            var falcon = new FalconDevice(link, 5, 0, 21);
+            try
+            {
+                Assert.True(SpinWait.SpinUntil(() => link.Reads > 5, 3000));
+                link.ForceFails = true;
+                Assert.True(SpinWait.SpinUntil(() => !falcon.IsAttached, 1000), "a Falcon that takes no force kept its row");
+                Assert.True(SpinWait.SpinUntil(() => link.Closes == 1, 1000));
+                Assert.Contains("Falcon: device 5 failed 3 force writes in a row, so it closes: scripted force write failure (D1)",
+                    SdlDiagLog.Snapshot());
+            }
+            finally
+            {
+                falcon.Dispose();
+            }
+            Assert.Equal(1, link.Closes);
+        }
+
+        /// <summary>A Falcon whose forces do not turn on closes at once and
+        /// logs why, as Force Dimension's examples stop when
+        /// dhdEnableForce fails, so the next sweep opens it again.</summary>
+        [Theory]
+        [InlineData(true, false, "could not turn on gravity compensation")]
+        [InlineData(false, true, "could not turn on its forces")]
+        public void AFalconWhoseForcesDoNotTurnOn_ClosesAndLogsWhy(bool gravityFails, bool enableFails, string why)
+        {
+            string text = "scripted start failure (D2, " + why + ")";
+            var link = new ScriptedFalcon { GravityFails = gravityFails, EnableFails = enableFails, ErrorText = text };
+            var falcon = new FalconDevice(link, 6, 0, 22);
+            try
+            {
+                Assert.True(SpinWait.SpinUntil(() => link.Closes == 1, 1000), "a Falcon with no forces stayed open");
+                Assert.False(falcon.IsAttached);
+                Assert.Equal(0, link.Reads);
+                Assert.Contains("Falcon: device 6 " + why + ", so it closes: " + text, SdlDiagLog.Snapshot());
+            }
+            finally
+            {
+                falcon.Dispose();
+            }
+            Assert.Equal(1, link.Closes);
+        }
+
+        /// <summary>A sweep asked for after the haptic thread ended still
+        /// answers, once, as a Falcon that closed mid-sweep does, so the
+        /// row never keeps "Move the handle..." for good.</summary>
+        [Fact]
+        public void ACalibrationAskedAfterTheFalconClosed_AnswersAtOnce()
+        {
+            var link = new ScriptedFalcon { Fail = true };
+            var falcon = new FalconDevice(link, 0, 0, 23);
+            try
+            {
+                Assert.True(SpinWait.SpinUntil(() => link.Closes == 1, 3000));
+                // The thread's last step, after the close, takes back any
+                // sweep stored before it.
+                Thread.Sleep(100);
+                int calls = 0;
+                FalconCalibration result = default;
+                Assert.True(falcon.BeginCalibration(r => { result = r; Interlocked.Increment(ref calls); }));
+                Assert.True(SpinWait.SpinUntil(() => Volatile.Read(ref calls) > 0, 1000), "the sweep never answered");
+                Thread.Sleep(50);
+                Assert.Equal(1, calls);
+                Assert.False(result.MeasuredX || result.MeasuredY || result.MeasuredZ);
+                Assert.Equal(FalconReach.Default, result.Reach);
+                Assert.False(falcon.IsCalibrating);
+            }
+            finally
+            {
+                falcon.Dispose();
+            }
+            Assert.False(falcon.BeginCalibration(_ => { }));
+        }
+
         [Fact]
         public void TheHandOff_IsKeptWhileNothingChanged_AndSilenceKeepsTheFeel()
         {
@@ -709,6 +791,539 @@ namespace PadForge.Tests
             }
         }
 
+        // ── Picking another library while one is loaded ──
+
+        private const string PathA = @"C:\FD\sdk-a\bin\dhd64.dll", PathB = @"C:\FD\sdk-b\bin\dhd64.dll";
+
+        private static object Call(InputManager im, string method)
+            => typeof(InputManager).GetMethod(method, BindingFlags.NonPublic | BindingFlags.Instance).Invoke(im, null);
+
+        /// <summary>An engine whose poll step starts no sweep: the test runs
+        /// each one itself.</summary>
+        private static InputManager SweepHost()
+        {
+            var im = new InputManager();
+            typeof(InputManager).GetField("_falconNextSweepTicks", BindingFlags.NonPublic | BindingFlags.Instance)
+                .SetValue(im, long.MaxValue);
+            return im;
+        }
+
+        /// <summary>The installed copy is A, and B loads only when picked.
+        /// Any other pick fails to load.</summary>
+        private static Func<string, FalconLibrary> Loader(ScriptedFalcon a, ScriptedFalcon b)
+            => picked => picked == null ? new FalconLibrary(a, PathA, "3.17.7")
+                : string.Equals(picked, PathB, StringComparison.OrdinalIgnoreCase) ? new FalconLibrary(b, PathB, "3.17.7")
+                : null;
+
+        private static void EndSweeps(InputManager im)
+        {
+            im.ShutdownFalconInputs();
+            FalconRuntime.Enabled = false;
+            FalconRuntime.PickedLibrary = null;
+            FalconRuntime.UseLoaderForTest(null);
+        }
+
+        [Fact]
+        public void ALibraryPickedAfterOneLoaded_TakesOver_AndTheFalconReopensOnIt()
+        {
+            var a = new ScriptedFalcon();
+            var b = new ScriptedFalcon();
+            FalconRuntime.PickedLibrary = null;
+            FalconRuntime.UseLoaderForTest(Loader(a, b));
+            var im = SweepHost();
+            try
+            {
+                FalconRuntime.Enabled = true;
+                Call(im, "FalconSweep");
+                Assert.Equal(PathA, FalconRuntime.Status.LibraryPath);
+                Assert.True(SpinWait.SpinUntil(() => a.Reads > 5, 3000), "no Falcon opened on the installed copy");
+
+                FalconRuntime.PickedLibrary = PathB;
+                // The first sweep after the pick closes the Falcon on the
+                // old copy, and the poll step lets it go.
+                Call(im, "FalconSweep");
+                Assert.Equal(1, a.Closes);
+                Call(im, "UpdateFalconDevices");
+                // The next sweep opens it on the picked copy.
+                Call(im, "FalconSweep");
+                Assert.True(SpinWait.SpinUntil(() => b.Reads > 5, 3000), "the Falcon never opened on the picked copy");
+                Assert.Equal(PathB, FalconRuntime.Status.LibraryPath);
+                Assert.Same(b, FalconRuntime.Acquire(Environment.TickCount64, out _, out _, out _));
+                Assert.Equal(1, a.Closes);
+            }
+            finally
+            {
+                EndSweeps(im);
+            }
+        }
+
+        [Fact]
+        public void APickedLibraryThatDoesNotLoad_LeavesTheCopyInUseAndItsFalcon_AndSaysSo()
+        {
+            var a = new ScriptedFalcon();
+            var b = new ScriptedFalcon();
+            FalconRuntime.PickedLibrary = null;
+            FalconRuntime.UseLoaderForTest(Loader(a, b));
+            var im = SweepHost();
+            try
+            {
+                FalconRuntime.Enabled = true;
+                Call(im, "FalconSweep");
+                Assert.True(SpinWait.SpinUntil(() => a.Reads > 5, 3000), "no Falcon opened on the installed copy");
+                Assert.False(FalconRuntime.Status.PickNotLoaded);
+
+                FalconRuntime.PickedLibrary = @"C:\elsewhere\dhd64.dll";
+                Call(im, "FalconSweep");
+                Call(im, "FalconSweep");
+                Assert.Equal(0, a.Closes);
+                Assert.Equal(PathA, FalconRuntime.Status.LibraryPath);
+                Assert.True(FalconRuntime.Status.PickNotLoaded);
+                Assert.Equal(0, b.Reads);
+            }
+            finally
+            {
+                EndSweeps(im);
+            }
+        }
+
+        /// <summary>The poll thread takes the same lock every pass, so the
+        /// sweep never makes a library call while it holds it.</summary>
+        [Fact]
+        public void ASwitchTurnedOffMidSweep_ClosesTheFalconOutsideTheEnginesLock()
+        {
+            var im = SweepHost();
+            object gate = typeof(InputManager).GetField("_falconLock", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(im);
+            bool closedUnderLock = false;
+            var a = new ScriptedFalcon
+            {
+                // Off between the open and the hand-off to the poll thread.
+                OnSerial = () => FalconRuntime.Enabled = false,
+                OnClose = () => closedUnderLock |= Monitor.IsEntered(gate),
+            };
+            FalconRuntime.PickedLibrary = null;
+            FalconRuntime.UseLoaderForTest(Loader(a, a));
+            try
+            {
+                FalconRuntime.Enabled = true;
+                Call(im, "FalconSweep");
+                Assert.Equal(1, a.Closes);
+                Assert.False(closedUnderLock, "the sweep closed the Falcon inside _falconLock");
+                Assert.Equal(0, a.Reads);
+            }
+            finally
+            {
+                EndSweeps(im);
+            }
+        }
+
+        // ── Why no Falcon opened ──
+
+        /// <summary>Force Dimension's own package puts the Falcon on WinUSB
+        /// with its interface GUID (fdhusb-3.18.00.03.inf, Falcon_Install.HW,
+        /// and fdhusb-3.7.0.3073.inf, Falcon_AddReg). A node with it is on
+        /// the driver the library needs.</summary>
+        [Fact]
+        public void ANodeWithForceDimensionsInterface_IsOnItsOwnPackage()
+        {
+            Assert.True(DriverInstaller.NamesFalconInterface(new[] { "{CB5DAA55-DC1A-4f2d-8F76-14CEE032832A}" }));
+            Assert.True(DriverInstaller.NamesFalconInterface(new[] { "{11111111-2222-3333-4444-555555555555}", "{cb5daa55-dc1a-4f2d-8f76-14cee032832a}" }));
+            Assert.False(DriverInstaller.NamesFalconInterface(new[] { "{FD826C66-3556-4845-9436-0FE7580DED02}" }));
+            Assert.False(DriverInstaller.NamesFalconInterface(Array.Empty<string>()));
+            Assert.False(DriverInstaller.NamesFalconInterface(null));
+            Assert.False(DriverInstaller.NamesFalconInterface(new[] { "not a guid" }));
+        }
+
+        [Fact]
+        public void AFalconOnForceDimensionsDriverThatDidNotOpen_GetsTheOpensErrorNotTheOtherDriverLine()
+        {
+            var s = PadForge.Resources.Strings.Strings.Instance;
+            var own = new FalconSweepStatus(string.Empty, PathA, "3.17.7", null, 0, Array.Empty<string>(), null,
+                OwnDriverNodes: 1, OpenError: "USB timeout");
+            string line = PadForge.Services.InputService.FalconNoRowLine(own, canInstall: false);
+            Assert.Equal(string.Format(s.Falcon_Status_OwnDriverNotOpen_Format, "USB timeout"), line);
+            Assert.DoesNotContain("WINUSB", line);
+            // A second, driverless Falcon: the install stops on any Falcon
+            // with a driver, so the button stays hidden.
+            var withDriverless = own with { NodeDrivers = new[] { string.Empty }, DriverPackage = @"C:\FD\drivers\usb\fdhusb.inf" };
+            Assert.True(PadForge.Services.InputService.FalconCanInstall(withDriverless with { OwnDriverNodes = 0 }, rows: 0));
+            Assert.False(PadForge.Services.InputService.FalconCanInstall(withDriverless, rows: 0));
+
+            // No error from the library: the SDK version's "?" stands in.
+            Assert.Equal(string.Format(s.Falcon_Status_OwnDriverNotOpen_Format, "?"),
+                PadForge.Services.InputService.FalconNoRowLine(own with { OpenError = null }, canInstall: false));
+
+            // Another driver keeps its own line.
+            var other = own with { NodeDrivers = new[] { "libusbK" }, OwnDriverNodes = 0 };
+            Assert.Equal(string.Format(s.Falcon_Status_OtherDriver_Format, "libusbK"),
+                PadForge.Services.InputService.FalconNoRowLine(other, canInstall: false));
+        }
+
+        [Fact]
+        public void AFailedOpen_LeavesTheLibrarysReasonInTheStatus()
+        {
+            var a = new ScriptedFalcon { OpenFails = true, ErrorText = "communication error (D4)" };
+            FalconRuntime.PickedLibrary = null;
+            FalconRuntime.UseLoaderForTest(Loader(a, a));
+            var im = SweepHost();
+            try
+            {
+                FalconRuntime.Enabled = true;
+                Call(im, "FalconSweep");
+                Assert.Equal("communication error (D4)", FalconRuntime.Status.OpenError);
+                Assert.Equal(0, FalconRuntime.Status.InUse);
+            }
+            finally
+            {
+                EndSweeps(im);
+            }
+        }
+
+        /// <summary>The scripted loader opens the sweep's fence, so nothing
+        /// in the app or the engine sets it.</summary>
+        [Fact]
+        public void TheScriptedLoader_IsSetByTestsAlone()
+        {
+            foreach (string project in new[] { "PadForge.App", "PadForge.Engine" })
+                foreach (string file in Directory.EnumerateFiles(RepoFile(project), "*.cs", SearchOption.AllDirectories))
+                {
+                    if (file.Contains(Path.DirectorySeparatorChar + "obj" + Path.DirectorySeparatorChar)) continue;
+                    string text = File.ReadAllText(file);
+                    int calls = text.Split("UseLoaderForTest(").Length - 1;
+                    int declared = Path.GetFileName(file) == "FalconRuntime.cs" ? 1 : 0;
+                    Assert.True(calls == declared, file + " calls UseLoaderForTest");
+                }
+        }
+
+        /// <summary>The Falcon install's own lines, a refused forced bind and
+        /// a restart Windows asked for among them, reach the diagnostics
+        /// ring, which a Release build keeps. Debug.WriteLine reaches nothing
+        /// there.</summary>
+        [Fact]
+        public void TheFalconDriverInstall_LogsToTheDiagnosticsRing()
+        {
+            string source = File.ReadAllText(RepoFile("PadForge.App", "Common", "DriverInstaller.cs")).Replace("\r\n", "\n");
+            int start = source.IndexOf("public static void InstallFalconDriver(string inf)", StringComparison.Ordinal);
+            int end = source.IndexOf("\n        }\n", start, StringComparison.Ordinal);
+            Assert.True(start > 0 && end > start);
+            string install = source.Substring(start, end - start);
+            Assert.DoesNotContain("Debug.WriteLine", install);
+            Assert.Contains("InstallSignedPackage(inf, FalconHardwareId,\n                    m => PadForge.Engine.SdlDiagLog.WriteLine(\"Falcon driver: \" + m))", install);
+        }
+
+        // ── A Falcon shared over Remote Link ──
+
+        private static void PollFeedback(InputManager manager, UserDevice device)
+            => typeof(InputManager).GetMethod("ApplyForceFeedback", BindingFlags.Instance | BindingFlags.NonPublic)
+                .Invoke(manager, new object[] { device });
+
+        private static readonly MethodInfo ApplyRemote =
+            typeof(InputService).GetMethod("ApplyRemoteOutput", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        private static PadSetting PeerSlot() => new()
+        {
+            FalconFeel = "1", FalconSpring = "150", FalconKickButton = "2", FalconKick = "80", FalconShake = "60",
+            FalconBraceButton = "3", FalconPreloadButton = "4", FalconGravity = "50", FalconForceCap = "5.5",
+            ForceOverall = "70",
+        };
+
+        [Fact]
+        public void TheFalconTail_RoundTrips_AndAFrameWithoutItReadsAsBefore()
+        {
+            var v = new Vibration(30000, 1000) { LeftTriggerMotorSpeed = 5, RightTriggerMotorSpeed = 6 };
+            var ps = PeerSlot();
+            var tail = FalconSettings.ToWire(ps);
+            byte[] withTail = OutputEffectCodec.EncodeVibration(v, tail);
+            Assert.True(OutputEffectCodec.TryDecode(withTail, out var with));
+            Assert.Equal(tail, with.Falcon);
+            Assert.Equal(FalconSettings.From(ps), FalconSettings.FromWire(with.Falcon.Value));
+            Assert.Equal((ushort)30000, with.Vibration.LeftMotorSpeed);
+            Assert.Equal((ushort)6, with.Vibration.RightTriggerMotorSpeed);
+            Assert.False(FalconSettings.ToWire(null).Equals(OutputEffectCodec.FalconTail.Unassigned));
+
+            // The tail follows the frame an owner from before it reads, byte
+            // for byte, and a frame without it carries no settings.
+            byte[] plain = OutputEffectCodec.EncodeVibration(v);
+            Assert.Equal(plain, withTail.AsSpan(0, plain.Length).ToArray());
+            Assert.Equal(OutputEffectCodec.FalconTail.Length, withTail.Length - plain.Length);
+            Assert.True(OutputEffectCodec.TryDecode(plain, out var without));
+            Assert.Null(without.Falcon);
+            Assert.True(OutputEffectCodec.TryDecode(OutputEffectCodec.EncodeVibration(v, OutputEffectCodec.FalconTail.Unassigned), out var letGo));
+            Assert.False(letGo.Falcon.Value.Assigned);
+        }
+
+        [Fact]
+        public void TheOwner_AnnouncesForceForASharedFalcon_AndTheFalconItselfStillReportsNone()
+        {
+            var savedDevices = SettingsManager.UserDevices;
+            var falcon = new FalconDevice(new ScriptedFalcon(), 0, 0, 78);
+            try
+            {
+                SettingsManager.UserDevices = new DeviceCollection();
+                var owner = new UserDevice();
+                owner.LoadFromExternalDevice(falcon);
+                owner.IsOnline = true;
+                SettingsManager.UserDevices.Items.Add(owner);
+                var service = new InputService(new MainViewModel());
+                var inventory = (System.Collections.Generic.IEnumerable<PadForge.Engine.RemoteLink.RemotePeerDeviceInfo>)typeof(InputService)
+                    .GetMethod("BuildExposedDevices", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(service, null);
+                var info = Assert.Single(inventory);
+                Assert.Equal(InputDeviceType.NovintFalcon, info.InputDeviceType);
+                Assert.True(info.HasRumble, "a peer's slot sends a shared Falcon no force");
+                // The local gates read the device's own flags, which stay off.
+                Assert.False(falcon.HasRumble);
+                Assert.False(falcon.HasHaptic);
+            }
+            finally
+            {
+                SettingsManager.UserDevices = savedDevices;
+                falcon.Dispose();
+            }
+        }
+
+        [Fact]
+        public void APeersFalconSlot_ReachesTheOwnersHandle_AndLettingItGoUnassignsIt()
+        {
+            var savedSettings = SettingsManager.UserSettings;
+            var savedSend = RemoteLinkOutputRouter.SendOutput;
+            var savedMembership = RemoteLinkOutputRouter.IsPeerConnected;
+            var falcon = new FalconDevice(new ScriptedFalcon(), 0, 0, 79);
+            var owner = new UserDevice();
+            owner.LoadFromExternalDevice(falcon);
+            owner.IsOnline = true;
+            var peer = new RemotePeerDevice(new RemotePeerDeviceInfo
+            {
+                PeerFingerprintHex = "owner", PeerLocalDeviceId = falcon.InstanceGuid.ToString("N"), HasRumble = true,
+                VendorId = falcon.VendorId, ProductId = falcon.ProductId, NumAxes = 3, NumButtons = 4,
+                InputDeviceType = InputDeviceType.NovintFalcon,
+            });
+            var remote = new UserDevice();
+            remote.LoadFromExternalDevice(peer);
+            var frames = new System.Collections.Generic.List<OutputEffectCodec.OutputEffect>();
+            var service = new InputService(new MainViewModel());
+            RemoteLinkOutputRouter.Register(peer.DevicePath, "owner", 0);
+            RemoteLinkOutputRouter.IsPeerConnected = _ => true;
+            RemoteLinkOutputRouter.SendOutput = (_, _, bytes) =>
+            {
+                Assert.True(OutputEffectCodec.TryDecode(bytes, out var effect));
+                frames.Add(effect);
+                ApplyRemote.Invoke(service, new object[] { effect, falcon, owner, "consumer", null });
+            };
+            try
+            {
+                SettingsManager.UserSettings = new SettingsCollection();
+                var setting = new UserSetting { InstanceGuid = remote.InstanceGuid, MapTo = 0 };
+                setting.SetPadSetting(new PadSetting { ForceOverall = "50", FalconFeel = "1", FalconForceCap = "5" });
+                SettingsManager.UserSettings.Items.Add(setting);
+                var manager = new InputManager();
+                manager.VibrationStates[0].LeftMotorSpeed = 40000;
+                PollFeedback(manager, remote);
+                var frame = Assert.Single(frames);
+                Assert.True(frame.Falcon is { Assigned: true }, "the frame carries no Falcon settings");
+                var handoff = falcon.Handoff;
+                Assert.True(handoff.Assigned, "the peer's force never reached the Falcon");
+                Assert.Equal(FalconFeel.Aim, handoff.Settings.Feel);
+                Assert.Equal(5.0, handoff.Settings.ForceCap);
+                Assert.Equal(0.5, handoff.Settings.Overall);
+                // The motors carry the peer's Overall, which the force model
+                // applies once, as on the Falcon's own PC.
+                Assert.True(frame.Vibration.LeftMotorSpeed > 0);
+                Assert.Equal(frame.Vibration.LeftMotorSpeed / 65535.0 / 0.5, handoff.Game.Heavy, 9);
+
+                // The owner's own pass, with no slot of its own, leaves the
+                // peer's hand-off standing while the peer drives the Falcon.
+                PollFeedback(manager, owner);
+                Assert.Same(handoff, falcon.Handoff);
+
+                // The peer's last slot lets the Falcon go.
+                SettingsManager.UserSettings.Items.Clear();
+                PollFeedback(manager, remote);
+                Assert.Equal(2, frames.Count);
+                Assert.True(frames[1].Falcon is { Assigned: false });
+                Assert.False(falcon.Handoff.Assigned);
+                PollFeedback(manager, remote);
+                Assert.Equal(2, frames.Count);
+            }
+            finally
+            {
+                SettingsManager.UserSettings = savedSettings;
+                RemoteLinkOutputRouter.SendOutput = savedSend;
+                RemoteLinkOutputRouter.IsPeerConnected = savedMembership;
+                RemoteLinkOutputRouter.Unregister(peer.DevicePath);
+                RemoteLinkOutputRouter.ReleaseDevice(owner.DevicePath);
+                falcon.Dispose();
+            }
+        }
+
+        [Fact]
+        public void AFrameWithoutFalconSettings_LeavesTheFalconAsThisPCsSlotsLeaveIt()
+        {
+            var savedMembership = RemoteLinkOutputRouter.IsPeerConnected;
+            var falcon = new FalconDevice(new ScriptedFalcon(), 0, 0, 80);
+            var owner = new UserDevice();
+            owner.LoadFromExternalDevice(falcon);
+            owner.IsOnline = true;
+            var service = new InputService(new MainViewModel());
+            RemoteLinkOutputRouter.IsPeerConnected = _ => true;
+            try
+            {
+                // A peer from before the settings rode the frame.
+                Assert.True(OutputEffectCodec.TryDecode(OutputEffectCodec.EncodeVibration(new Vibration(40000, 0)), out var old));
+                ApplyRemote.Invoke(service, new object[] { old, falcon, owner, "consumer", null });
+                Assert.Same(FalconHandoff.Unassigned, falcon.Handoff);
+                Assert.False(RemoteLinkOutputRouter.IsClaimedByPeer(owner.DevicePath));
+                Assert.False(RemoteLinkOutputRouter.PeerWroteLast(owner.DevicePath));
+
+                // Positive control: the same frame with the settings claims
+                // the Falcon and reaches it.
+                Assert.True(OutputEffectCodec.TryDecode(OutputEffectCodec.EncodeVibration(new Vibration(40000, 0),
+                    FalconSettings.ToWire(PeerSlot())), out var current));
+                ApplyRemote.Invoke(service, new object[] { current, falcon, owner, "consumer", null });
+                Assert.True(falcon.Handoff.Assigned);
+                Assert.True(RemoteLinkOutputRouter.IsClaimedByPeer(owner.DevicePath));
+            }
+            finally
+            {
+                RemoteLinkOutputRouter.IsPeerConnected = savedMembership;
+                RemoteLinkOutputRouter.ReleaseDevice(owner.DevicePath);
+                falcon.Dispose();
+            }
+        }
+
+        /// <summary>A feel changed on the peer's pad page ships while the
+        /// game's force holds still, and an unchanged frame does not.</summary>
+        [Fact]
+        public void AChangedFalconSetting_ShipsTheFrameAgain()
+        {
+            string path = "peer://owner/falcon-" + Guid.NewGuid().ToString("N");
+            var saved = RemoteLinkOutputRouter.SendOutput;
+            var tails = new System.Collections.Generic.List<OutputEffectCodec.FalconTail?>();
+            RemoteLinkOutputRouter.SendOutput = (_, _, bytes) =>
+            {
+                Assert.True(OutputEffectCodec.TryDecode(bytes, out var effect));
+                tails.Add(effect.Falcon);
+            };
+            RemoteLinkOutputRouter.Register(path, "owner", 0);
+            try
+            {
+                var joystick = FalconSettings.ToWire(new PadSetting());
+                var aim = FalconSettings.ToWire(new PadSetting { FalconFeel = "1" });
+                Assert.True(RemoteLinkOutputRouter.ShipVibration(path, new Vibration(20000, 0), joystick));
+                Assert.True(RemoteLinkOutputRouter.ShipVibration(path, new Vibration(20000, 0), joystick));
+                Assert.Single(tails);
+                Assert.True(RemoteLinkOutputRouter.ShipVibration(path, new Vibration(20000, 0), aim));
+                Assert.Equal(new OutputEffectCodec.FalconTail?[] { joystick, aim }, tails);
+            }
+            finally
+            {
+                RemoteLinkOutputRouter.SendOutput = saved;
+                RemoteLinkOutputRouter.Unregister(path);
+            }
+        }
+
+        /// <summary>A Falcon both PCs assign: the peer's game holds it while
+        /// its lease is fresh, through this PC's slot and through a pass
+        /// whose slot gives no force, and this PC's slot takes it back once
+        /// the peer lets go.</summary>
+        [Fact]
+        public void AFalconAPeerDrives_KeepsThePeersHandOff_OverThisPCsSlot()
+        {
+            var savedSettings = SettingsManager.UserSettings;
+            var savedMembership = RemoteLinkOutputRouter.IsPeerConnected;
+            var falcon = new FalconDevice(new ScriptedFalcon(), 0, 0, 81);
+            var owner = new UserDevice();
+            owner.LoadFromExternalDevice(falcon);
+            owner.IsOnline = true;
+            var service = new InputService(new MainViewModel());
+            RemoteLinkOutputRouter.IsPeerConnected = _ => true;
+            try
+            {
+                SettingsManager.UserSettings = new SettingsCollection();
+                var local = new UserSetting { InstanceGuid = owner.InstanceGuid, MapTo = 0 };
+                local.SetPadSetting(new PadSetting { ForceOverall = "100", FalconFeel = "0" });
+                SettingsManager.UserSettings.Items.Add(local);
+                var manager = new InputManager();
+                manager.VibrationStates[0].LeftMotorSpeed = 20000;
+
+                Assert.True(OutputEffectCodec.TryDecode(OutputEffectCodec.EncodeVibration(new Vibration(40000, 0),
+                    FalconSettings.ToWire(PeerSlot())), out var relayed));
+                ApplyRemote.Invoke(service, new object[] { relayed, falcon, owner, "consumer", null });
+                var peers = falcon.Handoff;
+                Assert.Equal(FalconFeel.Aim, peers.Settings.Feel);
+                PollFeedback(manager, owner);
+                Assert.Same(peers, falcon.Handoff);
+                // A pass whose slot gives no force leaves the peer's force too.
+                manager.TestRumbleTargetGuid[0] = Guid.NewGuid();
+                PollFeedback(manager, owner);
+                Assert.Same(peers, falcon.Handoff);
+                manager.TestRumbleTargetGuid[0] = Guid.Empty;
+
+                // Positive control: the peer lets go, and this PC's slot
+                // hands over its own feel and force.
+                RemoteLinkOutputRouter.ReleaseDevice(owner.DevicePath);
+                PollFeedback(manager, owner);
+                Assert.Equal(FalconFeel.Joystick, falcon.Handoff.Settings.Feel);
+                Assert.True(falcon.Handoff.Game.Heavy > 0);
+            }
+            finally
+            {
+                SettingsManager.UserSettings = savedSettings;
+                RemoteLinkOutputRouter.IsPeerConnected = savedMembership;
+                RemoteLinkOutputRouter.ReleaseDevice(owner.DevicePath);
+                falcon.Dispose();
+            }
+        }
+
+        /// <summary>The owner's Falcon applies the peer slot's Overall to the
+        /// game's effect, so the peer leaves it out of the effect it ships.
+        /// Any other device gets it baked in, since its owner replays at
+        /// 100.</summary>
+        [Theory]
+        [InlineData(InputDeviceType.NovintFalcon, 8000)]
+        [InlineData(InputDeviceType.Gamepad, 4000)]
+        public void APeersEffect_CarriesOverallOnlyForADeviceThatDoesNotApplyIt(int deviceType, int magnitude)
+        {
+            var savedSettings = SettingsManager.UserSettings;
+            var savedSend = RemoteLinkOutputRouter.SendOutput;
+            var peer = new RemotePeerDevice(new RemotePeerDeviceInfo
+            {
+                PeerFingerprintHex = "owner", PeerLocalDeviceId = Guid.NewGuid().ToString("N"), HasRumble = true,
+                HasHaptic = true, VendorId = FalconDevice.FalconVendorId, ProductId = FalconDevice.FalconProductId,
+                NumAxes = 3, NumButtons = 4, InputDeviceType = deviceType,
+            });
+            var remote = new UserDevice();
+            remote.LoadFromExternalDevice(peer);
+            var frames = new System.Collections.Generic.List<OutputEffectCodec.OutputEffect>();
+            RemoteLinkOutputRouter.Register(peer.DevicePath, "owner", 0);
+            RemoteLinkOutputRouter.SendOutput = (_, _, bytes) =>
+            {
+                Assert.True(OutputEffectCodec.TryDecode(bytes, out var effect));
+                frames.Add(effect);
+            };
+            try
+            {
+                SettingsManager.UserSettings = new SettingsCollection();
+                var setting = new UserSetting { InstanceGuid = remote.InstanceGuid, MapTo = 0 };
+                setting.SetPadSetting(new PadSetting { ForceOverall = "50" });
+                SettingsManager.UserSettings.Items.Add(setting);
+                var manager = new InputManager();
+                var game = manager.VibrationStates[0];
+                game.HasDirectionalData = true;
+                game.EffectType = FfbEffectTypes.Const;
+                game.SignedMagnitude = 8000;
+                game.DeviceGain = 255;
+                PollFeedback(manager, remote);
+                var frame = Assert.Single(frames);
+                Assert.Equal(magnitude, frame.Vibration.SignedMagnitude);
+                Assert.Equal(deviceType == InputDeviceType.NovintFalcon, frame.Falcon.HasValue);
+            }
+            finally
+            {
+                SettingsManager.UserSettings = savedSettings;
+                RemoteLinkOutputRouter.SendOutput = savedSend;
+                RemoteLinkOutputRouter.Unregister(peer.DevicePath);
+            }
+        }
+
         // ── A scripted Falcon ──
 
         private sealed class ScriptedFalcon : IFalconLink
@@ -718,6 +1333,20 @@ namespace PadForge.Tests
             public double Y { get; init; }
             public double Z { get; init; }
             public volatile bool Fail;
+            /// <summary>Every force write fails, as a write the USB link
+            /// refuses does.</summary>
+            public volatile bool ForceFails;
+            /// <summary>Gravity compensation, or the forces, refuse to
+            /// turn on.</summary>
+            public bool GravityFails { get; init; }
+            public bool EnableFails { get; init; }
+            /// <summary>Run inside the serial number read and the close.</summary>
+            public Action OnSerial { get; init; }
+            public Action OnClose { get; init; }
+            /// <summary>Every open fails with an error other than in use.</summary>
+            public bool OpenFails { get; init; }
+            /// <summary>The library's last error, in its words.</summary>
+            public string ErrorText { get; init; } = string.Empty;
             private int _reads, _closes;
             private (double, double, double) _lastForce = (double.NaN, double.NaN, double.NaN);
 
@@ -726,10 +1355,10 @@ namespace PadForge.Tests
             public (double, double, double) LastForce { get { lock (this) return _lastForce; } }
 
             public int DeviceCount() => 1;
-            public int OpenIndex(int index) => 0;
-            public int Close(int id) { Interlocked.Increment(ref _closes); return 0; }
+            public int OpenIndex(int index) => OpenFails ? -1 : 0;
+            public int Close(int id) { OnClose?.Invoke(); Interlocked.Increment(ref _closes); return 0; }
             public int SystemType(int id) => FalconDevice.SystemTypeFalcon;
-            public int SerialNumber(int id, out ushort serial) { serial = 1; return 0; }
+            public int SerialNumber(int id, out ushort serial) { OnSerial?.Invoke(); serial = 1; return 0; }
 
             public int GetPosition(int id, out double x, out double y, out double z)
             {
@@ -742,15 +1371,15 @@ namespace PadForge.Tests
             }
 
             public uint ButtonMask(int id) => 0;
-            public int EnableForce(int id, bool on) => 0;
-            public int SetForce(int id, double x, double y, double z) { lock (this) _lastForce = (x, y, z); return 0; }
+            public int EnableForce(int id, bool on) => EnableFails ? -1 : 0;
+            public int SetForce(int id, double x, double y, double z) { lock (this) _lastForce = (x, y, z); return ForceFails ? -1 : 0; }
             public int SetMaxForce(int id, double newtons) => 0;
-            public int SetGravityCompensation(int id, bool on) => 0;
+            public int SetGravityCompensation(int id, bool on) => GravityFails ? -1 : 0;
             public int SetStandardGravity(int id, double metersPerSecondSquared) => 0;
             public int GetStatus(int id, int[] status) => 0;
             public double ComFrequency(int id) => 1.0;
             public int LastError() => 0;
-            public string LastErrorText() => string.Empty;
+            public string LastErrorText() => ErrorText;
         }
 
         private static string RepoFile(params string[] parts)

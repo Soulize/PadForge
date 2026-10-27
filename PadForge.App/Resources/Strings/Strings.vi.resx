@@ -319,6 +319,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Hoạt động với các mod làm cho DSX, như mod cho GTA V, Red Dead Redemption 2, Skyrim và Forza. Khi máy chủ đang lắng nghe, PadForge ghi cổng của nó vào nơi các mod tìm.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Đang lắng nghe trên :{0}. {1} đang gửi tới tay cầm ảo {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Đang lắng nghe trên :{0}. {1} đang gửi, nhưng không có tay cầm ảo nào có tay cầm PlayStation.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Đang lắng nghe trên :{0}. {1} đang gửi tới chỉ số tay cầm {2}, và không có tay cầm ảo nào có tay cầm PlayStation mang chỉ số đó.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Cổng {0} đang được một chương trình khác sử dụng, chẳng hạn DSX. Hãy đóng nó hoặc chọn cổng khác.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Một mod trò chơi</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Hoạt động với OpenTrack và mọi bộ theo dõi gửi đầu ra UDP hoặc ghi vào bộ nhớ dùng chung FreeTrack 2.0, cũng như với một runtime OpenXR trên máy này có thể chạy phiên ở chế độ nền.</value></data>
@@ -4127,7 +4128,7 @@ Bạn có muốn PadForge gỡ cài đặt chúng ngay bây giờ không? Việc
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Đang chờ dữ liệu bộ nhớ dùng chung FreeTrack.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>Bộ nhớ dùng chung FreeTrack không khả dụng.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Rung theo góc lái</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Thêm rung liên tục khi trục cần analog ảo đã chọn di chuyển ra xa tâm. Dùng đầu ra đã ánh xạ từ mọi nguồn đã gán. Với Chia theo hướng, chuyển động âm điều khiển mô-tơ trái và chuyển động dương điều khiển mô-tơ phải. Mô-tơ trái hoặc Mô-tơ phải đặt cả hai hướng lên đúng mô-tơ đó. Dành cho đầu ra Xbox và PlayStation với thiết bị có rung. Không bao gồm phản hồi lực gốc của vô lăng.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Thêm rung liên tục khi trục cần analog ảo đã chọn di chuyển ra xa tâm. Dùng đầu ra đã ánh xạ từ mọi nguồn đã gán. Với Chia theo hướng, chuyển động âm điều khiển mô-tơ trái và chuyển động dương điều khiển mô-tơ phải. Mô-tơ trái hoặc Mô-tơ phải đặt cả hai hướng lên đúng mô-tơ đó. Dành cho đầu ra Xbox và PlayStation với thiết bị có rung. Hiệu ứng này bỏ qua vô lăng, các thiết bị khác có phản hồi lực không đổi và bàn đạp Fanatec.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Bật rung theo góc lái</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Trục ảo</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Cần trái X</value></data>
@@ -4330,6 +4331,7 @@ Bạn có muốn PadForge gỡ cài đặt chúng ngay bây giờ không? Việc
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>trực tiếp trên {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>đang gắn WinUSB vào màn hình của G19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>màn hình của G19 đang dùng trình điều khiển khác ({0}), hãy khởi động Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>màn hình của G19 đang dùng trình điều khiển của chương trình khác ({0}), PadForge không can thiệp vào</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>cần Logitech Gaming Software 8.52 trở lên</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>hãy khởi động Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>đang chờ điện thoại có Arx Control</value></data>
@@ -4401,6 +4403,7 @@ Bạn có muốn PadForge gỡ cài đặt chúng ngay bây giờ không? Việc
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Tay nắm</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} đang đặt cò của tay cầm này.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} đang đặt đèn của tay cầm này.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} đang đặt đèn của thiết bị này.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} đang đặt cò và đèn của tay cầm này.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} đang phát rung cò trên các cò xung lực của tay cầm này.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Xóa hiệu ứng mod</value></data>
@@ -4408,10 +4411,10 @@ Bạn có muốn PadForge gỡ cài đặt chúng ngay bây giờ không? Việc
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Trái/Phải</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Lên/Xuống</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Vào/Ra</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Nút {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, tải từ {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Không tải được dhd64.dll bạn đã chọn, nên PadForge dùng bản ở trên.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Thư viện của Force Dimension chỉ chạy trên bản x64 của PadForge.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>Đã tìm thấy dhd64.dll nhưng không tải được.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>dhd64.dll đó không phải thư viện Force Dimension mà PadForge mong đợi.</value></data>
@@ -4421,11 +4424,12 @@ Bạn có muốn PadForge gỡ cài đặt chúng ngay bây giờ không? Việc
   <data name="Falcon_Status_Open" xml:space="preserve"><value>đang mở</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Một chiếc Falcon đang mở trong chương trình khác, như FalconJoyForce hoặc công cụ của Force Dimension. Hãy đóng nó ở đó.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon đang dùng trình điều khiển khác ({0}), nên thư viện của Force Dimension không mở được. Trong Trình quản lý thiết bị, hãy cập nhật trình điều khiển của Falcon từ thư mục drivers\usb trong thư mục SDK của Force Dimension.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon đang dùng trình điều khiển của Force Dimension, và thư viện của Force Dimension không mở được nó: {0}. Hãy kiểm tra nguồn điện và cáp USB của nó.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Có Falcon được cắm vào nhưng chưa có trình điều khiển. Nút Cài đặt trình điều khiển Falcon sẽ cài trình điều khiển của Force Dimension cho nó.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Có Falcon được cắm vào nhưng chưa có trình điều khiển, và thư mục SDK không có gói trình điều khiển để cài cho nó. Hãy cài đặt lại SDK của Force Dimension.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Không tìm thấy Falcon. Hãy cắm nguồn điện và cáp USB của nó.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Chọn dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Tải bản sao thư viện của Force Dimension này trước mọi bản khác. Các bản do SDK cài đặt vẫn được tìm thấy mà không cần bước này.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Tải bản sao thư viện của Force Dimension này thay cho mọi bản khác. Falcon đang mở trên bản khác sẽ đóng rồi mở lại trên bản này. Các bản do SDK cài đặt vẫn được tìm thấy mà không cần bước này.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Thư viện (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Cài đặt trình điều khiển Falcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Cài trình điều khiển của Force Dimension, từ thư mục SDK, cho Falcon chưa có trình điều khiển. Windows có thể hỏi trước xem có tin cậy Force Dimension không.</value></data>
@@ -4442,7 +4446,7 @@ Bạn có muốn PadForge gỡ cài đặt chúng ngay bây giờ không? Việc
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Chơi game bằng Novint Falcon qua SDK của Force Dimension, mà bạn cài đặt từ Force Dimension. Tay nắm là một cần analog, bốn nút trên tay nắm là các nút, và PadForge đưa rung và hiệu ứng của game lên tay nắm dưới dạng lực. Tab Phản hồi lực của mỗi khe đặt cảm giác của Falcon.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Điều khiển Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Mở từng Falcon qua dhd64.dll của Force Dimension. Falcon đang mở chỉ thuộc về PadForge, nên FalconJoyForce và công cụ của Force Dimension không mở được nó khi tùy chọn này bật. Khi tắt, PadForge đóng mọi Falcon.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Đã đặt thư viện Falcon thành {0}. Bản đang dùng được giữ đến khi PadForge khởi động lại.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Đã đặt thư viện Falcon thành {0}. PadForge sẽ tải nó trong vài giây, và Falcon đang mở trên bản khác sẽ mở lại trên bản này.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Đang cài đặt trình điều khiển Falcon của Force Dimension…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Thiếu gói trình điều khiển Falcon của Force Dimension, hoặc danh mục của nó: {0}. Hãy cài đặt lại SDK của Force Dimension.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Không có Falcon nào được cắm vào.</value></data>

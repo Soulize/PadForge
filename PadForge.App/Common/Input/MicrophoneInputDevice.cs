@@ -99,13 +99,21 @@ namespace PadForge.Common.Input
         public bool SetRumble(ushort low, ushort high, uint durationMs = uint.MaxValue) => false;
         public bool StopRumble() => false;
 
+        /// <summary>The English name of button 0. The row keeps its objects in
+        /// the settings file and is not opened again when the language
+        /// changes, so the name is published in English and
+        /// MappingDisplayResolver.LocalizeObjectName translates it where it
+        /// is shown, as it does the NFC row's "Any NFC Tag". The phrases
+        /// carry the names the user gave them.</summary>
+        internal const string AnyPhraseName = "Any Phrase";
+
         public DeviceObjectItem[] GetDeviceObjects()
         {
             var phrases = VoicePhraseRegistry.Phrases;
             var items = new DeviceObjectItem[1 + phrases.Count];
             items[0] = new DeviceObjectItem
             {
-                Name = Resources.Strings.Strings.Instance.Voice_AnyPhrase,
+                Name = AnyPhraseName,
                 ObjectType = DeviceObjectTypeFlags.PushButton,
                 ObjectTypeGuid = ObjectGuid.Button,
                 InputIndex = AnyPhraseButton,

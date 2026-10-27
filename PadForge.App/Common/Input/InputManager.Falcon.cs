@@ -33,7 +33,7 @@ namespace PadForge.Common.Input
             get { lock (_falconLock) return _falconOpen.Values.ToList(); }
         }
 
-        /// <summary>Phase 1j3 (issue #521). Off with nothing to retire: two
+        /// <summary>Phase 1j3 (issue #521). Off with nothing to retire: three
         /// volatile reads and out.</summary>
         private bool UpdateFalconDevices()
         {
@@ -129,11 +129,40 @@ namespace PadForge.Common.Input
         private void FalconSweep()
         {
             if (_falconSuppressed || !FalconRuntime.Enabled) return;
+            // A dhd64.dll picked while another was loaded: every Falcon on the
+            // old copy closes here, the poll thread lets each one go, and the
+            // first sweep that finds none left hands over to the new copy and
+            // opens the Falcons on it. Until then an ID the old copy gave
+            // would still be listed as ours.
+            if (FalconRuntime.StagePick())
+            {
+                List<FalconDevice> held;
+                lock (_falconLock) held = _falconOpen.Values.Concat(_falconPending).ToList();
+                if (held.Count > 0)
+                {
+                    foreach (var dev in held)
+                    {
+                        try { dev.Dispose(); }
+                        catch { }
+                    }
+                    return;
+                }
+                FalconRuntime.SwapToStaged();
+                lock (_falconLock)
+                {
+                    _falconOtherTypes.Clear();
+                    _falconLastCount = -1;
+                }
+            }
             var link = FalconRuntime.Acquire(Environment.TickCount64, out string reason, out string path, out string version);
             int inUse = 0, falcons;
+            // The library's reason for the last failed open, read on this
+            // thread right after the call, since it keeps one per thread.
+            string openError = null;
             if (link != null)
             {
                 int count = link.DeviceCount();
+                if (count < 0) openError = link.LastErrorText();
                 HashSet<int> ours;
                 lock (_falconLock)
                 {
@@ -149,14 +178,16 @@ namespace PadForge.Common.Input
                 for (int index = 0; index < count && index <= sbyte.MaxValue; index++)
                 {
                     if (_falconOtherTypes.Contains(index)) continue;
-                    // The test host opens no device (DirectDeviceAccess).
-                    if (DirectDeviceAccess.RefusesAll) break;
+                    // The test host opens no device (DirectDeviceAccess),
+                    // only a test's scripted Falcon.
+                    if (DirectDeviceAccess.RefusesAll && !FalconRuntime.ScriptedForTest) break;
                     int id = link.OpenIndex(index);
                     if (id < 0)
                     {
                         // Another program holds it, FalconJoyForce or Force
-                        // Dimension's own tools.
+                        // Dimension's own tools, or the open failed.
                         if (link.LastError() == DhdErrorDeviceInUse) inUse++;
+                        else openError = link.LastErrorText();
                         continue;
                     }
                     // An index already open returns the ID it opened with.
@@ -168,15 +199,23 @@ namespace PadForge.Common.Input
                         continue;
                     }
                     ushort? serial = link.SerialNumber(id, out ushort sn) == 0 ? sn : null;
+                    // Decided inside the lock, closed after it: the poll
+                    // thread takes this lock every pass, and a library call
+                    // can block.
+                    bool keep;
                     lock (_falconLock)
                     {
-                        if (_falconSuppressed || !FalconRuntime.Enabled)
+                        keep = !_falconSuppressed && FalconRuntime.Enabled;
+                        if (keep)
                         {
-                            link.Close(id);
-                            return;
+                            _falconPending.Add(new FalconDevice(link, id, index, serial));
+                            _falconAnyRows = true;
                         }
-                        _falconPending.Add(new FalconDevice(link, id, index, serial));
-                        _falconAnyRows = true;
+                    }
+                    if (!keep)
+                    {
+                        link.Close(id);
+                        return;
                     }
                     ours.Add(id);
                     PadForge.Engine.SdlDiagLog.WriteLine($"Falcon: opened index {index} as device {id}, serial {(serial?.ToString() ?? "none")}");
@@ -185,10 +224,20 @@ namespace PadForge.Common.Input
             lock (_falconLock) falcons = _falconOpen.Count + _falconPending.Count;
 
             // With no Falcon open, the Falcon's own USB nodes say why: no
-            // driver, or a driver other than Force Dimension's.
+            // driver, a driver other than Force Dimension's, or Force
+            // Dimension's own, which the library still failed to open.
             string[] drivers = Array.Empty<string>();
+            int ownDriver = 0;
             if (falcons == 0)
-                drivers = DriverInstaller.FalconNodes().Select(n => n.Service ?? string.Empty).ToArray();
+            {
+                var others = new List<string>();
+                foreach (var node in DriverInstaller.FalconNodes())
+                {
+                    if (DriverInstaller.IsOnFalconPackage(node)) ownDriver++;
+                    else others.Add(node.Service ?? string.Empty);
+                }
+                drivers = others.ToArray();
+            }
             // The package the Install button would use, read here on the
             // worker: the loaded library's SDK folder first, then any other
             // SDK folder this PC names, for a library loaded from System32.
@@ -201,7 +250,8 @@ namespace PadForge.Common.Input
                     foreach (string root in PadForge.Engine.Common.ForceDimension.ForceDimensionCatalog.SdkRoots())
                         if ((package = DriverInstaller.FalconDriverPackage(root)) != null) break;
             }
-            FalconRuntime.Status = new FalconSweepStatus(reason, path, version, sdkRoot, inUse, drivers, package);
+            FalconRuntime.Status = new FalconSweepStatus(reason, path, version, sdkRoot, inUse, drivers, package,
+                FalconRuntime.PickNotLoaded, ownDriver, openError);
         }
 
         private static void DisposeFalconAsync(FalconDevice dev)
@@ -217,13 +267,38 @@ namespace PadForge.Common.Input
 
         /// <summary>The Step 2 hand-off for a Falcon its slots drive: the
         /// first slot's settings and the combined force, Trigger Rumble Fold
-        /// applied as on every direct writer.</summary>
-        private static void HandFalconForce(FalconDevice falcon, PadSetting firstPadSetting, Vibration combined,
+        /// applied as on every direct writer. A Falcon a peer's game drives
+        /// over Remote Link keeps the peer's hand-off while the peer holds
+        /// the output lease (#138's sole-writer rule), and this PC's slots
+        /// take it back once the lease lapses.</summary>
+        private static void HandFalconForce(UserDevice ud, FalconDevice falcon, PadSetting firstPadSetting, Vibration combined,
             ushort combinedL, ushort combinedR, ushort combinedLT, ushort combinedRT)
         {
+            if (RemoteLinkOutputRouter.IsClaimedByPeer(ud.DevicePath)) return;
+            RemoteLinkOutputRouter.NoteLocalWrite(ud.DevicePath);
             ushort left = combinedL, right = combinedR;
             ForceFeedbackState.FoldTriggersForDirectWriter(firstPadSetting, combinedLT, combinedRT, ref left, ref right);
             falcon.Publish(firstPadSetting, combined, left, right);
+        }
+
+        /// <summary>A Falcon no slot on this PC is assigned holds itself up
+        /// and does nothing else, unless a peer's game drives it: its
+        /// hand-off then stands while the peer's lease is fresh, and past
+        /// that while the peer wrote last, as a shared pad keeps a peer's
+        /// rumble (#402).</summary>
+        private static void UnassignFalcon(UserDevice ud, FalconDevice falcon)
+        {
+            if (RemoteLinkOutputRouter.IsClaimedByPeer(ud.DevicePath) || RemoteLinkOutputRouter.PeerWroteLast(ud.DevicePath))
+                return;
+            falcon.Handoff = FalconHandoff.Unassigned;
+        }
+
+        /// <summary>No slot gave a force this pass: the Falcon keeps its feel
+        /// and loses the game's force, unless a peer's game drives it.</summary>
+        private static void SilenceFalconGame(UserDevice ud, FalconDevice falcon)
+        {
+            if (RemoteLinkOutputRouter.IsClaimedByPeer(ud.DevicePath)) return;
+            falcon.SilenceGame();
         }
 
         /// <summary>An engine silence edge (stop, focus suspend, the crash

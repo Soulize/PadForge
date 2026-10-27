@@ -680,6 +680,7 @@
   <data name="DeviceType_NovintFalcon" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>ʻOku liliu ʻe {0} ʻa e ngaahi trigger ʻo e controller ko ʻení.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>ʻOku liliu ʻe {0} ʻa e ngaahi maama ʻo e controller ko ʻení.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>ʻOku liliu ʻe {0} ʻa e ngaahi maama ʻo e naunau ko ʻení.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>ʻOku liliu ʻe {0} ʻa e ngaahi trigger mo e maama ʻo e controller ko ʻení.</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Toʻohema/Toʻomataʻu</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>ʻOlunga/Lalo</value></data>

@@ -2006,8 +2006,6 @@ namespace PadForge.Common
         }
 
         // ─────────────────────────────────────────────
-        //  What the test host never does
-        // ─────────────────────────────────────────────
         //  Mad Catz S.T.R.I.K.E. 7 (issue #519)
         // ─────────────────────────────────────────────
 
@@ -2192,6 +2190,44 @@ namespace PadForge.Common
             return null;
         }
 
+        /// <summary>The interface Force Dimension's package gives a Falcon on
+        /// WinUSB, which its library opens the Falcon by. Both INF variants
+        /// in SDK 3.17.7 write it (fdhusb-3.18.00.03.inf, Falcon_Install.HW,
+        /// and fdhusb-3.7.0.3073.inf, Falcon_AddReg).</summary>
+        internal static readonly Guid FalconInterfaceGuid = new("CB5DAA55-DC1A-4f2d-8F76-14CEE032832A");
+
+        /// <summary>Whether a node's DeviceInterfaceGUIDs name Force
+        /// Dimension's Falcon interface.</summary>
+        internal static bool NamesFalconInterface(System.Collections.Generic.IEnumerable<string> guids)
+        {
+            if (guids == null) return false;
+            foreach (string g in guids)
+                if (Guid.TryParse(g, out var guid) && guid == FalconInterfaceGuid) return true;
+            return false;
+        }
+
+        /// <summary>Whether a Falcon's node is on Force Dimension's own
+        /// package: WinUSB, with the interface the package writes to the
+        /// node's Device Parameters key. A read of the registry.</summary>
+        internal static bool IsOnFalconPackage(PadForge.Services.VendorUsbDriverInstaller.UsbNode node)
+        {
+            if (!string.Equals(node.Service, "WINUSB", StringComparison.OrdinalIgnoreCase)
+                || string.IsNullOrEmpty(node.InstanceId))
+                return false;
+            try
+            {
+                using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
+                    @"SYSTEM\CurrentControlSet\Enum\" + node.InstanceId + @"\Device Parameters");
+                return NamesFalconInterface(key?.GetValue("DeviceInterfaceGUIDs") as string[])
+                       || NamesFalconInterface(key?.GetValue("DeviceInterfaceGUID") is string one ? new[] { one } : null);
+            }
+            catch (Exception ex) when (ex is System.Security.SecurityException or UnauthorizedAccessException
+                                          or IOException or ArgumentException)
+            {
+                return false;
+            }
+        }
+
         /// <summary>The Falcons plugged in, as USB nodes with the driver each
         /// one is on.</summary>
         internal static System.Collections.Generic.List<PadForge.Services.VendorUsbDriverInstaller.UsbNode> FalconNodes()
@@ -2224,7 +2260,11 @@ namespace PadForge.Common
                 if (!string.IsNullOrEmpty(n.Service))
                     throw new DriverCheckException(DriverCheckFailure.FalconOnAnotherDriver,
                         "A Falcon is on " + n.Service + ", so its driver stays as it is.", n.Service);
-            if (!PadForge.Services.VendorUsbDriverInstaller.InstallSignedPackage(inf, FalconHardwareId, m => Debug.WriteLine("[Falcon] " + m)))
+            // The install's lines go to the diagnostics ring, which a
+            // Release build keeps and Save Snapshot reads, a refused forced
+            // bind and a restart Windows asked for among them.
+            if (!PadForge.Services.VendorUsbDriverInstaller.InstallSignedPackage(inf, FalconHardwareId,
+                    m => PadForge.Engine.SdlDiagLog.WriteLine("Falcon driver: " + m)))
                 throw new DriverCheckException(DriverCheckFailure.FalconDriverDeclined,
                     "Windows did not install Force Dimension's driver package.");
             for (int i = 0; i < 20; i++)
@@ -2238,6 +2278,8 @@ namespace PadForge.Common
                 "The Falcon is not on Force Dimension's driver after the install.");
         }
 
+        // ─────────────────────────────────────────────
+        //  What the test host never does
         // ─────────────────────────────────────────────
 
         /// <summary>Test seam: set by the test assembly for the life of its

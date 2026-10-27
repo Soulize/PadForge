@@ -302,6 +302,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Hufanya kazi na mod zilizotengenezwa kwa DSX, kama zile za GTA V, Red Dead Redemption 2, Skyrim na Forza. Seva inaposikiliza, PadForge huandika mlango wake mahali ambapo mod hizo huutafuta.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Inasikiliza kwenye :{0}. {1} inatuma kwa kidhibiti pepe {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Inasikiliza kwenye :{0}. {1} inatuma, lakini hakuna kidhibiti pepe chenye kidhibiti cha PlayStation.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Inasikiliza kwenye :{0}. {1} inatuma kwa faharasa ya kidhibiti {2}, na hakuna kidhibiti pepe chenye kidhibiti cha PlayStation juu yake kinachotumia faharasa hiyo.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Mlango {0} unatumiwa na programu nyingine, kama DSX. Ifunge au chagua mlango mwingine.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Mod ya mchezo</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Inafanya kazi na OpenTrack na kifuatiliaji chochote kinachotuma towe lake la UDP au kuandika kumbukumbu ya pamoja ya FreeTrack 2.0, na pia na runtime ya OpenXR kwenye kompyuta hii inayoweza kuendesha kipindi chinichini.</value></data>
@@ -4045,7 +4046,7 @@ Ungependa PadForge iviondoe sasa? Hii inahitaji ruhusa za msimamizi na inaweza k
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Inasubiri data ya shared memory ya FreeTrack.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>Shared memory ya FreeTrack haipatikani.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Mtetemo wa Pembe ya Usukani</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Huongeza mtetemo endelevu mhimili pepe wa kijiti uliochaguliwa unavyosogea mbali na kituo. Hutumia matokeo yaliyoramaniwa kutoka vyanzo vyote vilivyoagizwa. Kwa Gawanya kwa Mwelekeo, mwendo hasi huendesha motor ya kushoto na mwendo chanya motor ya kulia. Motor ya Kushoto au Motor ya Kulia huweka pande zote mbili kwenye motor hiyo moja. Kwa matokeo ya Xbox na PlayStation yenye vifaa vya mtetemo. Force feedback asilia ya usukani haijumuishwi.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Huongeza mtetemo endelevu mhimili pepe wa kijiti uliochaguliwa unavyosogea mbali na kituo. Hutumia matokeo yaliyoramaniwa kutoka vyanzo vyote vilivyoagizwa. Kwa Gawanya kwa Mwelekeo, mwendo hasi huendesha motor ya kushoto na mwendo chanya motor ya kulia. Motor ya Kushoto au Motor ya Kulia huweka pande zote mbili kwenye motor hiyo moja. Kwa matokeo ya Xbox na PlayStation yenye vifaa vya mtetemo. Haitumiki kwa usukani, vifaa vingine vyenye force feedback ya nguvu thabiti, na kanyagio za Fanatec.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Washa Mtetemo wa Pembe ya Usukani</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Mhimili Pepe</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Kijiti cha Kushoto X</value></data>
@@ -4240,6 +4241,7 @@ Ungependa PadForge iviondoe sasa? Hii inahitaji ruhusa za msimamizi na inaweza k
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>moja kwa moja kwenye {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>inaunganisha WinUSB kwenye skrini ya G19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>skrini ya G19 iko kwenye kiendeshi kingine ({0}), kwa hivyo anzisha Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>skrini ya G19 iko kwenye kiendeshi cha programu nyingine ({0}), ambacho PadForge hakigusi</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>inahitaji Logitech Gaming Software 8.52 au mpya zaidi</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>anzisha Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>inasubiri simu yenye Arx Control</value></data>
@@ -4311,6 +4313,7 @@ Ungependa PadForge iviondoe sasa? Hii inahitaji ruhusa za msimamizi na inaweza k
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Kishikio</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} inaweka vichochezi vya kidhibiti hiki.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} inaweka taa za kidhibiti hiki.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} inaweka taa za kifaa hiki.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} inaweka vichochezi na taa za kidhibiti hiki.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} inacheza mitetemo ya vichochezi kwenye vichochezi vya impulse vya kidhibiti hiki.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Futa Athari za Mod</value></data>
@@ -4318,10 +4321,10 @@ Ungependa PadForge iviondoe sasa? Hii inahitaji ruhusa za msimamizi na inaweza k
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Kushoto/Kulia</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Juu/Chini</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Ndani/Nje</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Kitufe {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, imepakiwa kutoka {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Nakala ya dhd64.dll uliyochagua haikupakia, kwa hivyo PadForge hutumia nakala iliyo juu.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Maktaba ya Force Dimension inafanya kazi tu katika toleo la x64 la PadForge.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>dhd64.dll imepatikana lakini haikuweza kupakiwa.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>dhd64.dll hiyo si maktaba ya Force Dimension inayotarajiwa na PadForge.</value></data>
@@ -4331,11 +4334,12 @@ Ungependa PadForge iviondoe sasa? Hii inahitaji ruhusa za msimamizi na inaweza k
   <data name="Falcon_Status_Open" xml:space="preserve"><value>imefunguliwa</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Falcon imefunguliwa kwenye programu nyingine, kama FalconJoyForce au zana za Force Dimension zenyewe. Ifunge huko.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon iko kwenye kiendeshi kingine ({0}), kwa hiyo maktaba ya Force Dimension haiwezi kuifungua. Katika Kidhibiti cha Kifaa, sasisha kiendeshi cha Falcon kutoka folda ya drivers\usb ndani ya folda ya SDK ya Force Dimension.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon iko kwenye kiendeshi cha Force Dimension, na maktaba ya Force Dimension haikuweza kuifungua: {0}. Angalia umeme wake na kebo yake ya USB.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Falcon imechomekwa bila kiendeshi. Sakinisha Kiendeshi cha Falcon huipa kiendeshi cha Force Dimension.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Falcon imechomekwa bila kiendeshi, na folda ya SDK haina kifurushi cha kiendeshi cha kuipa. Sakinisha upya Force Dimension SDK.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Hakuna Falcon iliyopatikana. Chomeka umeme wake na kebo yake ya USB.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Chagua dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Hupakia nakala hii ya maktaba ya Force Dimension kabla ya nyingine yoyote. Nakala ambazo SDK husakinisha hupatikana bila hii.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Hupakia nakala hii ya maktaba ya Force Dimension badala ya nyingine yoyote. Falcon iliyofunguliwa kwenye nakala nyingine hufungwa na kufunguliwa tena kwenye hii. Nakala ambazo SDK husakinisha hupatikana bila hii.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Maktaba (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Sakinisha Kiendeshi cha Falcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Husakinisha kiendeshi cha Force Dimension, kutoka folda ya SDK, kwenye Falcon isiyo na kiendeshi. Windows inaweza kwanza kuuliza kama inaamini Force Dimension.</value></data>
@@ -4352,7 +4356,7 @@ Ungependa PadForge iviondoe sasa? Hii inahitaji ruhusa za msimamizi na inaweza k
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Hucheza michezo kwa Novint Falcon kupitia SDK ya Force Dimension, ambayo unaisakinisha kutoka Force Dimension. Kishikio ni kijiti, vitufe vinne vya mshiko ni vitufe, na PadForge huweka mtetemo na athari za mchezo kwenye kishikio kama nguvu. Kichupo cha Force Feedback cha kila nafasi huweka jinsi Falcon inavyohisi.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Endesha Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Hufungua kila Falcon kupitia dhd64.dll ya Force Dimension. Falcon iliyofunguliwa ni ya PadForge peke yake, kwa hiyo FalconJoyForce na zana za Force Dimension haziwezi kuifungua hii ikiwa imewashwa. Ikizimwa, PadForge hufunga kila Falcon.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Maktaba ya Falcon imewekwa kuwa {0}. Nakala inayotumika tayari inabaki hadi PadForge ianze tena.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Maktaba ya Falcon imewekwa kuwa {0}. PadForge huipakia ndani ya sekunde chache, na Falcon iliyofunguliwa kwenye nakala nyingine hufunguliwa tena kwenye hii.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Inasakinisha kiendeshi cha Falcon cha Force Dimension…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Kifurushi cha kiendeshi cha Falcon cha Force Dimension, au katalogi yake, hakipo: {0}. Sakinisha upya Force Dimension SDK.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Hakuna Falcon iliyochomekwa.</value></data>

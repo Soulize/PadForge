@@ -366,7 +366,9 @@ namespace PadForge.Services
         /// Removes a device and its associated settings entirely.
         /// The device record, any UserSettings pointing to it, and PadSettings
         /// are all deleted from SettingsManager. The virtual controller slot
-        /// itself is NOT deleted — it remains as an empty slot.
+        /// itself is NOT deleted. It remains as an empty slot. A keyboard
+        /// screen's choices go with its row, and a Bliss-Box port's go back
+        /// to the defaults, keeping the copy of the adapter's own picture.
         /// </summary>
         private void OnRemoveDevice(object sender, Guid instanceGuid)
         {
@@ -375,6 +377,8 @@ namespace PadForge.Services
             SettingsManager.RemoveDevice(instanceGuid);
             foreach (var pad in _mainVm.Pads)
                 pad.RemoveDeviceConfig(instanceGuid);
+            KeyboardScreenService.Forget(_mainVm.Settings, instanceGuid);
+            DreamcastScreenService.Forget(_mainVm.Settings, instanceGuid);
             _settingsService.MarkDirty();
             _mainVm.StatusText = Strings.Instance.Status_DeviceRemoved;
 

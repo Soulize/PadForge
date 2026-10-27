@@ -111,6 +111,11 @@ namespace PadForge.Services
         /// path is as it was.</summary>
         internal static bool OffLimitsForTest;
 
+        /// <summary>True after a start that found its port bound by another
+        /// program, the one failure worth trying again once that program
+        /// leaves.</summary>
+        public bool PortInUse { get; private set; }
+
         /// <summary>
         /// Starts the DSU server on the specified port.
         /// </summary>
@@ -118,6 +123,7 @@ namespace PadForge.Services
         {
             if (_running)
                 return true;
+            PortInUse = false;
             if (OffLimitsForTest && port == DefaultPort) return false;
 
             _port = port;
@@ -148,6 +154,7 @@ namespace PadForge.Services
             {
                 _socket?.Dispose();
                 _socket = null;
+                PortInUse = true;
                 StatusChanged?.Invoke(this, string.Format(Strings.Instance.Server_PortInUse_Format, port));
                 return false;
             }

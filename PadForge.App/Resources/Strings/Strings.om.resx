@@ -1655,7 +1655,7 @@
   <data name="RemoteLink_AssignmentBusy" xml:space="preserve">
     <value>PC isa kaan eegaa jira...</value>
   </data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Yeroo aksisiin sitikii fakkeessaa filatame giddu-galeessa irraa fagaatu raafama itti fufaa ida'a. Bu'aa walqabsiifame madda ramadaman hunda irraa fayyadama. "Kallattiin qoodi" yoo filatame, sochiin gara negaatiivii mootora bitaa, sochiin gara pozatiivii immoo mootora mirgaa socho'a. "Mootora bitaa" ykn "Mootora mirgaa" kallattii lamaanuu mootora tokko sana irratti kaa'a. Bu'aa Xbox fi PlayStation meeshaalee raafama qabaniif. Force feedback geengoo konkolaataa kan ofii isaa hin hammatamu.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Yeroo aksisiin sitikii fakkeessaa filatame giddu-galeessa irraa fagaatu raafama itti fufaa ida'a. Bu'aa walqabsiifame madda ramadaman hunda irraa fayyadama. "Kallattiin qoodi" yoo filatame, sochiin gara negaatiivii mootora bitaa, sochiin gara pozatiivii immoo mootora mirgaa socho'a. "Mootora bitaa" ykn "Mootora mirgaa" kallattii lamaanuu mootora tokko sana irratti kaa'a. Bu'aa Xbox fi PlayStation meeshaalee raafama qabaniif. Geengoo konkolaataa, meeshaalee biroo force feedback itti fufaa qaban, fi pedaalii Fanatec ni dhiisa.</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Aksisii fakkeessaa</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Sitikii bitaa X</value></data>
   <data name="Pad_SteeringAngleRumble_LY" xml:space="preserve"><value>Sitikii bitaa Y</value></data>
@@ -1739,6 +1739,7 @@
   <data name="KeyboardScreens_Status_Off" xml:space="preserve"><value>cufaa</value></data>
   <data name="KeyboardScreens_Status_Lgs" xml:space="preserve"><value>karaa Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>kallattiin {0} irratti</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>iskiriinii G19 draayivarii sagantaa biraa ({0}) irra jira, PadForge immoo isa hin tuqu</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>Logitech Gaming Software 8.52 yookiin isa booda barbaachisa</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>Logitech Gaming Software jalqabsiisi</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>bilbila Arx Control qabu eeggachaa jira</value></data>
@@ -1784,14 +1785,15 @@
   <data name="DeviceType_NovintFalcon" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} tiriigarii kontirolaa kanaa qindeessaa jira.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} ibsaa kontirolaa kanaa qindeessaa jira.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} ibsaa meeshaa kanaa qindeessaa jira.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} tiriigarii fi ibsaa kontirolaa kanaa qindeessaa jira.</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Bitaa/Mirga</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Ol/Gadi</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Keessa/Ala</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Qabduu {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, {1} irraa fe'ame</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>dhd64.dll ati filatte hin fe'amne, kanaaf PadForge isa olitti ibsame fayyadama.</value></data>
   <data name="Falcon_Status_Rate_Format" xml:space="preserve"><value>{0:0.0} kHz irratti hojjechaa jira</value></data>
   <data name="Falcon_Status_Open" xml:space="preserve"><value>banaa</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>dhd64.dll filadhu…</value></data>

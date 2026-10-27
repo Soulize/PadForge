@@ -1258,12 +1258,18 @@ namespace PadForge.ViewModels
                 TouchpadTrackpadPadWidthMm = s.TrackpadPadWidthMm;
                 var rs = s;
                 _touchpadPointerRegionAuthored = rs.PointerRegionAuthored;
-                TouchpadPointerRegionSizeX = rs.PointerRegionSizeX;
-                TouchpadPointerRegionSizeY = rs.PointerRegionSizeY;
-                TouchpadPointerRegionCenterX = rs.PointerRegionCenterX;
-                TouchpadPointerRegionCenterY = rs.PointerRegionCenterY;
+                // The region the card shows is settled before any of it is
+                // assigned. Assigning the stored region and then the seeded
+                // one raised two changes on every reload of an imported
+                // region, and each change marks the settings dirty.
+                double sizeX = rs.PointerRegionSizeX, sizeY = rs.PointerRegionSizeY;
+                double centerX = rs.PointerRegionCenterX, centerY = rs.PointerRegionCenterY;
                 if (!_touchpadPointerRegionAuthored)
-                    SeedPointerRegionFromMappingSources();
+                    SeedPointerRegionFromMappingSources(ref sizeX, ref sizeY, ref centerX, ref centerY);
+                TouchpadPointerRegionSizeX = sizeX;
+                TouchpadPointerRegionSizeY = sizeY;
+                TouchpadPointerRegionCenterX = centerX;
+                TouchpadPointerRegionCenterY = centerY;
                 TouchpadSwipeHapticsEnabled = s.EnableSwipeHaptics;
                 TouchpadSwipeHapticsIntensity = s.SwipeHapticsIntensity;
             }
@@ -1280,10 +1286,13 @@ namespace PadForge.ViewModels
         /// cursor visibly obeyed a different rectangle, and the first touch
         /// of any region slider would author THAT default and silently
         /// discard the imported region.</para>
-        /// <para>Assigns the backing fields directly: routing through the
-        /// setters would mark the region authored and perform the very
-        /// handover this is meant to defer.</para></summary>
-        private void SeedPointerRegionFromMappingSources()
+        /// <para>Only settles the values: the load assigns them through the
+        /// setters while <see cref="_loadingTouchpadGestures"/> holds, which
+        /// keeps the region unauthored and pushes nothing, so the handover
+        /// this is meant to defer never happens, and a value that did not
+        /// move raises no change.</para></summary>
+        private void SeedPointerRegionFromMappingSources(ref double sizeX, ref double sizeY,
+            ref double centerX, ref double centerY)
         {
             var sets = PadForge.Common.Input.SettingsManager.SlotMappingSets;
             if (sets == null) return;
@@ -1299,18 +1308,12 @@ namespace PadForge.ViewModels
             int pad = _selectedTouchpadIndex;
             bool gotX = FindPointerRegionAxis(sets, pad, wantX: true, out double sx, out double cx);
             bool gotY = FindPointerRegionAxis(sets, pad, wantX: false, out double sy, out double cy);
-            if (gotX) { _touchpadPointerRegionSizeX = sx; _touchpadPointerRegionCenterX = cx; }
-            if (gotY) { _touchpadPointerRegionSizeY = sy; _touchpadPointerRegionCenterY = cy; }
+            if (gotX) { sizeX = sx; centerX = cx; }
+            if (gotY) { sizeY = sy; centerY = cy; }
 
             PadForge.Engine.SdlDiagLog.WriteLine(
                 $"PTRSEED slot={PadIndex} pad={pad} sets={sets.Length} gotX={gotX} gotY={gotY} "
-                + $"sizeX={_touchpadPointerRegionSizeX:0.###} sizeY={_touchpadPointerRegionSizeY:0.###} "
-                + $"cx={_touchpadPointerRegionCenterX:0.###} cy={_touchpadPointerRegionCenterY:0.###}");
-
-            OnPropertyChanged(nameof(TouchpadPointerRegionSizeX));
-            OnPropertyChanged(nameof(TouchpadPointerRegionSizeY));
-            OnPropertyChanged(nameof(TouchpadPointerRegionCenterX));
-            OnPropertyChanged(nameof(TouchpadPointerRegionCenterY));
+                + $"sizeX={sizeX:0.###} sizeY={sizeY:0.###} cx={centerX:0.###} cy={centerY:0.###}");
         }
 
         /// <summary><para>One axis of the imported-region search, across EVERY

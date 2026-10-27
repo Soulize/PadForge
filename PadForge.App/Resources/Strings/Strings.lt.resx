@@ -302,6 +302,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Veikia su DSX skirtomis modifikacijomis, pavyzdžiui, skirtomis GTA V, Red Dead Redemption 2, Skyrim ir Forza. Kol serveris klausosi, PadForge įrašo savo prievadą ten, kur tų modifikacijų ieškoma.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Klausomasi adresu :{0}. {1} siunčia į virtualų valdiklį {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Klausomasi adresu :{0}. {1} siunčia, bet nė vienam virtualiam valdikliui nepriskirtas „PlayStation“ valdiklis.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Klausomasi adresu :{0}. {1} siunčia į valdiklio indeksą {2}, bet nė vienas virtualus valdiklis su „PlayStation“ valdikliu tokio indekso neturi.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Prievadą {0} naudoja kita programa, pavyzdžiui, DSX. Uždarykite ją arba pasirinkite kitą prievadą.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Žaidimo modifikacija</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Veikia su „OpenTrack“ ir bet kuriuo sekikliu, kuris siunčia UDP išvestį arba rašo į FreeTrack 2.0 bendrąją atmintį, taip pat su šio kompiuterio OpenXR vykdymo aplinka, galinčia vykdyti seansą fone.</value></data>
@@ -4102,7 +4103,7 @@ Ar norite, kad „PadForge“ jas dabar pašalintų? Tam reikia administratoriau
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Laukiama FreeTrack bendrosios atminties duomenų.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>FreeTrack bendroji atmintis nepasiekiama.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Vibracija pagal vairo kampą</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Prideda nuolatinę vibraciją, kai pasirinkta virtualios svirtelės ašis tolsta nuo centro. Naudoja visų priskirtų šaltinių priskirtą išvestį. Pasirinkus „Padalyti pagal kryptį“, neigiamas judesys valdo kairįjį variklį, teigiamas – dešinįjį. Pasirinkus „Kairysis variklis“ arba „Dešinysis variklis“, abi kryptys vibruoja per tą vieną variklį. Skirta „Xbox“ ir „PlayStation“ išvesčiai su vibruojančiais įrenginiais. Vairų jėgos grįžtamasis ryšys netaikomas.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Prideda nuolatinę vibraciją, kai pasirinkta virtualios svirtelės ašis tolsta nuo centro. Naudoja visų priskirtų šaltinių priskirtą išvestį. Pasirinkus „Padalyti pagal kryptį“, neigiamas judesys valdo kairįjį variklį, teigiamas – dešinįjį. Pasirinkus „Kairysis variklis“ arba „Dešinysis variklis“, abi kryptys vibruoja per tą vieną variklį. Skirta „Xbox“ ir „PlayStation“ išvesčiai su vibruojančiais įrenginiais. Praleidžia vairus, kitus įrenginius su pastoviu jėgos grįžtamuoju ryšiu ir Fanatec pedalus.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Įjungti vibraciją pagal vairo kampą</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Virtuali ašis</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Kairioji svirtelė X</value></data>
@@ -4305,6 +4306,7 @@ Ar norite, kad „PadForge“ jas dabar pašalintų? Tam reikia administratoriau
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>tiesiogiai: {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>WinUSB priskiriamas G19 ekranui</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>G19 ekranas naudoja kitą tvarkyklę ({0}), todėl paleiskite „Logitech Gaming Software“</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>G19 ekranas naudoja kitos programos tvarkyklę ({0}), kurios PadForge neliečia</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>reikia „Logitech Gaming Software“ 8.52 ar naujesnės versijos</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>paleiskite „Logitech Gaming Software“</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>laukiama telefono su Arx Control</value></data>
@@ -4376,6 +4378,7 @@ Ar norite, kad „PadForge“ jas dabar pašalintų? Tam reikia administratoriau
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Rankena</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} nustato šio valdiklio gaidukus.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} nustato šio valdiklio lemputes.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} nustato šio įrenginio lemputes.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} nustato šio valdiklio gaidukus ir lemputes.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} atkuria gaidukų vibracijas šio valdiklio impulsiniuose gaiduose.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Išvalyti modifikacijų efektus</value></data>
@@ -4383,10 +4386,10 @@ Ar norite, kad „PadForge“ jas dabar pašalintų? Tam reikia administratoriau
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Kairė/dešinė</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Aukštyn/žemyn</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Į vidų/į išorę</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Mygtukas {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, įkelta iš {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Pasirinktas dhd64.dll neįsikėlė, todėl PadForge naudoja pirmiau nurodytą kopiją.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Force Dimension biblioteka veikia tik x64 PadForge versijoje.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>Rastas dhd64.dll, bet jo nepavyko įkelti.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Šis dhd64.dll nėra Force Dimension biblioteka, kurios tikisi PadForge.</value></data>
@@ -4396,11 +4399,12 @@ Ar norite, kad „PadForge“ jas dabar pašalintų? Tam reikia administratoriau
   <data name="Falcon_Status_Open" xml:space="preserve"><value>atidarytas</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Falcon atidarytas kitoje programoje, pavyzdžiui, FalconJoyForce ar Force Dimension įrankiuose. Uždarykite jį ten.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon naudoja kitą tvarkyklę ({0}), todėl Force Dimension biblioteka negali jo atidaryti. Įrenginių tvarkytuvėje atnaujinkite Falcon tvarkyklę iš aplanko drivers\usb, esančio Force Dimension SDK aplanke.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon naudoja Force Dimension tvarkyklę, bet Force Dimension biblioteka negalėjo jo atidaryti: {0}. Patikrinkite jo maitinimą ir USB laidą.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Falcon prijungtas be tvarkyklės. Paspaudus „Įdiegti Falcon tvarkyklę“, jam suteikiama Force Dimension tvarkyklė.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Falcon prijungtas be tvarkyklės, o SDK aplanke nėra tvarkyklės paketo, kurį būtų galima jam suteikti. Iš naujo įdiekite Force Dimension SDK.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Falcon nerastas. Prijunkite jo maitinimą ir USB laidą.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Pasirinkti dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Įkelia šią Force Dimension bibliotekos kopiją prieš kitas. SDK įdiegtos kopijos randamos ir be to.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Įkelia šią Force Dimension bibliotekos kopiją vietoj bet kurios kitos. Falcon, atidarytas per kitą kopiją, užsidaro ir vėl atsidaro per šią. SDK įdiegtos kopijos randamos ir be to.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Bibliotekos (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Įdiegti Falcon tvarkyklę</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Iš SDK aplanko įdiegia Force Dimension tvarkyklę Falcon, kuris jos neturi. Windows pirmiausia gali paklausti, ar pasitikite Force Dimension.</value></data>
@@ -4417,7 +4421,7 @@ Ar norite, kad „PadForge“ jas dabar pašalintų? Tam reikia administratoriau
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Žaidžia su Novint Falcon per Force Dimension SDK, kurį įdiegiate iš Force Dimension. Rankena yra svirtelė, keturi rankenos mygtukai yra mygtukai, o PadForge žaidimo vibraciją ir efektus perduoda rankenai kaip jėgą. Kiekvieno lizdo skirtukas „Jėgos grįžtamasis ryšys“ nustato, kaip jaučiasi Falcon.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Valdyti Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Atidaro kiekvieną Falcon per Force Dimension dhd64.dll. Atidarytas Falcon priklauso tik PadForge, todėl, kol tai įjungta, FalconJoyForce ir Force Dimension įrankiai jo atidaryti negali. Išjungus, PadForge uždaro visus Falcon.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon biblioteka nustatyta į {0}. Jau naudojama kopija lieka, kol PadForge bus paleista iš naujo.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon biblioteka nustatyta į {0}. PadForge ją įkelia per kelias sekundes, o Falcon, atidarytas per kitą kopiją, vėl atsidaro per šią.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Diegiama Force Dimension Falcon tvarkyklė…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Trūksta Force Dimension Falcon tvarkyklės paketo arba jo katalogo: {0}. Iš naujo įdiekite Force Dimension SDK.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Falcon neprijungtas.</value></data>

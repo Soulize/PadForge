@@ -368,11 +368,22 @@ namespace PadForge.Common.Input
             foreach (int index in controllers)
             {
                 if ((uint)index >= (uint)order.Length) continue;
-                int slot = order[index];
-                UserEffectsDispatcher.NotifyModEffectsChanged(slot);
-                Peripherals.GameLightbarCapture.NotifyChanged(slot);
+                NotifySlot(order[index]);
             }
         }
+
+        /// <summary>Queues a pass on one virtual controller's effects
+        /// dispatcher and its lighting rows. Both only queue, so any thread
+        /// may call it.</summary>
+        private static void NotifySlot(int slot)
+        {
+            NotifiedForTest?.Invoke(slot);
+            UserEffectsDispatcher.NotifyModEffectsChanged(slot);
+            Peripherals.GameLightbarCapture.NotifyChanged(slot);
+        }
+
+        /// <summary>Test seam: sees every slot told.</summary>
+        internal static Action<int> NotifiedForTest;
 
         // ─────────────────────────────────────────────
         //  Controller order
@@ -477,20 +488,43 @@ namespace PadForge.Common.Input
 
         /// <summary><see cref="ForSlot"/> for the polling thread, which asks
         /// every cycle: the controller order is resolved at most every
-        /// 250 ms. The polling thread holds neither the devices lock nor the
-        /// settings lock where it asks.</summary>
+        /// 250 ms, and a move in it is told (<see cref="RefreshOrder"/>). The
+        /// polling thread holds neither the devices lock nor the settings
+        /// lock where it asks.</summary>
         internal static Hold ForSlotCached(int padIndex)
         {
             if (!s_any) return null;
             long now = Environment.TickCount64;
             var order = Volatile.Read(ref s_cachedOrder);
             if (now - Volatile.Read(ref s_cachedOrderMs) >= OrderCacheMs)
-            {
-                order = OrderedSlots();
-                Volatile.Write(ref s_cachedOrder, order);
-                Volatile.Write(ref s_cachedOrderMs, now);
-            }
+                order = RefreshOrder();
             return ForController(Array.IndexOf(order, padIndex));
+        }
+
+        /// <summary>The controller order resolved now, and cached for
+        /// <see cref="ForSlotCached"/>. When it differs from the order cached
+        /// before while a mod holds anything, every virtual controller in
+        /// either order is told: turning a virtual controller on or off, or
+        /// a Sony pad arriving or leaving, moves the pad a mod's index names,
+        /// and a mod that resends unchanged values publishes nothing that
+        /// would tell them. The pad the hold left then gives the mod's values
+        /// back and the pad it reached takes them. The exchange hands each
+        /// move to one caller. The polling thread calls this through
+        /// <see cref="ForSlotCached"/> and the interface on its own timer,
+        /// which covers a moment when no virtual controller polls.</summary>
+        internal static int[] RefreshOrder()
+        {
+            long now = Environment.TickCount64;
+            var order = OrderedSlots();
+            Volatile.Write(ref s_cachedOrderMs, now);
+            var previous = Interlocked.Exchange(ref s_cachedOrder, order);
+            if (s_any && !previous.AsSpan().SequenceEqual(order))
+            {
+                var told = new HashSet<int>(previous);
+                told.UnionWith(order);
+                foreach (int slot in told) NotifySlot(slot);
+            }
+            return order;
         }
 
         /// <summary>A trigger as the virtual controller reports it: 0 below
@@ -550,6 +584,7 @@ namespace PadForge.Common.Input
             Volatile.Write(ref s_cachedOrder, Array.Empty<int>());
             Volatile.Write(ref s_cachedOrderMs, 0L);
             OrderedSlotsOverrideForTest = null;
+            NotifiedForTest = null;
         }
     }
 }

@@ -126,6 +126,89 @@ public sealed class EffectDeliveryTests(ITestOutputHelper output)
         }
     }
 
+    // A change-gated audio assert (headphone volume, output path, the DualShock 4
+    // microphone gain) is spent only when a frame carrying it lands. A frame the
+    // stale-skip drops leaves it owed, so the next frame carries it.
+    [Theory] [InlineData("volume")] [InlineData("path")] [InlineData("ds4-volume")] [InlineData("ds4-mic")]
+    public void ASupersededFrameLeavesItsAudioAssertOwed(string change)
+    {
+        StopAudioWorker();
+        bool ds4=change.StartsWith("ds4");
+        string dir=System.IO.Path.Combine(System.IO.Path.GetTempPath(),"PadForge-AudioAssert-"+Guid.NewGuid().ToString("N"));
+        System.IO.Directory.CreateDirectory(dir);string file=System.IO.Path.Combine(dir,"BTHENUM-report.bin");
+        var oldDevices=SettingsManager.UserDevices;var oldSettings=SettingsManager.UserSettings;var cfgs=UserEffectsDispatcher.SlotPerDeviceConfigsProvider;
+        var seqs=(System.Collections.Concurrent.ConcurrentDictionary<string,long>)typeof(UserEffectsDispatcher).GetField("s_lastWriteSeq",Static)!.GetValue(null)!;
+        var mics=(System.Collections.IDictionary)typeof(AudioPassthroughService).GetField("_ds4Mic",Static)!.GetValue(null)!;
+        var id=Guid.NewGuid();UserEffectsDispatcher dispatcher=null;
+        try
+        {
+            SettingsManager.UserDevices=new();SettingsManager.UserSettings=new();UserEffectsDispatcher.SlotPerDeviceConfigsProvider=null;
+            System.IO.File.WriteAllBytes(file,[]);
+            SettingsManager.UserDevices.Items.Add(new UserDevice{InstanceGuid=id,VendorId=0x054c,ProdId=(ushort)(ds4?0x09cc:0x0ce6),IsOnline=true,IsEnabled=true,DevicePath=file});
+            SettingsManager.UserSettings.Items.Add(new UserSetting{InstanceGuid=id,MapTo=15});
+            var cfg=new DeviceSlotConfig{LightbarMode=LightbarMode.Off,AudioOutputPath=AudioOutputPath.StereoHeadset,HeadphoneVolume=80};
+            dispatcher=new UserEffectsDispatcher(15,cfg,startTimer:false);
+            void Apply(){dispatcher.ApplyOnce();(typeof(UserEffectsDispatcher).GetField("_animTimer",Private)!.GetValue(dispatcher) as Timer)?.Change(Timeout.Infinite,Timeout.Infinite);}
+            byte Flags(){var r=System.IO.File.ReadAllBytes(file);Assert.True(r.Length>3,"no frame landed");return r[3];}
+            // Owed bits: DualSense valid_flag0 0x10 headphone volume and 0x80
+            // audio control, DualShock 4 byte 3 0x30 headphone volume and 0x40
+            // microphone gain.
+            byte bit=change switch{"volume"=>0x10,"path"=>0x80,"ds4-volume"=>0x30,_=>0x40};
+            Apply();
+            ((Dictionary<Guid,int>)typeof(UserEffectsDispatcher).GetField("_audioMuteBurstLeft",Private)!.GetValue(dispatcher)!)[id]=0;
+            Apply();
+            System.IO.File.WriteAllBytes(file,[]);Apply();
+            Assert.Equal(0,Flags()&bit); // a steady frame owes nothing
+
+            seqs[file]=long.MaxValue; // every frame now reads as superseded
+            System.IO.File.WriteAllBytes(file,[]);
+            if(change=="volume"||change=="ds4-volume")cfg.HeadphoneVolume=40;
+            else if(change=="path")cfg.AudioOutputPath=AudioOutputPath.SpeakerOnly;
+            else
+            {
+                typeof(AudioPassthroughService).GetMethod("NoteDs4MicPlugged",Static)!.Invoke(null,[id,true]);
+                typeof(AudioPassthroughService).GetMethod("SetDs4MicWanted",Static)!.Invoke(null,[id,-1,false,true]);
+                Assert.True(AudioPassthroughService.IsDs4MicArmed(id));
+            }
+            Apply();
+            Assert.Empty(System.IO.File.ReadAllBytes(file));
+
+            seqs.TryRemove(file,out _);
+            Apply();
+            output.WriteLine($"change={change} flags=0x{Flags():X2}");
+            Assert.Equal(bit,Flags()&bit);
+        }
+        finally
+        {
+            dispatcher?.Dispose();seqs.TryRemove(file,out _);mics.Remove(id);
+            UserEffectsDispatcher.SlotPerDeviceConfigsProvider=cfgs;SettingsManager.UserDevices=oldDevices;SettingsManager.UserSettings=oldSettings;
+            if(System.IO.File.Exists(file))System.IO.File.Delete(file);System.IO.Directory.Delete(dir);
+        }
+    }
+
+    // A frame captured before a re-arm, or before a newer frame's commit,
+    // lands late and must not undo either.
+    [Fact] public void ALateCommitCannotUndoAReArmOrANewerCommit()
+    {
+        var dispatcher=(UserEffectsDispatcher)System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(typeof(UserEffectsDispatcher));
+        foreach(var f in new[]{"_audioPrevGate","_audioCommitSeq","_prevHeadphoneVolume","_prevAudioOutputPath","_prevDs4MicArmed"})
+        {
+            var field=typeof(UserEffectsDispatcher).GetField(f,Private)!;
+            field.SetValue(dispatcher,Activator.CreateInstance(field.FieldType));
+        }
+        var volumes=(Dictionary<Guid,int>)typeof(UserEffectsDispatcher).GetField("_prevHeadphoneVolume",Private)!.GetValue(dispatcher)!;
+        var commit=typeof(UserEffectsDispatcher).GetMethod("CommitDeliveredAudio",Private)!;
+        var rearm=typeof(UserEffectsDispatcher).GetMethod("RearmAudioAsserts",Private)!;
+        long now=(long)typeof(UserEffectsDispatcher).GetField("s_dispatchSeq",Static)!.GetValue(null)!;
+        var id=Guid.NewGuid();
+        commit.Invoke(dispatcher,[id,now-3,(50,1,false)]);
+        commit.Invoke(dispatcher,[id,now-5,(20,1,false)]);
+        Assert.Equal(50,volumes[id]);
+        rearm.Invoke(dispatcher,[id]);
+        commit.Invoke(dispatcher,[id,now-1,(20,1,false)]);
+        Assert.False(volumes.ContainsKey(id));
+    }
+
     [Theory] [InlineData("unassign")] [InlineData("offline")] [InlineData("owner")] [InlineData("dispose")]
     public void RetiringTheOutputTargetStopsItsRetry(string transition)
     {

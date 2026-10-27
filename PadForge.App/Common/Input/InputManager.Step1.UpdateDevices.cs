@@ -1728,7 +1728,7 @@ namespace PadForge.Common.Input
         private volatile bool _analogSweepRunning;
         private volatile bool _analogInputsSuppressed;
         // Rows open or waiting to register, so the switched-off steady state
-        // costs two volatile reads.
+        // costs three volatile reads.
         private volatile bool _analogAnyRows;
         // Latest sweep's present paths. Null until the first sweep completes,
         // so nothing is retired on a cold cache.
@@ -2819,7 +2819,7 @@ namespace PadForge.Common.Input
                 return false;
 
             bool enabled = HandheldButtonRegistry.FeatureEnabled;
-            // Off with nothing to retire: two volatile reads and out. The
+            // Off with nothing to retire: five volatile reads and out. The
             // feature must cost a machine that never uses it nothing.
             if (!enabled && _handheldDevice == null && _systemMotionDevice == null && _systemMotionPending == null)
                 return false;
@@ -3037,7 +3037,7 @@ namespace PadForge.Common.Input
         /// <summary>Phase 1i (issue #355). One row while either input is on,
         /// recreated when the user removes it (the NFC recreate
         /// pattern) and reopened when the port or the FreeTrack toggle
-        /// changes. Off with nothing to retire: two volatile reads and out.</summary>
+        /// changes. Off with nothing to retire: five volatile reads and out.</summary>
         private bool UpdateHeadTrackerDevice()
         {
             if (_headTrackerInputsSuppressed)
@@ -3147,8 +3147,8 @@ namespace PadForge.Common.Input
 
         /// <summary>Phase 1j (issue #454). One row while the feature is on,
         /// recreated when the user removes it from the Devices page (the NFC
-        /// recreate pattern). Off with nothing to retire: two volatile reads
-        /// and out.
+        /// recreate pattern). Off with nothing to retire: three volatile
+        /// reads and out.
         ///
         /// <para>The row opens even when the SDK is absent, so the Devices
         /// list can carry the reason. A row that vanishes tells a user nothing

@@ -304,6 +304,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Werk met mods wat vir DSX gemaak is, soos dié vir GTA V, Red Dead Redemption 2, Skyrim en Forza. Terwyl die bediener luister, skryf PadForge sy poort waar daardie mods dit soek.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Luister op :{0}. {1} stuur na virtuele controller {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Luister op :{0}. {1} stuur, maar geen virtuele controller het 'n PlayStation-controller daaraan nie.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Luister op :{0}. {1} stuur na controller-indeks {2}, en geen virtuele controller met 'n PlayStation-controller daarop het daardie indeks nie.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Poort {0} word deur 'n ander program gebruik, soos DSX. Maak dit toe of kies 'n ander poort.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>'n Speletjie-mod</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Werk saam met OpenTrack en enige volger wat sy UDP-uitvoer stuur of FreeTrack 2.0 gedeelde geheue skryf, en met 'n OpenXR-looptyd op hierdie rekenaar wat 'n sessie in die agtergrond kan laat loop.</value></data>
@@ -3946,7 +3947,7 @@ Wil jy hê PadForge moet dit nou deïnstalleer? Dit vereis verhoogde regte en ka
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Wag vir FreeTrack se gedeelde geheuedata.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>FreeTrack se gedeelde geheue is nie beskikbaar nie.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Vibrasie volgens stuurhoek</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Voeg deurlopende vibrasie by namate die gekose virtuele stokkie-as van die middel af beweeg. Gebruik die gekarteerde uitvoer van alle toegewysde bronne. Met Verdeel volgens rigting dryf negatiewe beweging die linkermotor en positiewe beweging die regtermotor. Linkermotor of Regtermotor plaas albei rigtings op daardie een motor. Vir Xbox- en PlayStation-uitvoer met vibrasietoestelle. Inheemse stuurwiel-kragterugvoer is uitgesluit.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Voeg deurlopende vibrasie by namate die gekose virtuele stokkie-as van die middel af beweeg. Gebruik die gekarteerde uitvoer van alle toegewysde bronne. Met Verdeel volgens rigting dryf negatiewe beweging die linkermotor en positiewe beweging die regtermotor. Linkermotor of Regtermotor plaas albei rigtings op daardie een motor. Vir Xbox- en PlayStation-uitvoer met vibrasietoestelle. Dit slaan stuurwiele, ander toestelle met konstante kragterugvoer en Fanatec-pedale oor.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Skakel stuurhoekvibrasie aan</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Virtuele as</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Linkerstokkie X</value></data>
@@ -4107,6 +4108,7 @@ Wil jy hê PadForge moet dit nou deïnstalleer? Dit vereis verhoogde regte en ka
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>direk op die {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>bind WinUSB aan die G19 se skerm</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>die G19 se skerm is op 'n ander drywer ({0}), so begin Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>die G19 se skerm is op 'n ander program se drywer ({0}), wat PadForge met rus laat</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>benodig Logitech Gaming Software 8.52 of nuwer</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>begin Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>wag vir 'n foon met Arx Control</value></data>
@@ -4178,6 +4180,7 @@ Wil jy hê PadForge moet dit nou deïnstalleer? Dit vereis verhoogde regte en ka
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Handvatsel</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} stel hierdie controller se snellers.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} stel hierdie controller se ligte.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} stel hierdie toestel se ligte.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} stel hierdie controller se snellers en ligte.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} speel snellervibrasies op hierdie controller se impulssnellers.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Vee modeffekte uit</value></data>
@@ -4185,10 +4188,10 @@ Wil jy hê PadForge moet dit nou deïnstalleer? Dit vereis verhoogde regte en ka
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Links/Regs</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Op/Af</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>In/Uit</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Knoppie {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, gelaai vanaf {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Die dhd64.dll wat jy gekies het, het nie gelaai nie, so PadForge gebruik die kopie hierbo.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Force Dimension se biblioteek loop net in die x64-weergawe van PadForge.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>dhd64.dll is gevind, maar kon nie gelaai word nie.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Daardie dhd64.dll is nie die Force Dimension-biblioteek wat PadForge verwag nie.</value></data>
@@ -4198,11 +4201,12 @@ Wil jy hê PadForge moet dit nou deïnstalleer? Dit vereis verhoogde regte en ka
   <data name="Falcon_Status_Open" xml:space="preserve"><value>oop</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>'n Falcon is in 'n ander program oop, soos FalconJoyForce of Force Dimension se eie nutsprogramme. Maak dit daar toe.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Die Falcon gebruik 'n ander drywer ({0}), so Force Dimension se biblioteek kan dit nie oopmaak nie. Werk in Toestelbestuurder die Falcon se drywer op vanaf die drivers\usb-gids in Force Dimension se SDK-gids.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Die Falcon gebruik Force Dimension se drywer, en Force Dimension se biblioteek kon dit nie oopmaak nie: {0}. Kontroleer sy krag en sy USB-kabel.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>'n Falcon is ingeprop sonder 'n drywer. Installeer Falcon-drywer gee dit Force Dimension se drywer.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>'n Falcon is ingeprop sonder 'n drywer, en die SDK-gids het geen drywerpakket om dit te gee nie. Installeer Force Dimension se SDK weer.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Geen Falcon gevind nie. Prop sy krag en sy USB-kabel in.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Kies dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Laai hierdie kopie van Force Dimension se biblioteek voor enige ander. Die kopieë wat die SDK installeer, word sonder dit gevind.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Laai hierdie kopie van Force Dimension se biblioteek in plaas van enige ander. 'n Falcon wat op 'n ander kopie oop is, maak toe en maak weer oop op hierdie een. Die kopieë wat die SDK installeer, word sonder dit gevind.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Biblioteke (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Installeer Falcon-drywer</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Installeer Force Dimension se drywer, vanuit die SDK-gids, op 'n Falcon wat nie een het nie. Windows kan eers vra of dit Force Dimension moet vertrou.</value></data>
@@ -4219,7 +4223,7 @@ Wil jy hê PadForge moet dit nou deïnstalleer? Dit vereis verhoogde regte en ka
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Speel speletjies met 'n Novint Falcon deur Force Dimension se SDK, wat jy by Force Dimension installeer. Die handvatsel is 'n stokkie, die greep se vier knoppies is knoppies, en PadForge sit die speletjie se vibrasie en effekte as krag op die handvatsel. Elke gleuf se Kragterugvoer-oortjie stel hoe die Falcon voel.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Bestuur Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Maak elke Falcon oop deur Force Dimension se dhd64.dll. 'n Oop Falcon behoort aan PadForge alleen, so FalconJoyForce en Force Dimension se nutsprogramme kan dit nie oopmaak terwyl dit aan is nie. Wanneer dit af is, maak PadForge elke Falcon toe.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon-biblioteek gestel op {0}. 'n Kopie wat reeds in gebruik is, bly totdat PadForge weer begin.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon-biblioteek gestel op {0}. PadForge laai dit binne 'n paar sekondes, en 'n Falcon wat op 'n ander kopie oop is, maak weer oop op hierdie een.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Installeer tans Force Dimension se Falcon-drywer…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Force Dimension se Falcon-drywerpakket, of sy katalogus, ontbreek: {0}. Installeer Force Dimension se SDK weer.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Geen Falcon is ingeprop nie.</value></data>

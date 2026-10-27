@@ -9,7 +9,8 @@ namespace PadForge.Common.Input
 {
     /// <summary>
     /// One program sending game-mod packets (#529), found by the UDP port it
-    /// sends from.
+    /// first sent from. The server leads every other port the same process
+    /// owns to this sender.
     ///
     /// <para>DSX keeps a mod's effects until the mod sends
     /// ResetToUserSettings, and mods that crash or close never send it. So
@@ -28,7 +29,7 @@ namespace PadForge.Common.Input
     {
         internal const long LapseMs = 15_000;
 
-        /// <summary>The UDP port the packets come from.</summary>
+        /// <summary>The UDP port the first packet came from.</summary>
         internal readonly int Port;
 
         /// <summary>The sending process, or 0 when it could not be found.</summary>
@@ -54,8 +55,14 @@ namespace PadForge.Common.Input
         /// <summary>Finds the process that owns <paramref name="port"/> on
         /// this PC and opens it to watch for its exit.</summary>
         internal static GameModSender Identify(int port, long nowMs)
+            => Identify(port, FindUdpOwner(port), nowMs);
+
+        /// <summary>Opens process <paramref name="pid"/>, already found to
+        /// own <paramref name="port"/>, to watch for its exit. A pid of 0,
+        /// or a process that cannot be opened, makes a sender with no
+        /// process.</summary>
+        internal static GameModSender Identify(int port, int pid, long nowMs)
         {
-            int pid = FindUdpOwner(port);
             if (pid > 0)
             {
                 var handle = OpenProcess(Synchronize | ProcessQueryLimitedInformation, false, pid);

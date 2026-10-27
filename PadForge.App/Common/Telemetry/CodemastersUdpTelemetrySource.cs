@@ -10,12 +10,13 @@ namespace PadForge.Common.Telemetry
     /// different wire formats from one socket (they can't both bind 20777, so a
     /// single listener disambiguates per datagram):
     /// <list type="bullet">
-    ///   <item><b>F1 23 / F1 24</b> — structured packets, 29-byte header, first u16
-    ///   = 2023/2024. Current RPM is <c>CarTelemetryData.m_engineRPM</c> (u16) in
-    ///   packet id 6 at <c>29 + player*60 + 16</c>; redline is
-    ///   <c>CarStatusData.m_maxRPM</c> (u16) in packet id 7 at <c>29 + player*55 +
-    ///   17</c> (idle at +19). The two values arrive in separate packets, so both
-    ///   are cached.</item>
+    ///   <item><b>F1 22 to F1 25</b>: structured packets, first u16 the format,
+    ///   2022 to 2025. Current RPM is <c>CarTelemetryData.m_engineRPM</c> (u16) in
+    ///   packet id 6 at <c>header + player*60 + 16</c>. Redline is
+    ///   <c>CarStatusData.m_maxRPM</c> (u16) in packet id 7 at <c>header +
+    ///   player*entry + 17</c> (idle at +19), with a 24-byte header and 47-byte
+    ///   entries in format 2022 and 29 and 55 after (<see cref="ReadF1"/>). The
+    ///   two values arrive in separate packets, so both are cached.</item>
     ///   <item><b>DiRT Rally 2.0 / DiRT Rally / DiRT 4 / GRID</b> — the classic
     ///   Codemasters flat-float datagram, exactly 264 bytes (<c>extradata=3</c>):
     ///   rpm float @148, max @252, idle @256 (each ×10 for absolute RPM; the ×10
@@ -23,9 +24,9 @@ namespace PadForge.Common.Telemetry
     ///   covers them all when each is configured to <c>extradata=3</c>.</item>
     /// </list>
     /// Offsets verified against the EA F1 24 UDP spec + accepted parsers and the
-    /// Codemasters EGO/D-BOX format (2026-06-02). F1 22 (format 2022) has a
-    /// different layout and is rejected. EA WRC UDP was not confirmed and is not
-    /// claimed here.
+    /// Codemasters EGO/D-BOX format (2026-06-02), and the F1 layouts against
+    /// vAzhure F12022.cs to F12025.cs (2026-10-27). EA WRC UDP was not confirmed
+    /// and is not claimed here.
     /// </summary>
     internal sealed class CodemastersUdpTelemetrySource : IUdpTelemetrySource
     {
@@ -33,6 +34,7 @@ namespace PadForge.Common.Telemetry
 
         private const int ListenPort = 20777;
         private const int F1Header = 29;
+        private const int F1_22Header = 24;
 
         public int Port => ListenPort;
 
@@ -67,7 +69,7 @@ namespace PadForge.Common.Telemetry
                 {
                     byte[] b = _udp.Receive(ref any);
                     if (b.Length == 264) ParseDirt(b);
-                    else if (b.Length >= F1Header) ParseF1(b);
+                    else if (b.Length >= F1_22Header) ParseF1(b);
                 }
                 catch (SocketException) { if (!_run) break; }
                 catch (ObjectDisposedException) { break; }
@@ -75,32 +77,52 @@ namespace PadForge.Common.Telemetry
             }
         }
 
-        // F1 23/24: reject other formats; cache RPM (id 6) + maxRPM/idle (id 7).
+        // Cache RPM (id 6) + maxRPM/idle (id 7).
         private void ParseF1(byte[] b)
         {
-            ushort fmt = BitConverter.ToUInt16(b, 0);
-            if (fmt != 2023 && fmt != 2024) return;
-            byte packetId = b[6];
-            byte player = b[27];
-            if (player == 255) return; // no player car
+            var read = ReadF1(b, out int fmt, out float rpm, out float max, out float idle);
+            if (read == F1Read.None) return;
+            if (read == F1Read.Rpm) _rpm = rpm;
+            else { _maxRpm = max; _idleRpm = idle; }
+            _label = "F1 " + fmt + " UDP";
+            _lastTick = Environment.TickCount;
+        }
+
+        /// <summary>What one F1 packet gave the lights.</summary>
+        internal enum F1Read { None, Rpm, MaxAndIdle }
+
+        /// <summary>Formats 2022 to 2025, the ones the Game Telemetry row
+        /// reads. Format 2022 has a 24-byte header (packet id at 5, player
+        /// car at 22) and 47-byte Car Status entries. The later formats have
+        /// a 29-byte header (id at 6, player at 27) and 55-byte entries. Car
+        /// Telemetry entries are 60 bytes with the RPM at 16, and Car Status
+        /// has the max RPM at 17 and idle at 19, in all four (vAzhure
+        /// F12022.cs to F12025.cs). A packet must have its id's size in its
+        /// format (TelemetryDecoders.F1PacketSize), so no other game's
+        /// datagram reads as F1.</summary>
+        internal static F1Read ReadF1(byte[] b, out int format, out float rpm, out float maxRpm, out float idleRpm)
+        {
+            rpm = maxRpm = idleRpm = 0f;
+            format = b.Length >= 2 ? BitConverter.ToUInt16(b, 0) : 0;
+            bool f1_22 = format == 2022;
+            int header = f1_22 ? F1_22Header : F1Header;
+            if (b.Length < header) return F1Read.None;
+            byte packetId = b[f1_22 ? 5 : 6];
+            if (packetId is not (6 or 7)
+                || b.Length != PadForge.Common.Input.Telemetry.TelemetryDecoders.F1PacketSize(format, packetId))
+                return F1Read.None;
+            byte player = b[f1_22 ? 22 : 27];
+            if (player >= 22) return F1Read.None; // 255: no player car
 
             if (packetId == 6)
             {
-                int off = F1Header + player * 60 + 16;
-                if (off + 2 > b.Length) return;
-                _rpm = BitConverter.ToUInt16(b, off);
-                _label = "F1 " + fmt + " UDP";
-                _lastTick = Environment.TickCount;
+                rpm = BitConverter.ToUInt16(b, header + player * 60 + 16);
+                return F1Read.Rpm;
             }
-            else if (packetId == 7)
-            {
-                int s = F1Header + player * 55;
-                if (s + 21 > b.Length) return;
-                _maxRpm = BitConverter.ToUInt16(b, s + 17);
-                _idleRpm = BitConverter.ToUInt16(b, s + 19);
-                _label = "F1 " + fmt + " UDP";
-                _lastTick = Environment.TickCount;
-            }
+            int s = header + player * (f1_22 ? 47 : 55);
+            maxRpm = BitConverter.ToUInt16(b, s + 17);
+            idleRpm = BitConverter.ToUInt16(b, s + 19);
+            return F1Read.MaxAndIdle;
         }
 
         // DiRT Rally (2.0) classic flat-float, extradata=3 (264 bytes).

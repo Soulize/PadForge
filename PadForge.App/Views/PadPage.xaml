@@ -3352,7 +3352,7 @@
                                                 <TextBlock Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding MacroAction_TriggerEffect_Duration, Source={x:Static strings:Strings.Instance}}"
                                                            VerticalAlignment="Center" Width="120" Margin="0,0,8,0"/>
                                                 <Slider Value="{Binding TriggerEffectMs, Mode=TwoWay}"
-                                                        Minimum="1" Maximum="10000" Width="220"
+                                                        Minimum="1" Maximum="60000" Width="220"
                                                         VerticalAlignment="Center"
                                                         AutomationProperties.Name="{Binding MacroAction_TriggerEffect_Duration, Source={x:Static strings:Strings.Instance}}"/>
                                                 <TextBox Text="{Binding TriggerEffectMs, Mode=TwoWay}" Width="80" Margin="8,0,0,0"
@@ -8116,9 +8116,10 @@
                                    Foreground="{DynamicResource EmberBrush}"
                                    TextWrapping="Wrap" Margin="0,-8,0,16"/>
 
-                        <!-- Novint Falcon (#521): the feel, how the game's rumble
-                             and effects reach the handle, and the reach. Shown
-                             by SyncTabVisibility for a Falcon row. -->
+                        <!-- Novint Falcon (#521): the feel, and how the game's
+                             rumble and effects reach the handle. The reach is on
+                             the Falcon's Devices panel. Shown by
+                             SyncTabVisibility for a Falcon row. -->
                         <Border x:Name="FalconCard" Style="{StaticResource CardBorder}" Visibility="Collapsed">
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,8">

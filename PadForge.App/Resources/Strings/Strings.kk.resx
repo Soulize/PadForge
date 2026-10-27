@@ -304,6 +304,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>DSX үшін жасалған модтармен жұмыс істейді, мысалы GTA V, Red Dead Redemption 2, Skyrim және Forza модтарымен. Сервер тыңдап тұрғанда PadForge өз портын сол модтар іздейтін жерге жазады.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>:{0} портын тыңдап тұр. {1} {2}-виртуалды контроллерге жіберіп тұр.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>:{0} портын тыңдап тұр. {1} жіберіп тұр, бірақ ешбір виртуалды контроллерде PlayStation контроллері жоқ.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>:{0} портын тыңдап тұр. {1} {2} контроллер индексіне жіберіп тұр, бірақ PlayStation контроллері бар виртуалды контроллерлердің ешқайсысында мұндай индекс жоқ.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>{0} портын DSX сияқты басқа бағдарлама пайдаланып тұр. Оны жабыңыз немесе басқа порт таңдаңыз.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Ойын моды</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>OpenTrack-пен, UDP шығысын жіберетін немесе FreeTrack 2.0 ортақ жадына жазатын кез келген трекермен, сондай-ақ осы компьютердегі сеансты фондық режимде іске қоса алатын OpenXR орындау ортасымен жұмыс істейді.</value></data>
@@ -4102,7 +4103,7 @@ PadForge оларды қазір жойсын ба? Ол үшін әкімші �
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>FreeTrack ортақ жады деректері күтілуде.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>FreeTrack ортақ жадысы қолжетімсіз.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Рөл бұрышы дірілі</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Таңдалған виртуалды стик осі центрден алыстаған сайын үздіксіз діріл қосады. Барлық тағайындалған көздердің тағайындалған шығысын қолданады. Бағыт бойынша бөлу режимінде теріс қозғалыс сол моторды, оң қозғалыс оң моторды басқарады. Сол мотор немесе Оң мотор таңдалса, екі бағыт та сол бір моторға беріледі. Діріл құрылғылары бар Xbox және PlayStation шығысы үшін. Төл рөлдің күштік кері байланысы қосылмайды.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Таңдалған виртуалды стик осі центрден алыстаған сайын үздіксіз діріл қосады. Барлық тағайындалған көздердің тағайындалған шығысын қолданады. Бағыт бойынша бөлу режимінде теріс қозғалыс сол моторды, оң қозғалыс оң моторды басқарады. Сол мотор немесе Оң мотор таңдалса, екі бағыт та сол бір моторға беріледі. Діріл құрылғылары бар Xbox және PlayStation шығысы үшін. Рөлдерді, тұрақты күштік кері байланысы бар басқа құрылғыларды және Fanatec педальдарын өткізіп жібереді.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Рөл бұрышы дірілін қосу</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Виртуалды ось</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Сол жақ стик X</value></data>
@@ -4305,6 +4306,7 @@ PadForge оларды қазір жойсын ба? Ол үшін әкімші �
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>тікелей {0} құрылғысында</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>WinUSB драйверін G19 экранына байлау</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>G19 экраны басқа драйвермен ({0}) жұмыс істейді, сондықтан Logitech Gaming Software бағдарламасын іске қосыңыз</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>G19 экраны басқа бағдарламаның драйверінде ({0}), оны PadForge тиіспей қалдырады</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>Logitech Gaming Software 8.52 немесе одан кейінгі нұсқасы қажет</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>Logitech Gaming Software бағдарламасын іске қосыңыз</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>Arx Control бар телефон күтілуде</value></data>
@@ -4376,6 +4378,7 @@ PadForge оларды қазір жойсын ба? Ол үшін әкімші �
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Тұтқа</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} осы контроллердің триггерлерін орнатып тұр.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} осы контроллердің жарықтарын орнатып тұр.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} осы құрылғының жарықтарын орнатып тұр.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} осы контроллердің триггерлері мен жарықтарын орнатып тұр.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} осы контроллердің импульстік триггерлерінде триггер дірілдерін ойнатып тұр.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Мод эффектілерін тазалау</value></data>
@@ -4383,10 +4386,10 @@ PadForge оларды қазір жойсын ба? Ол үшін әкімші �
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Солға/оңға</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Жоғары/төмен</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Ішке/сыртқа</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Түйме {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, {1} жолынан жүктелген</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Сіз таңдаған dhd64.dll жүктелмеді, сондықтан PadForge жоғарыдағы көшірмені пайдаланады.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Force Dimension кітапханасы PadForge-дің тек x64 нұсқасында жұмыс істейді.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>dhd64.dll табылды, бірақ оны жүктеу мүмкін болмады.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Бұл dhd64.dll PadForge күтетін Force Dimension кітапханасы емес.</value></data>
@@ -4396,11 +4399,12 @@ PadForge оларды қазір жойсын ба? Ол үшін әкімші �
   <data name="Falcon_Status_Open" xml:space="preserve"><value>ашық</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Falcon басқа бағдарламада ашық, мысалы FalconJoyForce немесе Force Dimension компаниясының өз құралдарында. Оны сол жерде жабыңыз.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon басқа драйверде ({0}), сондықтан Force Dimension кітапханасы оны аша алмайды. Құрылғылар диспетчерінде Falcon драйверін Force Dimension SDK қалтасындағы drivers\usb қалтасынан жаңартыңыз.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon Force Dimension драйверінде, бірақ Force Dimension кітапханасы оны аша алмады: {0}. Қуат көзін және USB кабелін тексеріңіз.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Falcon қосулы, бірақ драйвері жоқ. «Falcon драйверін орнату» түймесі оған Force Dimension драйверін береді.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Falcon қосулы, бірақ драйвері жоқ, ал SDK қалтасында оған беретін драйвер пакеті де жоқ. Force Dimension SDK-ын қайта орнатыңыз.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Falcon табылмады. Оның қуат көзін және USB кабелін қосыңыз.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>dhd64.dll таңдау…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Force Dimension кітапханасының осы көшірмесін басқаларынан бұрын жүктейді. SDK орнататын көшірмелер онсыз да табылады.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Force Dimension кітапханасының осы көшірмесін басқаларының орнына жүктейді. Басқа көшірмеде ашық тұрған Falcon жабылып, осы көшірмеде қайта ашылады. SDK орнататын көшірмелер онсыз да табылады.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Кітапханалар (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Falcon драйверін орнату</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Force Dimension драйверін SDK қалтасынан, драйвері жоқ Falcon-ға орнатады. Windows алдымен Force Dimension жариялаушысына сенесіз бе деп сұрауы мүмкін.</value></data>
@@ -4417,7 +4421,7 @@ PadForge оларды қазір жойсын ба? Ол үшін әкімші �
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Novint Falcon құрылғысымен Force Dimension SDK арқылы ойнауға мүмкіндік береді, оны Force Dimension сайтынан орнатасыз. Тұтқа стик ретінде, тұтқадағы төрт түйме түймелер ретінде жұмыс істейді, ал PadForge ойынның дірілі мен әсерлерін тұтқаға күш ретінде береді. Falcon сезімін әр ұяшықтың «Күштік кері байланыс» қойындысы реттейді.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Novint Falcon басқару</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Әр Falcon құрылғысын Force Dimension dhd64.dll файлы арқылы ашады. Ашық Falcon тек PadForge-ге тиесілі, сондықтан бұл қосулы кезде FalconJoyForce пен Force Dimension құралдары оны аша алмайды. Өшірулі болса, PadForge барлық Falcon құрылғыларын жабады.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon кітапханасы {0} болып орнатылды. Қолданыстағы көшірме PadForge қайта іске қосылғанша қалады.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon кітапханасы {0} болып орнатылды. PadForge оны бірнеше секунд ішінде жүктейді, ал басқа көшірмеде ашық тұрған Falcon осы көшірмеде қайта ашылады.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Force Dimension Falcon драйвері орнатылуда…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Force Dimension Falcon драйвер пакеті немесе оның каталогы жоқ: {0}. Force Dimension SDK-ын қайта орнатыңыз.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Falcon қосылмаған.</value></data>

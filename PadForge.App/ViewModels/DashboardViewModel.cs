@@ -389,8 +389,8 @@ namespace PadForge.ViewModels
 
         private PadForge.Common.Input.Telemetry.GameTelemetryFormat _gameTelemetryFormat;
 
-        /// <summary>The game picked, or Auto. Picking Project CARS 2 or the
-        /// ETS2 plugin moves the port to the one that sender is fixed to.</summary>
+        /// <summary>The game picked, or Auto. The user's pick also moves the
+        /// port to and from a sender's fixed one (<see cref="PickGameTelemetry"/>).</summary>
         public PadForge.Common.Input.Telemetry.GameTelemetryFormat GameTelemetryFormat
         {
             get => _gameTelemetryFormat;
@@ -399,8 +399,15 @@ namespace PadForge.ViewModels
                 if (!SetProperty(ref _gameTelemetryFormat, value)) return;
                 PadForge.Common.Input.Telemetry.GameTelemetryRuntime.Format = value;
                 OnPropertyChanged(nameof(SelectedGameTelemetryOption));
+                OnPropertyChanged(nameof(GameTelemetryReadsUdp));
             }
         }
+
+        /// <summary>False while Assetto Corsa is picked: the row reads its
+        /// shared memory alone and opens no socket, so the port and the
+        /// forward port are off.</summary>
+        public bool GameTelemetryReadsUdp
+            => PadForge.Common.Input.Telemetry.TelemetryReader.FormatReadsUdp(_gameTelemetryFormat);
 
         private string _gameTelemetryCustomFormat = string.Empty;
 
@@ -432,23 +439,41 @@ namespace PadForge.ViewModels
             set
             {
                 if (value == null) return;
-                GameTelemetryCustomFormat = value.CustomName;
-                GameTelemetryFormat = value.Format;
-                // These two senders cannot change their port.
-                if (value.Format == PadForge.Common.Input.Telemetry.GameTelemetryFormat.ProjectCars2)
-                    GameTelemetryPort = PadForge.Common.Input.Telemetry.GameTelemetryRuntime.ProjectCars2Port;
-                else if (value.Format == PadForge.Common.Input.Telemetry.GameTelemetryFormat.TruckSimulator)
-                    GameTelemetryPort = PadForge.Common.Input.Telemetry.GameTelemetryRuntime.TruckSimulatorPort;
+                PickGameTelemetry(value.Format, value.CustomName);
             }
         }
 
         private RelayCommand _resetGameTelemetryGameCommand;
         public RelayCommand ResetGameTelemetryGameCommand =>
             _resetGameTelemetryGameCommand ??= new RelayCommand(() =>
-            {
-                GameTelemetryCustomFormat = string.Empty;
-                GameTelemetryFormat = PadForge.Common.Input.Telemetry.GameTelemetryFormat.Auto;
-            });
+                PickGameTelemetry(PadForge.Common.Input.Telemetry.GameTelemetryFormat.Auto, string.Empty));
+
+        /// <summary>The user's pick, from the picker or its reset. Project
+        /// CARS 2 and the ETS2 plugin cannot change their port, so picking
+        /// either moves the port to theirs, and leaving either puts the
+        /// default back while the port is still theirs. A port the player
+        /// typed after the pick stays. A load or a profile applies its saved
+        /// port as saved (<see cref="ApplyGameTelemetrySettings"/>).</summary>
+        private void PickGameTelemetry(PadForge.Common.Input.Telemetry.GameTelemetryFormat format, string customName)
+        {
+            int leftPort = FixedTelemetryPort(_gameTelemetryFormat);
+            GameTelemetryCustomFormat = customName;
+            GameTelemetryFormat = format;
+            int fixedPort = FixedTelemetryPort(format);
+            if (fixedPort != 0)
+                GameTelemetryPort = fixedPort;
+            else if (leftPort != 0 && _gameTelemetryPort == leftPort)
+                GameTelemetryPort = PadForge.Common.Input.Telemetry.GameTelemetryRuntime.DefaultPort;
+        }
+
+        /// <summary>The port a sender is fixed to, or 0 for one whose port
+        /// the player sets.</summary>
+        private static int FixedTelemetryPort(PadForge.Common.Input.Telemetry.GameTelemetryFormat format) => format switch
+        {
+            PadForge.Common.Input.Telemetry.GameTelemetryFormat.ProjectCars2 => PadForge.Common.Input.Telemetry.GameTelemetryRuntime.ProjectCars2Port,
+            PadForge.Common.Input.Telemetry.GameTelemetryFormat.TruckSimulator => PadForge.Common.Input.Telemetry.GameTelemetryRuntime.TruckSimulatorPort,
+            _ => 0,
+        };
 
         private int _gameTelemetryForwardPort;
 
@@ -498,6 +523,9 @@ namespace PadForge.ViewModels
             {
                 _gameTelemetryFormats = value ?? new();
                 PadForge.Common.Input.Telemetry.GameTelemetryRuntime.Formats = _gameTelemetryFormats.ToArray();
+                // Each variable field carries the axis its name keeps, which
+                // the settings file saves with the formats.
+                PadForge.Common.Input.Telemetry.GameTelemetryRuntime.WriteAxes(_gameTelemetryFormats);
                 // The expression variables' picker lists the variables.
                 TelemetryChannelOptions.Refresh();
                 var rebuilt = BuildGameTelemetryOptions(_gameTelemetryFormats);
@@ -550,9 +578,13 @@ namespace PadForge.ViewModels
             foreach (PadForge.Common.Input.Telemetry.GameTelemetryFormat format in Enum.GetValues(typeof(PadForge.Common.Input.Telemetry.GameTelemetryFormat)))
                 if (format != PadForge.Common.Input.Telemetry.GameTelemetryFormat.Custom)
                     list.Add(new GameTelemetryOption(format, string.Empty));
+            // The runtime's rule: a name that cannot be read, or that
+            // repeats an earlier one's (case aside), is left out.
+            var names = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase);
             if (formats != null)
                 foreach (var custom in formats)
-                    if (custom != null && PadForge.Common.Input.Telemetry.CustomTelemetryFormat.IsValidName(custom.Name))
+                    if (custom != null && PadForge.Common.Input.Telemetry.CustomTelemetryFormat.IsValidName(custom.Name)
+                        && names.Add(custom.Name))
                         list.Add(new GameTelemetryOption(PadForge.Common.Input.Telemetry.GameTelemetryFormat.Custom, custom.Name));
             return list;
         }

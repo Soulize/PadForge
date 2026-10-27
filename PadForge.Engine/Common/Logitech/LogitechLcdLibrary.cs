@@ -3,6 +3,19 @@ using System.Runtime.InteropServices;
 
 namespace PadForge.Engine.Common.Logitech
 {
+    /// <summary>The calls an LCD applet makes on <see cref="LogitechLcdLibrary"/>,
+    /// so its owner can be driven by a stand-in in the tests.</summary>
+    public interface ILogitechLcd
+    {
+        bool Init(string friendlyName, int lcdTypes);
+        bool IsConnected(int lcdType);
+        bool IsButtonPressed(int button);
+        void Update();
+        void Shutdown();
+        bool MonoSetBackground(byte[] monoBitmap);
+        bool ColorSetBackground(byte[] colorBitmap);
+    }
+
     /// <summary>
     /// Logitech Gaming Software's LCD library (issue #519), the surface
     /// <c>LogitechLCDLib.h</c> declares: an applet on the monochrome GamePanel
@@ -19,7 +32,7 @@ namespace PadForge.Engine.Common.Logitech
     /// <para>The library is not documented as thread-safe, so its owner
     /// makes every call from one thread.</para>
     /// </summary>
-    public sealed class LogitechLcdLibrary
+    public sealed class LogitechLcdLibrary : ILogitechLcd
     {
         public const int TypeMono = 0x00000001;
         public const int TypeColor = 0x00000002;

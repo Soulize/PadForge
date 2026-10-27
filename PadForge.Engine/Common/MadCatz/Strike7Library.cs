@@ -206,6 +206,13 @@ namespace PadForge.Engine.Common.MadCatz
             catch (Exception) { }
         }
 
+        private static long s_runtimeFound;
+
+        /// <summary>How many checks have found the runtime, so a screen
+        /// waiting for it learns of an install the moment the installer's
+        /// own check finds it.</summary>
+        public static long RuntimeFoundCount => System.Threading.Interlocked.Read(ref s_runtimeFound);
+
         /// <summary>Whether Microsoft's Visual C++ 2008 runtime for x64 is in
         /// the side-by-side store, where the library's manifest binds
         /// Microsoft.VC90.CRT. A read of the Windows folder alone.</summary>
@@ -214,7 +221,9 @@ namespace PadForge.Engine.Common.MadCatz
             try
             {
                 string store = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "WinSxS");
-                return Directory.EnumerateDirectories(store, "amd64_microsoft.vc90.crt_1fc8b3b9a1e18e3b_*").Any();
+                bool found = Directory.EnumerateDirectories(store, "amd64_microsoft.vc90.crt_1fc8b3b9a1e18e3b_*").Any();
+                if (found) System.Threading.Interlocked.Increment(ref s_runtimeFound);
+                return found;
             }
             catch (Exception)
             {

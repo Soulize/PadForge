@@ -115,6 +115,7 @@
   <data name="Dashboard_GameMods" xml:space="preserve"><value>Mod o taʻaloga</value></data>
   <data name="Dashboard_EnableGameMods" xml:space="preserve"><value>Talia mod o taʻaloga mo DSX</value></data>
   <data name="Dashboard_GameModPort" xml:space="preserve"><value>Port o mod o taʻaloga</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>O loʻo faʻalogo i le :{0}. O loʻo auina atu e {1} i le numera controller {2}, ae leai se controller faʻafoliga o loʻo i ai se controller PlayStation e iai lena numera.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>O loʻo faʻaaogā le port {0} e se isi polokalame, e pei o DSX. Tapuni pe filifili se isi port.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Se mod o taʻaloga</value></data>
   <data name="RemoteLink_Connect" xml:space="preserve"><value>Fesoʻotaʻi</value></data>
@@ -1083,16 +1084,20 @@
   <data name="DeviceType_NovintFalcon" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>O loʻo setiina e {0} trigger o lenei controller.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>O loʻo setiina e {0} moli o lenei controller.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>O loʻo setiina e {0} moli o lenei masini.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>O loʻo setiina e {0} trigger ma moli o lenei controller.</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Agavale/Taumatau</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Luga/Lalo</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Totonu/Fafo</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Faʻamau {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>E leʻi galue le dhd64.dll na e filifilia, o lea ua faʻaaogā ai e PadForge le kopi o loʻo i luga.</value></data>
   <data name="Falcon_Status_Open" xml:space="preserve"><value>ua tatala</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>O loʻo i luga o le driver a Force Dimension le Falcon, ae na le mafai e le library a Force Dimension ona tatala: {0}. Siaki lona eletise ma lona uaea USB.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Filifili le dhd64.dll…</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Faʻaaogā lenei kopi o le library a Force Dimension nai lo se isi lava kopi. O se Falcon o loʻo tatala i se isi kopi e tapuni ona toe tatala lea i lenei kopi. O kopi e faʻapipiʻi e le SDK e maua e aunoa ma lenei.</value></data>
   <data name="Settings_Falcon_Title" xml:space="preserve"><value>Novint Falcon</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Ua setiina le library a le Falcon i le {0}. E faʻaaogā e PadForge i totonu o ni nai sekone, ma o se Falcon o loʻo tatala i se isi kopi e toe tatala i lenei kopi.</value></data>
   <data name="Pad_Falcon_Header" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Pad_Falcon_ResetAll" xml:space="preserve"><value>Toe setiina le Novint Falcon</value></data>
   <data name="Pad_Falcon_Button1" xml:space="preserve"><value>Faʻamau 1</value></data>

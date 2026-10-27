@@ -114,6 +114,21 @@ namespace PadForge.Services
         /// <summary>Why a requested plain address is not served.</summary>
         private PlainFailure _plainFailure;
         private int _plainFailurePort;
+        /// <summary>The plain address the running server was asked for, or
+        /// null, so a refused one can be added again.</summary>
+        private PlainHttpOptions _plainRequested;
+        /// <summary>The plain address the running listener's accept loop
+        /// judges requests by. Set before a retry adds the prefix, so the
+        /// first request on that port already needs the code.</summary>
+        private PlainSlot _acceptPlain;
+        /// <summary>True after a start whose main address was refused for a
+        /// port in use.</summary>
+        private volatile bool _portInUse;
+
+        private sealed class PlainSlot
+        {
+            internal volatile PlainHttpOptions Value;
+        }
         /// <summary>The plain address's access code, normalized. Only
         /// <see cref="SetPlainAccessCode"/> writes it, so a new code set while
         /// the server starts cannot be overwritten by the one it started with.</summary>
@@ -195,6 +210,17 @@ namespace PadForge.Services
 
         /// <summary>True while the plain address is served.</summary>
         public bool IsPlainServing => _running && _plain != null;
+
+        /// <summary>True after a start whose main address was refused because
+        /// another program holds the port, until the next start.</summary>
+        internal bool PortInUse => _portInUse;
+
+        /// <summary>True while the server runs and its plain address was
+        /// refused because another program holds that port.</summary>
+        internal bool PlainPortInUse
+        {
+            get { lock (_lifecycleLock) return _running && _plainFailure == PlainFailure.PortInUse; }
+        }
 
         /// <summary>True while the plain address is served to this PC only,
         /// so its URL names localhost and a QR code would be no use.</summary>
@@ -297,6 +323,7 @@ namespace PadForge.Services
                 if (_starting) return false;
                 _starting = true;
                 generation = ++_startGeneration;
+                _portInUse = false;
             }
 
             IWebControllerListener pending = null;
@@ -361,10 +388,15 @@ namespace PadForge.Services
                     }
                 }
 
+                // A held plain port is tried again while the main address
+                // serves (RetryPlainAddress). One line for the outage.
+                if (plainFailure == PlainFailure.PortInUse)
+                    PadForge.Engine.SdlDiagLog.WriteLine($"Web controller: plain HTTP port {plain.Port} is in use");
+
                 pendingLifetime = new CancellationTokenSource();
                 var ownedListener = pending;
                 var token = pendingLifetime.Token;
-                var servedPlain = plainServed;
+                var servedPlain = new PlainSlot { Value = plainServed };
                 var acceptThread = new Thread(() => AcceptLoop(ownedListener, token, generation, servedPlain))
                 {
                     Name = "PadForge.WebServer",
@@ -382,6 +414,8 @@ namespace PadForge.Services
                     _plain = plainServed;
                     _plainFailure = plainFailure;
                     _plainFailurePort = plain?.Port ?? 0;
+                    _plainRequested = plain;
+                    _acceptPlain = servedPlain;
                     // Under the lifecycle lock, so a later Stop's removal is
                     // queued after this and wins. Best effort, like the rule.
                     try { _plainFirewall(plainServed); } catch { }
@@ -403,6 +437,7 @@ namespace PadForge.Services
                 var msg = ex.ErrorCode == 5
                     ? string.Format(Strings.Instance.Server_AccessDenied_Format, port)
                     : string.Format(Strings.Instance.Server_PortInUse_Format, port);
+                if (ex.ErrorCode != 5) _portInUse = true;
                 RaiseStatus(generation, msg);
                 return false;
             }
@@ -449,6 +484,8 @@ namespace PadForge.Services
                 _httpsFallback = HttpsFallback.None;
                 _plain = null;
                 _plainFailure = PlainFailure.None;
+                _plainRequested = null;
+                _acceptPlain = null;
                 // Close the plain port's opening with the server. Queued under
                 // the lock, and this server cannot start again until Stop
                 // returns, so a later start's opening is queued after this.
@@ -521,12 +558,85 @@ namespace PadForge.Services
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>Whether http.sys would take <paramref name="port"/> for
+        /// the main address now: a listener on <c>http://+:port/</c>, the
+        /// prefix whose refusal made a start report the port in use, started
+        /// and closed at once. It meets the same holders the start met,
+        /// another program's http.sys registration or a socket on the port,
+        /// and spawns nothing. A full start runs netsh for the HTTPS binding
+        /// and the firewall rule before it binds, which a retry every few
+        /// seconds must not do while the port stays held.</summary>
+        internal static bool ProbePort(int port, Func<IWebControllerListener> createListener)
+        {
+            IWebControllerListener probe = null;
+            try
+            {
+                probe = createListener();
+                probe.Start($"http://+:{port}/");
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                try { probe?.Stop(); } catch { }
+                try { probe?.Close(); } catch { }
+            }
+        }
+
+        /// <summary>Adds the plain address again on the running listener
+        /// when another program held its port at the start. Adding the
+        /// prefix is its own probe: http.sys refuses it without touching the
+        /// main prefix and spawns nothing. The accept loop's plain address is
+        /// set first, so the first request on the port already needs the
+        /// code, and taken back when the prefix is refused. Under the
+        /// lifecycle lock, so Stop cannot close the listener halfway. True
+        /// when the plain address is served now.</summary>
+        internal bool RetryPlainAddress()
+        {
+            long generation;
+            lock (_lifecycleLock)
+            {
+                if (!_running || _stopping || _disposed || _plainFailure != PlainFailure.PortInUse) return false;
+                var wanted = _plainRequested;
+                var slot = _acceptPlain;
+                if (wanted == null || slot == null || _listener == null) return false;
+                slot.Value = wanted;
+                try
+                {
+                    _listener.AddPrefix($"http://+:{wanted.Port}/");
+                }
+                catch (HttpListenerException ex)
+                {
+                    slot.Value = null;
+                    if (ex.ErrorCode == 5) _plainFailure = PlainFailure.AccessDenied;
+                    return false;
+                }
+                catch (Exception)
+                {
+                    slot.Value = null;
+                    _plainFailure = PlainFailure.Failed;
+                    return false;
+                }
+                _plain = wanted;
+                _plainFailure = PlainFailure.None;
+                try { _plainFirewall(wanted); } catch { }
+                generation = _startGeneration;
+            }
+            RaiseStatus(generation, _clients.Count > 0
+                ? string.Format(Strings.Instance.Server_RunningClients_Format, _clients.Count)
+                : string.Format(Strings.Instance.Server_RunningOn_Format, Url));
+            return true;
+        }
+
         // ─────────────────────────────────────────────
         //  Accept loop
         // ─────────────────────────────────────────────
 
         private void AcceptLoop(IWebControllerListener listener, CancellationToken lifetime, long generation,
-            PlainHttpOptions plain)
+            PlainSlot plain)
         {
             while (!lifetime.IsCancellationRequested && IsServing(generation))
             {
@@ -557,7 +667,7 @@ namespace PadForge.Services
                 string code;
                 try
                 {
-                    var admission = Admit(ctx, plain, out viaPlain, out code);
+                    var admission = Admit(ctx, plain.Value, out viaPlain, out code);
                     if (admission is WebControllerAccess.Decision.DenyMissingCode
                         or WebControllerAccess.Decision.DenyNotLocal)
                     {
@@ -596,9 +706,10 @@ namespace PadForge.Services
         /// always allowed. One on the plain address is judged against the
         /// code read here, which <paramref name="code"/> returns so the cookie
         /// and the session registration use the same one.
-        /// <paramref name="plain"/> is what this listener was started with,
-        /// never the live field, which Stop clears while a dequeued request
-        /// can still be on its way here.</summary>
+        /// <paramref name="plain"/> is this listener's own plain address, the
+        /// one it was started with or a retry added, never the live field,
+        /// which Stop clears while a dequeued request can still be on its way
+        /// here.</summary>
         private WebControllerAccess.Decision Admit(HttpListenerContext ctx, PlainHttpOptions plain,
             out bool viaPlain, out string code)
         {

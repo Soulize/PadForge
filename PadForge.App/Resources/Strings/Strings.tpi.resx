@@ -179,6 +179,7 @@
   <data name="Dashboard_GameMods" xml:space="preserve"><value>Ol mod bilong gem</value></data>
   <data name="Dashboard_EnableGameMods" xml:space="preserve"><value>Kisim ol DSX mod bilong gem</value></data>
   <data name="Dashboard_GameModPort" xml:space="preserve"><value>Pot bilong ol mod bilong gem</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>I harim long :{0}. {1} i salim long kontrola namba {2}, tasol dispela namba i no bilong wanpela virtual kontrola i gat PlayStation kontrola long en.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Narapela program, olsem DSX, i usim pot {0}. Pasim em o makim narapela pot.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Wanpela mod bilong gem</value></data>
   <data name="BlissBox_NoController" xml:space="preserve"><value>nogat kontrola</value></data>
@@ -1492,7 +1493,7 @@
   <data name="RemoteLink_AssignmentBusy" xml:space="preserve">
     <value>Wet long narapela PC...</value>
   </data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Em i putim guria oltaim taim eksis bilong virtual stik yu makim i muv i go longwe long namel. Em i yusim aut bilong mapin long olgeta sos yu putim. Long "Skelim long sait", muv long sait negatif i kirapim lephan mota na muv long sait positiv i kirapim raithan mota. "Lephan mota" o "Raithan mota" i putim tupela sait long dispela wanpela mota tasol. Em i bilong Xbox na PlayStation aut wantaim ol masin i gat guria. Force feedback bilong stiaring wil yet i no insait.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Em i putim guria oltaim taim eksis bilong virtual stik yu makim i muv i go longwe long namel. Em i yusim aut bilong mapin long olgeta sos yu putim. Long "Skelim long sait", muv long sait negatif i kirapim lephan mota na muv long sait positiv i kirapim raithan mota. "Lephan mota" o "Raithan mota" i putim tupela sait long dispela wanpela mota tasol. Em i bilong Xbox na PlayStation aut wantaim ol masin i gat guria. Em i lusim ol stiaring wil, ol narapela masin i gat constant force feedback, na ol pedal bilong Fanatec.</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Stik long han kais X</value></data>
   <data name="Pad_SteeringAngleRumble_LY" xml:space="preserve"><value>Stik long han kais Y</value></data>
   <data name="Pad_SteeringAngleRumble_RX" xml:space="preserve"><value>Stik long han sut X</value></data>
@@ -1574,6 +1575,7 @@
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>stret long {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>i putim WinUSB long skrin bilong G19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>skrin bilong G19 i stap long narapela draiva ({0}), olsem na statim Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>skrin bilong G19 i stap long draiva bilong narapela program ({0}), na PadForge i lusim em i stap</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>i nidim Logitech Gaming Software 8.52 o nupela moa</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>statim Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>i wet long fon i gat Arx Control</value></data>
@@ -1640,16 +1642,17 @@
   <data name="DeviceType_NovintFalcon" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} i senisim ol triga bilong dispela kontrola.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} i senisim ol lait bilong dispela kontrola.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} i senisim ol lait bilong dispela masin.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} i senisim ol triga na ol lait bilong dispela kontrola.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Rausim ol senis bilong mod</value></data>
   <data name="Devices_ClearModEffects_Tooltip" xml:space="preserve"><value>Pinisim ol samting ol mod bilong gem i senisim long dispela kontrola. Ol seting bilong en yet i kam bek inap long taim wanpela mod i salim gen.</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Lephan/Raithan</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Antap/Daunbilo</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Insait/Ausait</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Baten {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, i kam long {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>dhd64.dll yu makim i no lod, olsem na PadForge i yusim kopi i stap antap.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Laibreri bilong Force Dimension i wok long x64 version bilong PadForge tasol.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>PadForge i painim dhd64.dll, tasol em i no inap lodim.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Dispela dhd64.dll i no laibreri bilong Force Dimension we PadForge i laikim.</value></data>
@@ -1657,11 +1660,12 @@
   <data name="Falcon_Status_Rate_Format" xml:space="preserve"><value>i wok long {0:0.0} kHz</value></data>
   <data name="Falcon_Status_Open" xml:space="preserve"><value>i op</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Wanpela Falcon i op long narapela program, olsem FalconJoyForce o ol tul bilong Force Dimension yet. Pasim em long dispela program.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon i stap long draiva bilong Force Dimension, tasol laibreri bilong Force Dimension i no inap opim em: {0}. Sekim pawa na USB kebol bilong en.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Wanpela Falcon i konek pinis na i nogat draiva. Instolim draiva bilong Falcon i givim draiva bilong Force Dimension long en.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Wanpela Falcon i konek pinis na i nogat draiva, na SDK folda i nogat draiva pekets bilong givim long en. Instolim gen SDK bilong Force Dimension.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>I no painim Falcon. Putim pawa na USB kebol bilong en.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Makim dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Lodim dispela kopi bilong laibreri bilong Force Dimension pastaim long olgeta narapela. PadForge i save painim ol kopi SDK i instolim.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Lodim dispela kopi bilong laibreri bilong Force Dimension long ples bilong olgeta narapela. Sapos wanpela Falcon i op long narapela kopi, em bai pas na op gen long dispela kopi. PadForge i save painim ol kopi SDK i instolim.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Ol laibreri (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Instolim draiva bilong Falcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Instolim draiva bilong Force Dimension, long SDK folda, long Falcon i nogat draiva. Windows inap askim pastaim sapos yu trastim Force Dimension.</value></data>
@@ -1674,7 +1678,7 @@
   <data name="Settings_Falcon_Title" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Bosim Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Opim olgeta Falcon long dhd64.dll bilong Force Dimension. Falcon i op em i bilong PadForge tasol, olsem na FalconJoyForce na ol tul bilong Force Dimension i no inap opim taim dispela i on. Taim em i of, PadForge i pasim olgeta Falcon.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Laibreri bilong Falcon i kamap {0}. Kopi i wok pinis i stap inap PadForge i stat gen.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Laibreri bilong Falcon i kamap {0}. PadForge i lodim em insait long sampela sekon, na sapos wanpela Falcon i op long narapela kopi, em bai op gen long dispela kopi.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>I instolim draiva bilong Falcon bilong Force Dimension…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Draiva pekets bilong Falcon bilong Force Dimension, o katalog bilong en, i no stap: {0}. Instolim gen SDK bilong Force Dimension.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>I nogat Falcon i konek.</value></data>

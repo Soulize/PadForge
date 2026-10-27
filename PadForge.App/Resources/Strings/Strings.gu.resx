@@ -304,6 +304,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>DSX માટે બનાવેલા મોડ્સ સાથે કામ કરે છે, જેમ કે GTA V, Red Dead Redemption 2, Skyrim અને Forza માટેના. સર્વર સાંભળતું હોય ત્યારે PadForge તેનો પોર્ટ ત્યાં લખે છે જ્યાં તે મોડ્સ તેને શોધે છે.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>:{0} પર સાંભળી રહ્યું છે. {1} વર્ચ્યુઅલ કંટ્રોલર {2} પર મોકલી રહ્યું છે.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>:{0} પર સાંભળી રહ્યું છે. {1} મોકલી રહ્યું છે, પરંતુ કોઈ વર્ચ્યુઅલ કંટ્રોલર પર PlayStation કંટ્રોલર નથી.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>:{0} પર સાંભળી રહ્યું છે. {1} કંટ્રોલર ઇન્ડેક્સ {2} પર મોકલી રહ્યું છે, અને PlayStation કંટ્રોલરવાળા કોઈ વર્ચ્યુઅલ કંટ્રોલરનો તે ઇન્ડેક્સ નથી.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>પોર્ટ {0} DSX જેવા અન્ય પ્રોગ્રામ દ્વારા ઉપયોગમાં છે. તેને બંધ કરો અથવા બીજો પોર્ટ પસંદ કરો.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>એક ગેમ મોડ</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>OpenTrack સાથે અને UDP આઉટપુટ મોકલતા અથવા FreeTrack 2.0 શેર્ડ મેમરી લખતા કોઈપણ ટ્રૅકર સાથે કામ કરે છે, તેમજ આ મશીન પર બૅકગ્રાઉન્ડમાં સેશન ચલાવી શકતા OpenXR રનટાઇમ સાથે.</value></data>
@@ -4097,7 +4098,7 @@
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>FreeTrack શેર્ડ મેમરી ડેટાની રાહ જોવાય છે.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>FreeTrack શેર્ડ મેમરી ઉપલબ્ધ નથી.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>સ્ટીયરિંગ એંગલ રમ્બલ</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>પસંદ કરેલ વર્ચ્યુઅલ સ્ટિક અક્ષ કેન્દ્રથી દૂર જાય તેમ સતત રમ્બલ ઉમેરે છે. બધા અસાઇન કરેલા સ્રોતોનું મેપ કરેલ આઉટપુટ વાપરે છે. દિશા પ્રમાણે વિભાજિત સાથે, નકારાત્મક હિલચાલ ડાબી મોટર ચલાવે છે અને સકારાત્મક હિલચાલ જમણી. ડાબી મોટર અથવા જમણી મોટર બંને દિશાઓને તે એક જ મોટર પર મૂકે છે. રમ્બલ ઉપકરણો સાથે Xbox અને PlayStation આઉટપુટ માટે. નેટિવ વ્હીલ ફોર્સ ફીડબેક બાકાત છે.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>પસંદ કરેલ વર્ચ્યુઅલ સ્ટિક અક્ષ કેન્દ્રથી દૂર જાય તેમ સતત રમ્બલ ઉમેરે છે. બધા અસાઇન કરેલા સ્રોતોનું મેપ કરેલ આઉટપુટ વાપરે છે. દિશા પ્રમાણે વિભાજિત સાથે, નકારાત્મક હિલચાલ ડાબી મોટર ચલાવે છે અને સકારાત્મક હિલચાલ જમણી. ડાબી મોટર અથવા જમણી મોટર બંને દિશાઓને તે એક જ મોટર પર મૂકે છે. રમ્બલ ઉપકરણો સાથે Xbox અને PlayStation આઉટપુટ માટે. તે વ્હીલ, સતત ફોર્સ ફીડબેકવાળા અન્ય ઉપકરણો અને Fanatec પેડલને છોડી દે છે.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>સ્ટીયરિંગ એંગલ રમ્બલ ચાલુ કરો</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>વર્ચ્યુઅલ અક્ષ</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>ડાબી સ્ટિક X</value></data>
@@ -4300,6 +4301,7 @@
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>સીધા {0} પર</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>G19 ની સ્ક્રીન સાથે WinUSB બાંધી રહ્યું છે</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>G19 ની સ્ક્રીન બીજા ડ્રાઇવર ({0}) પર છે, તેથી Logitech Gaming Software શરૂ કરો</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>G19 ની સ્ક્રીન બીજા પ્રોગ્રામના ડ્રાઇવર ({0}) પર છે, જેને PadForge જેમ છે તેમ રાખે છે</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>Logitech Gaming Software 8.52 કે તેથી નવું જોઈએ</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>Logitech Gaming Software શરૂ કરો</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>Arx Control ધરાવતા ફોનની રાહ જોઈ રહ્યું છે</value></data>
@@ -4371,6 +4373,7 @@
   <data name="Devices_FalconHandle" xml:space="preserve"><value>હેન્ડલ</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} આ કંટ્રોલરના ટ્રિગર સેટ કરી રહ્યું છે.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} આ કંટ્રોલરની લાઇટ સેટ કરી રહ્યું છે.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} આ ઉપકરણની લાઇટ સેટ કરી રહ્યું છે.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} આ કંટ્રોલરના ટ્રિગર અને લાઇટ સેટ કરી રહ્યું છે.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} આ કંટ્રોલરના ઇમ્પલ્સ ટ્રિગર પર ટ્રિગર વાઇબ્રેશન વગાડી રહ્યું છે.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>મોડ ઇફેક્ટ સાફ કરો</value></data>
@@ -4378,10 +4381,10 @@
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>ડાબે/જમણે</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>ઉપર/નીચે</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>અંદર/બહાર</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>બટન {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, {1} માંથી લોડ થયું</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>તમે પસંદ કરેલ dhd64.dll લોડ થયું નહીં, તેથી PadForge ઉપરની નકલ વાપરે છે.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Force Dimension ની લાઇબ્રેરી PadForge ના x64 બિલ્ડમાં જ ચાલે છે.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>dhd64.dll મળ્યું પણ લોડ થઈ શક્યું નહીં.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>તે dhd64.dll એ Force Dimension ની લાઇબ્રેરી નથી જેની PadForge અપેક્ષા રાખે છે.</value></data>
@@ -4391,11 +4394,12 @@
   <data name="Falcon_Status_Open" xml:space="preserve"><value>ખુલ્લું</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Falcon બીજા પ્રોગ્રામમાં ખુલ્લું છે, જેમ કે FalconJoyForce કે Force Dimension ના પોતાના ટૂલ્સ. તેને ત્યાં બંધ કરો.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon બીજા ડ્રાઇવર ({0}) પર છે, તેથી Force Dimension ની લાઇબ્રેરી તેને ખોલી શકતી નથી. ઉપકરણ વ્યવસ્થાપકમાં, Force Dimension ના SDK ફોલ્ડરના drivers\usb ફોલ્ડરમાંથી Falcon નો ડ્રાઇવર અપડેટ કરો.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon Force Dimension ના ડ્રાઇવર પર છે, અને Force Dimension ની લાઇબ્રેરી તેને ખોલી શકી નહીં: {0}. તેનો પાવર અને USB કેબલ તપાસો.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Falcon પ્લગ ઇન છે પણ ડ્રાઇવર નથી. Falcon ડ્રાઇવર ઇન્સ્ટોલ કરો તેને Force Dimension નો ડ્રાઇવર આપે છે.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Falcon પ્લગ ઇન છે પણ ડ્રાઇવર નથી, અને SDK ફોલ્ડરમાં તેને આપવા માટે ડ્રાઇવર પૅકેજ નથી. Force Dimension નું SDK ફરીથી ઇન્સ્ટોલ કરો.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>કોઈ Falcon મળ્યું નહીં. તેનો પાવર અને USB કેબલ પ્લગ ઇન કરો.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>dhd64.dll પસંદ કરો…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Force Dimension ની લાઇબ્રેરીની આ નકલને બીજી બધી પહેલાં લોડ કરે છે. SDK જે નકલો ઇન્સ્ટોલ કરે છે તે આના વિના પણ મળી જાય છે.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Force Dimension ની લાઇબ્રેરીની આ નકલને બીજી કોઈપણ નકલની જગ્યાએ લોડ કરે છે. બીજી નકલ પર ખુલ્લું Falcon બંધ થઈને આ નકલ પર ફરી ખુલે છે. SDK જે નકલો ઇન્સ્ટોલ કરે છે તે આના વિના પણ મળી જાય છે.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|લાઇબ્રેરીઓ (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Falcon ડ્રાઇવર ઇન્સ્ટોલ કરો</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>SDK ફોલ્ડરમાંથી Force Dimension નો ડ્રાઇવર એવા Falcon પર ઇન્સ્ટોલ કરે છે જેમાં ડ્રાઇવર નથી. Windows પહેલા પૂછી શકે છે કે Force Dimension પર વિશ્વાસ કરવો કે નહીં.</value></data>
@@ -4412,7 +4416,7 @@
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Force Dimension ના SDK દ્વારા Novint Falcon સાથે ગેમ રમે છે, જે તમે Force Dimension પાસેથી ઇન્સ્ટોલ કરો છો. હેન્ડલ એક સ્ટિક છે, ગ્રિપના ચાર બટન બટન છે, અને PadForge ગેમના રમ્બલ અને ઇફેક્ટ્સને હેન્ડલ પર બળ તરીકે મૂકે છે. દરેક સ્લોટનો ફોર્સ ફીડબેક ટૅબ નક્કી કરે છે કે Falcon કેવું લાગે.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Novint Falcon ચલાવો</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Force Dimension ની dhd64.dll દ્વારા દરેક Falcon ખોલે છે. ખુલ્લું Falcon ફક્ત PadForge નું હોય છે, તેથી આ ચાલુ હોય ત્યારે FalconJoyForce અને Force Dimension ના ટૂલ્સ તેને ખોલી શકતા નથી. બંધ હોય ત્યારે PadForge દરેક Falcon બંધ કરે છે.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon લાઇબ્રેરી {0} પર સેટ કરી. વપરાશમાં રહેલી નકલ PadForge ફરી શરૂ થાય ત્યાં સુધી રહે છે.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon લાઇબ્રેરી {0} પર સેટ કરી. PadForge તેને થોડી સેકન્ડોમાં લોડ કરે છે, અને બીજી નકલ પર ખુલ્લું Falcon આ નકલ પર ફરી ખુલે છે.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Force Dimension નો Falcon ડ્રાઇવર ઇન્સ્ટોલ થઈ રહ્યો છે…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Force Dimension નું Falcon ડ્રાઇવર પૅકેજ અથવા તેની કૅટલોગ ખૂટે છે: {0}. Force Dimension નું SDK ફરીથી ઇન્સ્ટોલ કરો.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>કોઈ Falcon પ્લગ ઇન નથી.</value></data>

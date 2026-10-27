@@ -71,6 +71,31 @@ namespace PadForge.Common.Input.Falcon
                 Math.Clamp(ParseInt(ps.ForceOverall, 100), 0, 100) / 100.0);
         }
 
+        /// <summary>A slot's settings as a shared Falcon's frame carries them
+        /// to the PC it is plugged into (#521, Remote Link).</summary>
+        public static PadForge.Engine.RemoteLink.OutputEffectCodec.FalconTail ToWire(PadSetting ps)
+        {
+            var s = From(ps);
+            static byte Percent(double v) => (byte)Math.Clamp((int)Math.Round(v * 100.0), 0, 200);
+            return new(true, (byte)s.Feel, Percent(s.Spring), (byte)s.KickButton, Percent(s.Kick), Percent(s.Shake),
+                (byte)s.BraceButton, (byte)s.PreloadButton, Percent(s.Gravity),
+                (ushort)Math.Round(s.ForceCap * 10.0), Percent(s.Overall));
+        }
+
+        /// <summary>The settings a shared Falcon's frame carried, held to the
+        /// ranges <see cref="From"/> keeps.</summary>
+        public static FalconSettings FromWire(PadForge.Engine.RemoteLink.OutputEffectCodec.FalconTail t)
+            => new(t.Feel == 1 ? FalconFeel.Aim : FalconFeel.Joystick,
+                Math.Min((int)t.Spring, 200) / 100.0,
+                Math.Min((int)t.KickButton, FalconDevice.ButtonCount),
+                Math.Min((int)t.Kick, 200) / 100.0,
+                Math.Min((int)t.Shake, 200) / 100.0,
+                Math.Min((int)t.BraceButton, FalconDevice.ButtonCount),
+                Math.Min((int)t.PreloadButton, FalconDevice.ButtonCount),
+                Math.Min((int)t.Gravity, 200) / 100.0,
+                Math.Clamp(t.ForceCapTenths / 10.0, 1.0, RatedForceN),
+                Math.Min((int)t.Overall, 100) / 100.0);
+
         private static int ParseInt(string s, int fallback)
             => int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out int v) ? v : fallback;
 

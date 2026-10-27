@@ -1,6 +1,7 @@
 using System;
 using PadForge.Engine;
 using PadForge.Engine.Common;
+using PadForge.Engine.Data;
 
 namespace PadForge.Common.Input
 {
@@ -119,5 +120,81 @@ namespace PadForge.Common.Input
         internal static bool TakesRumble(int slot, Guid device, long nowMs)
             => !AudioPassthroughService.RendersPersonaHaptics(device, nowMs)
             && !HapticToneService.RendersPersonaHaptics(slot, device);
+
+        /// <summary>One caller's reusable state for <see cref="ForDevice"/>:
+        /// an all-zero rumble the level is layered onto, the merge's scratch,
+        /// and a setting that carries a row's gains with audio rumble off.</summary>
+        internal sealed class DeviceScratch
+        {
+            internal readonly Vibration Zero = new();
+            internal readonly Vibration Merged = new();
+            internal readonly PadSetting Gains = new() { AudioRumbleEnabled = "0" };
+        }
+
+        /// <summary>The persona haptics alone as <paramref name="device"/>
+        /// takes them, as the 8-bit right and left motor bytes the Sony
+        /// dispatcher writes: for each of the device's rows, the row slot's
+        /// fresh level (<see cref="InputManager.WithPersonaHaptics"/>) through
+        /// that row's Overall Gain, motor strengths and swap
+        /// (<see cref="InputManager.ScaleRumbleForDevice"/>) and its main
+        /// motor redirect, the strongest row winning, the same row walk the
+        /// dispatcher's full rumble provider makes. No game rumble, macro
+        /// rumble, audio rumble, constant force or touchpad pulse joins it.
+        /// A row on a slot whose test rumble targets another device
+        /// contributes nothing, and a device with no rows reads the slot with
+        /// identity gains. (0, 0) when no level is fresh or the device plays
+        /// the haptic track itself.</summary>
+        internal static (byte right, byte left) ForDevice(InputManager im, int padIndex, Guid device,
+            long nowMs, DeviceScratch scratch)
+        {
+            if (im == null || scratch == null || im.OutputsQuiesced) return (0, 0);
+            if ((uint)padIndex >= InputManager.MaxPads) return (0, 0);
+            ushort maxL = 0, maxR = 0;
+            bool sawRow = false;
+            var settings = SettingsManager.UserSettings;
+            if (settings != null && device != Guid.Empty)
+            {
+                lock (settings.SyncRoot)
+                {
+                    for (int i = 0; i < settings.Items.Count; i++)
+                    {
+                        var us = settings.Items[i];
+                        if (us == null || us.InstanceGuid != device) continue;
+                        int slot = us.MapTo;
+                        if ((uint)slot >= InputManager.MaxPads) continue;
+                        sawRow = true;
+                        var tt = im.TestRumbleTargetGuid[slot];
+                        if (tt != Guid.Empty && tt != device) continue;
+                        AddRow(im, slot, device, us.GetPadSetting(), nowMs, scratch, ref maxL, ref maxR);
+                    }
+                }
+            }
+            if (!sawRow) AddRow(im, padIndex, device, null, nowMs, scratch, ref maxL, ref maxR);
+            return ((byte)(maxR >> 8), (byte)(maxL >> 8));
+        }
+
+        private static void AddRow(InputManager im, int slot, Guid device, PadSetting ps, long nowMs,
+            DeviceScratch scratch, ref ushort maxL, ref ushort maxR)
+        {
+            var v = im.WithPersonaHaptics(slot, device, scratch.Zero, scratch.Merged, nowMs);
+            if (ReferenceEquals(v, scratch.Zero)) return;
+            PadSetting gains = null;
+            if (ps != null)
+            {
+                // The row's gains only. Its audio rumble is another source,
+                // so the copy keeps AudioRumbleEnabled at "0".
+                gains = scratch.Gains;
+                gains.ForceOverall = ps.ForceOverall;
+                gains.LeftMotorStrength = ps.LeftMotorStrength;
+                gains.RightMotorStrength = ps.RightMotorStrength;
+                gains.ForceSwapMotor = ps.ForceSwapMotor;
+            }
+            im.ScaleRumbleForDevice(v.LeftMotorSpeed, v.RightMotorSpeed, gains, out ushort l, out ushort r);
+            im.GetTriggerRouteMainRedirect(slot, device, out bool zMainL, out bool zMainR);
+            if (zMainL) l = 0;
+            if (zMainR) r = 0;
+            if (l > maxL) maxL = l;
+            if (r > maxR) maxR = r;
+        }
     }
 }

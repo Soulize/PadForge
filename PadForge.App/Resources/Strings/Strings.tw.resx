@@ -667,11 +667,13 @@
   <data name="Common_Pixels" xml:space="preserve"><value>px</value></data>
   <data name="DeviceType_NovintFalcon" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} rehyehyɛ controller yi nkanea.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} rehyehyɛ device yi nkanea.</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Benkum/Nifa</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Soro/Fam</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Mu/Abɔnten</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>dhd64.dll a wopaw no anyɛ adwuma, enti PadForge de nea ɛwɔ soro hɔ no na ɛredi dwuma.</value></data>
   <data name="Falcon_Status_Open" xml:space="preserve"><value>abue</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Paw dhd64.dll…</value></data>
   <data name="Settings_Falcon_Title" xml:space="preserve"><value>Novint Falcon</value></data>

@@ -270,8 +270,6 @@ namespace PadForge.ViewModels
                     OnPropertyChanged(nameof(ShowRegisterNfcTag));
                     OnPropertyChanged(nameof(IsHandheldDevice));
                     OnPropertyChanged(nameof(IsSystemMotionDevice));
-                    OnPropertyChanged(nameof(IsHeadTrackerDevice));
-                    OnPropertyChanged(nameof(IsGameTelemetryDevice));
                     OnPropertyChanged(nameof(ShowLearnHandheldButton));
                     OnPropertyChanged(nameof(HasHandheldDaemonWarning));
                     OnPropertyChanged(nameof(IsTabletDevice));
@@ -655,12 +653,6 @@ namespace PadForge.ViewModels
 
         /// <summary>True for the machine's own motion sensor row (issue #343).</summary>
         public bool IsSystemMotionDevice => DeviceTypeKey == "SystemMotion";
-
-        /// <summary>True for the head tracker row (issue #355).</summary>
-        public bool IsHeadTrackerDevice => DeviceTypeKey == "HeadTracker";
-
-        /// <summary>True for the Game Telemetry row (issue #531).</summary>
-        public bool IsGameTelemetryDevice => DeviceTypeKey == "GameTelemetry";
 
         /// <summary>Whether to show the Learn / Manage Hidden Buttons button
         /// (issue #343). Owner only: a peer row's buttons are learned on the

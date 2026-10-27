@@ -50,8 +50,8 @@ namespace PadForge.Common.Input
             return ud.ProdId is 0x0CE6   // DualSense
                 or 0x0DF2                // DualSense Edge
                 or 0x05C4                // DS4 v1
-                or 0x09CC                // DS4 v1 alt
-                or 0x0BA0;               // DS4 v2
+                or 0x09CC                // DS4 v2
+                or 0x0BA0;               // DS4 wireless adapter
         }
 
         /// <summary>True when the device both has a touchpad and has a

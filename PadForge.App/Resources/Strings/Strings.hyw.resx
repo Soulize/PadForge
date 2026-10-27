@@ -304,6 +304,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Կ'աշխատի DSX-ի համար շինուած յաւելուածներու հետ, օրինակ՝ GTA V, Red Dead Redemption 2, Skyrim եւ Forza խաղերուն համար շինուածներուն։ Մինչ սպասարկիչը կ'ունկնդրէ, PadForge իր փորթը կը գրէ հոն, ուր այդ յաւելուածները զայն կը փնտռեն։</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Կ՚ունկնդրէ՝ :{0}։ {1} կը ղրկէ վիրթուալ կառավարիչ {2}-ին։</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Կ՚ունկնդրէ՝ :{0}։ {1} կը ղրկէ, բայց ոչ մէկ վիրթուալ կառավարիչի վրայ PlayStation կառավարիչ կայ։</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Կ՚ունկնդրէ՝ :{0}։ {1} կը ղրկէ {2} համարով կառավարիչին, բայց PlayStation կառավարիչ ունեցող վիրթուալ կառավարիչներէն ոչ մէկը այդ համարը չունի։</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>{0} փորթը կը գործածուի ուրիշ ծրագրի մը կողմէ, օրինակ՝ DSX-ի։ Գոցեցէք զայն կամ ուրիշ փորթ մը ընտրեցէք։</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Խաղի յաւելուած մը</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Կ՚աշխատի OpenTrack-ի եւ որեւէ հետեւիչի հետ, որ իր UDP ելքը կը ղրկէ կամ FreeTrack 2.0 համատեղ յիշողութեան մէջ կը գրէ, ինչպէս նաեւ այս համակարգիչին վրայ OpenXR գործարկման միջավայրի մը հետ, որ կրնայ նիստ մը գործարկել խորքին մէջ։</value></data>
@@ -4063,7 +4064,7 @@
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Կը սպասէ FreeTrack համատեղ յիշողութեան տուեալներուն։</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>FreeTrack համատեղ յիշողութիւնը անմատչելի է։</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Ղեկի անկիւնի թրթռում</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Կ'աւելցնէ շարունակական թրթռում, երբ ընտրուած վիրթուալ լծակի առանցքը կեդրոնէն կը հեռանայ։ Կը գործածէ բոլոր նշանակուած աղբիւրներուն համապատասխանեցուած ելքը։ «Բաժնուած ըստ ուղղութեան» ընտրանքով բացասական շարժումը կը գործարկէ ձախ մոթորը, դրականը՝ աջը։ «Ձախ մոթոր» կամ «Աջ մոթոր» երկու ուղղութիւններն ալ կը դնէ այդ մէկ մոթորին վրայ։ Xbox եւ PlayStation ելքի համար՝ թրթռումով սարքերով։ Ղեկերու սեփական ուժային արձագանգը բացառուած է։</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Կ'աւելցնէ շարունակական թրթռում, երբ ընտրուած վիրթուալ լծակի առանցքը կեդրոնէն կը հեռանայ։ Կը գործածէ բոլոր նշանակուած աղբիւրներուն համապատասխանեցուած ելքը։ «Բաժնուած ըստ ուղղութեան» ընտրանքով բացասական շարժումը կը գործարկէ ձախ մոթորը, դրականը՝ աջը։ «Ձախ մոթոր» կամ «Աջ մոթոր» երկու ուղղութիւններն ալ կը դնէ այդ մէկ մոթորին վրայ։ Xbox եւ PlayStation ելքի համար՝ թրթռումով սարքերով։ Ան կը շրջանցէ ղեկերը, անընդհատ ուժային արձագանգ ունեցող ուրիշ սարքերը եւ Fanatec ոտնակները։</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Միացնել ղեկի անկիւնի թրթռումը</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Վիրթուալ առանցք</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Ձախ լծակ X</value></data>
@@ -4265,6 +4266,7 @@
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>ուղղակի {0}-ին վրայ</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>WinUSB-ը կը կապուի G19-ի պաստառին</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>G19-ի պաստառը ուրիշ վարիչի վրայ է ({0}), ուստի գործարկեցէք Logitech Gaming Software-ը</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>G19-ի պաստառը ուրիշ ծրագրի մը վարիչին վրայ է ({0}), որուն PadForge-ը չի դպչիր</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>կը պահանջէ Logitech Gaming Software 8.52 կամ աւելի նոր տարբերակ</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>գործարկեցէք Logitech Gaming Software-ը</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>կը սպասէ Arx Control-ով հեռաձայնի մը</value></data>
@@ -4336,6 +4338,7 @@
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Բռնակ</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} այս կառավարիչին ձգանները կը կարգաւորէ։</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} այս կառավարիչին լոյսերը կը կարգաւորէ։</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} այս սարքին լոյսերը կը կարգաւորէ։</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} այս կառավարիչին ձգաններն ու լոյսերը կը կարգաւորէ։</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} ձգանի թրթռումներ կը նուագէ այս կառավարիչին Impulse ձգաններուն վրայ։</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Մաքրել յաւելուածի էֆեքթները</value></data>
@@ -4343,10 +4346,10 @@
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Ձախ/Աջ</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Վեր/Վար</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Ներս/Դուրս</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Կոճակ {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}՝ {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, բեռնուած հետեւեալ վայրէն՝ {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Ձեր ընտրած dhd64.dll-ը չբեռնուեցաւ, ուստի PadForge-ը կը գործածէ վերի օրինակը։</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Force Dimension-ի գրադարանը կ'աշխատի միայն PadForge-ի x64 տարբերակին մէջ։</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>dhd64.dll-ը գտնուեցաւ, բայց չկրցաւ բեռնուիլ։</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Այդ dhd64.dll-ը այն Force Dimension գրադարանը չէ, որ PadForge-ը կ'ակնկալէ։</value></data>
@@ -4356,11 +4359,12 @@
   <data name="Falcon_Status_Open" xml:space="preserve"><value>բաց է</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Falcon մը բաց է ուրիշ ծրագրի մը մէջ, օրինակ՝ FalconJoyForce-ի կամ Force Dimension-ի սեփական գործիքներուն մէջ։ Փակեցէք զայն այնտեղ։</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon-ը ուրիշ վարիչի վրայ է ({0}), ուստի Force Dimension-ի գրադարանը չի կրնար զայն բանալ։ Սարքերու կառավարիչին մէջ թարմացուցէք Falcon-ի վարիչը Force Dimension-ի SDK թղթապանակին մէջի drivers\usb թղթապանակէն։</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon-ը Force Dimension-ի վարիչին վրայ է, բայց Force Dimension-ի գրադարանը չկրցաւ զայն բանալ՝ {0}։ Ստուգեցէք անոր հոսանքը եւ USB մալուխը։</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Falcon մը միացուած է առանց վարիչի։ «Տեղադրել Falcon-ի վարիչը» կոճակը անոր կու տայ Force Dimension-ի վարիչը։</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Falcon մը միացուած է առանց վարիչի, եւ SDK թղթապանակին մէջ վարիչի փաթեթ չկայ զայն տալու համար։ Վերատեղադրեցէք Force Dimension-ի SDK-ն։</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Falcon չգտնուեցաւ։ Միացուցէք անոր հոսանքը եւ USB մալուխը։</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Ընտրել dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Կը բեռնէ Force Dimension-ի գրադարանին այս օրինակը՝ ամէն ուրիշէ առաջ։ SDK-ին տեղադրած օրինակները կը գտնուին առանց ատոր։</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Կը բեռնէ Force Dimension-ի գրադարանին այս օրինակը՝ ամէն ուրիշի փոխարէն։ Ուրիշ օրինակի վրայ բաց Falcon մը կը գոցուի եւ կրկին կը բացուի այս մէկուն վրայ։ SDK-ին տեղադրած օրինակները կը գտնուին առանց ատոր։</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Գրադարաններ (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Տեղադրել Falcon-ի վարիչը</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Կը տեղադրէ Force Dimension-ի վարիչը SDK թղթապանակէն այն Falcon-ին վրայ, որ վարիչ չունի։ Windows-ը նախ կրնայ հարցնել՝ վստահի՞լ Force Dimension-ին։</value></data>
@@ -4377,7 +4381,7 @@
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Թոյլ կու տայ Novint Falcon-ով խաղալ Force Dimension-ի SDK-ին միջոցով, որ կը տեղադրէք Force Dimension-էն։ Բռնակը լծակ է, բռնակին չորս կոճակները՝ կոճակներ, եւ PadForge-ը խաղին թրթռումն ու էֆեկտները բռնակին վրայ կը փոխանցէ իբրեւ ուժ։ Իւրաքանչիւր խցիկի «Ուժային արձագանգ» ներդիրը կը որոշէ, թէ Falcon-ը ինչպէս կը զգացուի։</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Կառավարել Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Իւրաքանչիւր Falcon կը բանայ Force Dimension-ի dhd64.dll-ով։ Բաց Falcon-ը կը պատկանի միայն PadForge-ին, ուստի FalconJoyForce-ը եւ Force Dimension-ի գործիքները չեն կրնար զայն բանալ, քանի դեռ այս ընտրանքը միացուած է։ Երբ անջատուած է, PadForge-ը կը փակէ բոլոր Falcon-ները։</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon-ի գրադարանը սահմանուեցաւ՝ {0}։ Արդէն գործածուող օրինակը կը մնայ, մինչեւ որ PadForge-ը վերագործարկուի։</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon-ի գրադարանը սահմանուեցաւ՝ {0}։ PadForge-ը զայն կը բեռնէ քանի մը վայրկեանի ընթացքին, եւ ուրիշ օրինակի վրայ բաց Falcon մը կրկին կը բացուի այս մէկուն վրայ։</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Կը տեղադրուի Force Dimension-ի Falcon վարիչը…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Force Dimension-ի Falcon վարիչի փաթեթը կամ անոր կատալոգը կը պակսի՝ {0}։ Վերատեղադրեցէք Force Dimension-ի SDK-ն։</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Միացուած Falcon չկայ։</value></data>

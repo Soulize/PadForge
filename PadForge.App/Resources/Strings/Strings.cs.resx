@@ -319,6 +319,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Funguje s mody vytvořenými pro DSX, například pro GTA V, Red Dead Redemption 2, Skyrim a Forza. Dokud server naslouchá, PadForge zapisuje svůj port tam, kde ho mody hledají.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Naslouchá na :{0}. {1} posílá na virtuální ovladač {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Naslouchá na :{0}. {1} posílá, ale žádný virtuální ovladač nemá ovladač PlayStation.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Naslouchá na :{0}. {1} posílá na index ovladače {2} a žádný virtuální ovladač s ovladačem PlayStation nemá tento index.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Port {0} používá jiný program, například DSX. Zavřete ho nebo zvolte jiný port.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Herní mod</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Funguje s programem OpenTrack a s každým sledovačem, který odesílá výstup přes UDP nebo zapisuje do sdílené paměti FreeTrack 2.0, a také s běhovým prostředím OpenXR na tomto počítači, které umí spustit relaci na pozadí.</value></data>
@@ -4127,7 +4128,7 @@ Má je PadForge teď odinstalovat? Vyžaduje to zvýšená oprávnění a může
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Čeká se na data sdílené paměti FreeTrack.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>Sdílená paměť FreeTrack není k dispozici.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Vibrace podle úhlu řízení</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Přidává nepřetržité vibrace, jak se vybraná osa virtuální páčky vzdaluje od středu. Používá namapovaný výstup ze všech přiřazených zdrojů. S volbou Rozdělit podle směru záporný pohyb řídí levý motor a kladný pravý. Volba Levý motor nebo Pravý motor přesune oba směry na tento jediný motor. Pro výstup Xbox a PlayStation se zařízeními s vibracemi. Nativní silová zpětná vazba volantů je vyloučena.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Přidává nepřetržité vibrace, jak se vybraná osa virtuální páčky vzdaluje od středu. Používá namapovaný výstup ze všech přiřazených zdrojů. S volbou Rozdělit podle směru záporný pohyb řídí levý motor a kladný pravý. Volba Levý motor nebo Pravý motor přesune oba směry na tento jediný motor. Pro výstup Xbox a PlayStation se zařízeními s vibracemi. Přeskakuje volanty, další zařízení s konstantní silovou zpětnou vazbou a pedály Fanatec.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Povolit vibrace podle úhlu řízení</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Virtuální osa</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Levá páčka X</value></data>
@@ -4330,6 +4331,7 @@ Má je PadForge teď odinstalovat? Vyžaduje to zvýšená oprávnění a může
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>přímo na {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>připojuje se WinUSB k obrazovce G19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>obrazovka G19 používá jiný ovladač ({0}), spusťte proto Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>obrazovka G19 používá ovladač jiného programu ({0}), který PadForge ponechává beze změny</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>vyžaduje Logitech Gaming Software 8.52 nebo novější</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>spusťte Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>čeká se na telefon s Arx Control</value></data>
@@ -4401,6 +4403,7 @@ Má je PadForge teď odinstalovat? Vyžaduje to zvýšená oprávnění a může
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Rukojeť</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} nastavuje spouště tohoto ovladače.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} nastavuje světla tohoto ovladače.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} nastavuje světla tohoto zařízení.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} nastavuje spouště a světla tohoto ovladače.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} přehrává vibrace spouští na impulzních spouštích tohoto ovladače.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Zrušit efekty modu</value></data>
@@ -4408,10 +4411,10 @@ Má je PadForge teď odinstalovat? Vyžaduje to zvýšená oprávnění a může
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Vlevo/vpravo</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Nahoru/dolů</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Dovnitř/ven</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Tlačítko {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, načteno z {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Vybraný soubor dhd64.dll se nenačetl, proto PadForge používá kopii uvedenou výše.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Knihovna Force Dimension běží jen v sestavení PadForge pro x64.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>Soubor dhd64.dll byl nalezen, ale nepodařilo se ho načíst.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Tento soubor dhd64.dll není knihovna Force Dimension, kterou PadForge očekává.</value></data>
@@ -4421,11 +4424,12 @@ Má je PadForge teď odinstalovat? Vyžaduje to zvýšená oprávnění a může
   <data name="Falcon_Status_Open" xml:space="preserve"><value>otevřeno</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Falcon je otevřený v jiném programu, například ve FalconJoyForce nebo v nástrojích Force Dimension. Zavřete ho tam.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon používá jiný ovladač ({0}), takže ho knihovna Force Dimension nemůže otevřít. Ve Správci zařízení aktualizujte ovladač Falconu ze složky drivers\usb ve složce SDK Force Dimension.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon používá ovladač Force Dimension a knihovna Force Dimension ho nemohla otevřít: {0}. Zkontrolujte jeho napájení a kabel USB.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Falcon je připojen bez ovladače. Tlačítko Nainstalovat ovladač Falcon mu dá ovladač Force Dimension.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Falcon je připojen bez ovladače a složka SDK neobsahuje balíček ovladače, který by mu dala. Přeinstalujte Force Dimension SDK.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Žádný Falcon nenalezen. Připojte jeho napájení a kabel USB.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Vybrat dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Před všemi ostatními načte tuto kopii knihovny Force Dimension. Kopie, které SDK nainstaluje, se najdou i bez toho.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Načte tuto kopii knihovny Force Dimension místo všech ostatních. Falcon otevřený v jiné kopii se zavře a znovu otevře v této. Kopie, které SDK nainstaluje, se najdou i bez toho.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Knihovny (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Nainstalovat ovladač Falcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Nainstaluje ovladač Force Dimension ze složky SDK do Falconu, který žádný nemá. Windows se může nejdřív zeptat, zda Force Dimension důvěřujete.</value></data>
@@ -4442,7 +4446,7 @@ Má je PadForge teď odinstalovat? Vyžaduje to zvýšená oprávnění a může
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Hraje hry s Novint Falcon přes Force Dimension SDK, které si nainstalujete od Force Dimension. Rukojeť je páčka, čtyři tlačítka na úchopu jsou tlačítka a PadForge přenáší vibrace a efekty hry na rukojeť jako sílu. Karta Silová zpětná vazba každého slotu určuje, jak se Falcon chová.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Ovládat Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Otevírá každý Falcon přes dhd64.dll od Force Dimension. Otevřený Falcon patří jen PadForge, takže ho FalconJoyForce ani nástroje Force Dimension nemohou při zapnutí otevřít. Při vypnutí PadForge všechny Falcony zavře.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Knihovna Falcon nastavena na {0}. Již používaná kopie platí, dokud se PadForge znovu nespustí.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Knihovna Falcon nastavena na {0}. PadForge ji načte během několika sekund a Falcon otevřený v jiné kopii se znovu otevře v této.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Instaluje se ovladač Falcon od Force Dimension…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Balíček ovladače Falcon od Force Dimension nebo jeho katalog chybí: {0}. Přeinstalujte Force Dimension SDK.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Není připojen žádný Falcon.</value></data>

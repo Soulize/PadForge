@@ -151,6 +151,18 @@ namespace PadForge.Tests
             Assert.All(Sliders(property), s => Assert.Equal(range, s));
         }
 
+        /// <summary>The Adaptive Trigger Effect action's Time slider (#531)
+        /// covers the 1 to 60,000 ms its action accepts. It stopped at
+        /// 10,000.</summary>
+        [Fact]
+        public void TheTriggerEffectTimeSliderCoversItsActionsRange()
+        {
+            var action = new MacroAction();
+            var range = ModelRange(v => action.TriggerEffectMs = (int)v, () => action.TriggerEffectMs);
+            Assert.Equal((1.0, 60000.0), range);
+            Assert.All(Sliders("TriggerEffectMs"), s => Assert.Equal(range, s));
+        }
+
         /// <summary>The model really does clamp, so the comparisons above are
         /// against a ceiling and not against an unbounded property.</summary>
         [Fact]

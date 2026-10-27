@@ -21,6 +21,9 @@ namespace PadForge.Common.Input.KeyboardScreens
         /// <summary>The G19's screen interface is on another driver, named
         /// in the detail, which LGS installs.</summary>
         G19OtherDriver,
+        /// <summary>The G19's screen interface is on another program's
+        /// driver, named in the detail, which PadForge leaves alone.</summary>
+        G19ForeignDriver,
         /// <summary>LGS's Arx Control library is not installed.</summary>
         ArxNoLibrary,
         /// <summary>The library is there and LGS did not take the applet,
@@ -81,7 +84,13 @@ namespace PadForge.Common.Input.KeyboardScreens
         private const string LgsKeysSource = "lgs";
 
         private readonly object _lock = new();
+        /// <summary>Each screen's latest picture and its version. The
+        /// versions come from one counter for every screen, so no two frames
+        /// share one: LGS's session keeps the version it last wrote for a
+        /// kind, and a new leading screen's frame must never match the old
+        /// leader's.</summary>
         private readonly Dictionary<string, (byte[] Frame, long Version)> _frames = new(StringComparer.Ordinal);
+        private long _version;
         private readonly Dictionary<string, KeyboardScreenStatus> _status = new(StringComparer.Ordinal);
         private readonly AutoResetEvent _wake = new(false);
         private readonly Action<string> _log;
@@ -90,8 +99,24 @@ namespace PadForge.Common.Input.KeyboardScreens
         private readonly G19UsbScreens _g19;
         private readonly ArxScreen _arx = new();
         private readonly Strike7Screen _strike7;
-        private Thread _thread;
+        private Thread _thread, _previous;
         private volatile bool _stop;
+        /// <summary>The worker of the host made last. A new host's worker
+        /// waits for it, up to <see cref="PredecessorJoinMs"/>, so one
+        /// host's sessions are closed before the next host's open.</summary>
+        private static Thread s_lastWorker;
+        internal const int PredecessorJoinMs = 5000;
+        /// <summary>Canceled when the host stops, for work the worker hands
+        /// off, which may outlive the pass that started it.</summary>
+        private readonly CancellationTokenSource _stopping = new();
+        /// <summary>How long Dispose waits for the worker.</summary>
+        internal int JoinMs = 5000;
+        /// <summary>Test seam: run in place of each pass's engines, so a test
+        /// drives the worker's life without reaching a screen.</summary>
+        internal Action PassForTest;
+        /// <summary>The thread that shut the engines down, for the
+        /// tests.</summary>
+        internal int ClosedOnThread;
         private string _strike7Path, _strike7Sha256;
         private bool _lgsWasActive;
         private KeyboardScreenInfo[] _screens = Array.Empty<KeyboardScreenInfo>();
@@ -102,7 +127,7 @@ namespace PadForge.Common.Input.KeyboardScreens
         public KeyboardScreenHost(byte[] strike7Icon, int iconWidth, int iconHeight, Action<string> log)
         {
             _log = log ?? (_ => { });
-            _g19 = new G19UsbScreens(_log);
+            _g19 = new G19UsbScreens(_log, _stopping.Token);
             _strike7 = new Strike7Screen(strike7Icon, iconWidth, iconHeight);
         }
 
@@ -110,6 +135,7 @@ namespace PadForge.Common.Input.KeyboardScreens
         {
             if (_thread != null) return;
             _thread = new Thread(Run) { IsBackground = true, Name = "PadForge.KeyboardScreens" };
+            _previous = Interlocked.Exchange(ref s_lastWorker, _thread);
             _thread.Start();
         }
 
@@ -130,7 +156,7 @@ namespace PadForge.Common.Input.KeyboardScreens
                 _frames.TryGetValue(screen, out var last);
                 if (ReferenceEquals(last.Frame, bgra)
                     || (last.Frame != null && bgra != null && last.Frame.AsSpan().SequenceEqual(bgra))) return;
-                _frames[screen] = (bgra, last.Version + 1);
+                _frames[screen] = (bgra, ++_version);
             }
             _wake.Set();
         }
@@ -193,74 +219,134 @@ namespace PadForge.Common.Input.KeyboardScreens
         /// time.</summary>
         public bool TryTakeDrag(out int dx, out int dy) => _strike7.TryTakeDrag(out dx, out dy);
 
-        private (byte[] Frame, long Version) FrameOf(string screen)
+        internal (byte[] Frame, long Version) FrameOf(string screen)
         {
             lock (_lock) return _frames.TryGetValue(screen, out var f) ? f : (null, 0);
         }
 
+        /// <summary>
+        /// The worker. It opens and closes every engine's session on this
+        /// one thread: Arx's guide (LogitechGArxControl.pdf page 3) asks for
+        /// init and shutdown on the same thread, and the LCD library, not
+        /// documented as thread-safe, gets every call from one thread
+        /// (<see cref="PadForge.Engine.Common.Logitech.LogitechLcdLibrary"/>).
+        /// So the engines are shut down here, when the loop ends, and never
+        /// by <see cref="Dispose"/> on the caller's thread.
+        /// A worker that outlives Dispose's wait still shuts them down when
+        /// its pass ends.
+        /// </summary>
         private void Run()
         {
-            while (!_stop)
+            try
             {
-                KeyboardScreenInfo[] screens;
-                string strike7Path, strike7Sha256;
-                lock (_lock)
+                // The last host's worker closes its sessions first, for at
+                // most PredecessorJoinMs, the peripheral backends' rule
+                // (HidppBackend.PredecessorJoinMs).
+                var previous = _previous;
+                _previous = null;
+                long until = Environment.TickCount64 + PredecessorJoinMs;
+                while (previous != null && !_stop && !previous.Join(LoopMs))
                 {
-                    screens = _screens;
-                    strike7Path = _strike7Path;
-                    strike7Sha256 = _strike7Sha256;
+                    if (Environment.TickCount64 < until) continue;
+                    _log("Keyboard screens: the last host's worker is still running after "
+                         + PredecessorJoinMs + " ms, starting anyway");
+                    break;
                 }
-                long now = Environment.TickCount64;
-                var monoLeader = Leader(screens, KeyboardScreenKind.Monochrome);
-                var colorLeader = Leader(screens, KeyboardScreenKind.Color);
-                var mono = monoLeader != null ? FrameOf(monoLeader.Id) : (null, 0);
-                var color = colorLeader != null ? FrameOf(colorLeader.Id) : (null, 0);
 
-                // Each engine on its own, so one that throws leaves the
-                // others drawing.
-                try { _lgs.Step(mono.Frame, mono.Version, color.Frame, color.Version, now); }
-                catch (Exception ex) { _log("Keyboard screens: LGS pass failed: " + ex.Message); }
-                bool lgs = _lgs.Active;
-                if (lgs && !_lgsWasActive) _hid.ForgetWrites();
-                _lgsWasActive = lgs;
-                _lgsActive = lgs;
-
-                try { _hid.Step(FrameOf, MonoDrawsDirectly(lgs, _lgs.MonoConnected), appletKeyOnly: lgs, now); }
-                catch (Exception ex) { _log("Keyboard screens: monochrome pass failed: " + ex.Message); }
-                try { _g19.Step(FrameOf, G19MayBind(lgs), now); }
-                catch (Exception ex) { _log("Keyboard screens: G19 pass failed: " + ex.Message); }
-                var arx = FrameOf(KeyboardScreenInfo.ArxId);
-                try { _arx.Step(arx.Frame, arx.Version, now); }
-                catch (Exception ex) { _log("Keyboard screens: Arx pass failed: " + ex.Message); }
-                var strike7 = FrameOf(KeyboardScreenInfo.Strike7Id);
-                try { _strike7.Step(strike7.Frame, strike7.Version, strike7Path, strike7Sha256, now); }
-                catch (Exception ex) { _log("Keyboard screens: S.T.R.I.K.E. 7 pass failed: " + ex.Message); }
-
-                DealLgsKeys(lgs ? _lgs.ButtonFlags : 0, monoLeader, colorLeader, now);
-
-                var present = PresentScreens(strike7Path);
-                var status = new Dictionary<string, KeyboardScreenStatus>(StringComparer.Ordinal);
-                foreach (var s in present) status[s.Id] = StatusFor(s, lgs, strike7Path);
-                var arxStatus = ArxStatusNow();
-                var strike7Status = Strike7StatusNow(strike7Path);
-                bool listChanged;
-                lock (_lock)
+                while (!_stop)
                 {
-                    listChanged = !present.SequenceEqual(_screens);
-                    if (listChanged) _screens = present;
-                    _status.Clear();
-                    foreach (var (id, s) in status) _status[id] = s;
-                    _arxStatus = arxStatus;
-                    _strike7Status = strike7Status;
-                    // A picture of a screen that left is dropped with it.
-                    foreach (string gone in _frames.Keys.Where(id => !status.ContainsKey(id)).ToList()) _frames.Remove(gone);
+                    if (PassForTest != null) PassForTest();
+                    else Pass();
+                    _wake.WaitOne(LoopMs);
                 }
-                // A new array only when the list changed, which is what the
-                // device sweep looks for.
-                if (listChanged) KeyboardScreensRuntime.Screens = present;
-
-                _wake.WaitOne(LoopMs);
             }
+            finally
+            {
+                Close();
+            }
+        }
+
+        private void Pass()
+        {
+            KeyboardScreenInfo[] screens;
+            string strike7Path, strike7Sha256;
+            lock (_lock)
+            {
+                screens = _screens;
+                strike7Path = _strike7Path;
+                strike7Sha256 = _strike7Sha256;
+            }
+            long now = Environment.TickCount64;
+            var monoLeader = Leader(screens, KeyboardScreenKind.Monochrome);
+            var colorLeader = Leader(screens, KeyboardScreenKind.Color);
+            var mono = monoLeader != null ? FrameOf(monoLeader.Id) : (null, 0);
+            var color = colorLeader != null ? FrameOf(colorLeader.Id) : (null, 0);
+
+            // Each engine on its own, so one that throws leaves the
+            // others drawing.
+            try { _lgs.Step(mono.Frame, mono.Version, color.Frame, color.Version, now); }
+            catch (Exception ex) { _log("Keyboard screens: LGS pass failed: " + ex.Message); }
+            bool lgs = _lgs.Active;
+            if (lgs && !_lgsWasActive) _hid.ForgetWrites();
+            _lgsWasActive = lgs;
+            _lgsActive = lgs;
+
+            try { _hid.Step(FrameOf, MonoDrawsDirectly(lgs, _lgs.MonoConnected), appletKeyOnly: AppletKeyOnly(lgs, _lgs.MonoConnected), now); }
+            catch (Exception ex) { _log("Keyboard screens: monochrome pass failed: " + ex.Message); }
+            try { _g19.Step(FrameOf, G19MayBind(lgs), now); }
+            catch (Exception ex) { _log("Keyboard screens: G19 pass failed: " + ex.Message); }
+            var arx = FrameOf(KeyboardScreenInfo.ArxId);
+            try { _arx.Step(arx.Frame, arx.Version, now); }
+            catch (Exception ex) { _log("Keyboard screens: Arx pass failed: " + ex.Message); }
+            var strike7 = FrameOf(KeyboardScreenInfo.Strike7Id);
+            try { _strike7.Step(strike7.Frame, strike7.Version, strike7Path, strike7Sha256, now); }
+            catch (Exception ex) { _log("Keyboard screens: S.T.R.I.K.E. 7 pass failed: " + ex.Message); }
+
+            DealLgsKeys(lgs ? _lgs.ButtonFlags : 0, monoLeader, colorLeader, now);
+
+            var present = PresentScreens(strike7Path);
+            var status = new Dictionary<string, KeyboardScreenStatus>(StringComparer.Ordinal);
+            foreach (var s in present) status[s.Id] = StatusFor(s, lgs, strike7Path);
+            var arxStatus = ArxStatusNow();
+            var strike7Status = Strike7StatusNow(strike7Path);
+            bool listChanged;
+            lock (_lock)
+            {
+                listChanged = !present.SequenceEqual(_screens);
+                if (listChanged) _screens = present;
+                _status.Clear();
+                foreach (var (id, s) in status) _status[id] = s;
+                _arxStatus = arxStatus;
+                _strike7Status = strike7Status;
+                // A picture of a screen that left is dropped with it.
+                foreach (string gone in _frames.Keys.Where(id => !status.ContainsKey(id)).ToList()) _frames.Remove(gone);
+            }
+            if (listChanged) PublishScreens(present);
+        }
+
+        /// <summary>The present screens for the device sweep, a new array
+        /// only when the list changed, which is what the sweep looks for.
+        /// Nothing once the host is stopping: Dispose empties the list, and
+        /// a pass still running must not put its screens back.</summary>
+        internal void PublishScreens(KeyboardScreenInfo[] present)
+        {
+            lock (_lock)
+                if (!_stop) KeyboardScreensRuntime.Screens = present;
+        }
+
+        /// <summary>The engines' sessions closed and their handles freed, on
+        /// the worker as the loop ends, or on the caller's thread for a host
+        /// that never started. Each screen's keys go with its engine.</summary>
+        private void Close()
+        {
+            try { _lgs.Dispose(); } catch (Exception) { }
+            try { _hid.Dispose(); } catch (Exception) { }
+            try { _g19.Dispose(); } catch (Exception) { }
+            try { _arx.Dispose(); } catch (Exception) { }
+            try { _strike7.Dispose(); } catch (Exception) { }
+            foreach (string id in _lgsKeyed) KeyboardScreenKeys.Clear(id, LgsKeysSource);
+            _lgsKeyed.Clear();
+            ClosedOnThread = Environment.CurrentManagedThreadId;
         }
 
         /// <summary>The screens the engines see now, in id order: each
@@ -324,6 +410,13 @@ namespace PadForge.Common.Input.KeyboardScreens
         internal static bool MonoDrawsDirectly(bool lgsActive, bool lgsSeesMono)
             => !lgsActive || !lgsSeesMono;
 
+        /// <summary>Whether the monochrome readers pass on the round applet
+        /// key alone: exactly while LGS draws those screens, since LGS then
+        /// hands the applet the other four keys itself. While PadForge draws
+        /// them, nothing else reports those four.</summary>
+        internal static bool AppletKeyOnly(bool lgsActive, bool lgsSeesMono)
+            => !MonoDrawsDirectly(lgsActive, lgsSeesMono);
+
         /// <summary>Whether a G19's screen interface may be bound to WinUSB:
         /// never while LGS took the applet, since LGS's own driver serves
         /// that interface then.</summary>
@@ -340,22 +433,33 @@ namespace PadForge.Common.Input.KeyboardScreens
                 case KeyboardScreenKind.Color:
                 {
                     var g19 = _g19.Find(screen.Id);
-                    switch (g19?.Current)
-                    {
-                        case G19UsbScreen.State.Open:
-                            return new(KeyboardScreenRoute.Direct, "G19");
-                        case G19UsbScreen.State.OtherDriver when !(lgs && _lgs.ColorConnected):
-                            return new(KeyboardScreenRoute.G19OtherDriver, g19.OtherDriver);
-                        case G19UsbScreen.State.Binding when !lgs:
-                            return new(KeyboardScreenRoute.G19Preparing);
-                    }
-                    return lgs && _lgs.ColorConnected ? new(KeyboardScreenRoute.Lgs) : new(KeyboardScreenRoute.NotFound);
+                    return ColorStatus(g19?.Current, g19?.OtherDriver, lgs, _lgs.ColorConnected);
                 }
                 case KeyboardScreenKind.Arx:
                     return ArxStatusNow();
                 default:
                     return Strike7StatusNow(strike7Path);
             }
+        }
+
+        /// <summary>A G19's line: drawn directly, on LGS's driver while LGS
+        /// does not draw it, on another program's driver whatever LGS does
+        /// (LGS cannot reach it there either), being bound, or drawn by
+        /// LGS.</summary>
+        internal static KeyboardScreenStatus ColorStatus(G19UsbScreen.State? state, string driver, bool lgs, bool lgsSeesColor)
+        {
+            switch (state)
+            {
+                case G19UsbScreen.State.Open:
+                    return new(KeyboardScreenRoute.Direct, "G19");
+                case G19UsbScreen.State.ForeignDriver:
+                    return new(KeyboardScreenRoute.G19ForeignDriver, driver ?? string.Empty);
+                case G19UsbScreen.State.OtherDriver when !(lgs && lgsSeesColor):
+                    return new(KeyboardScreenRoute.G19OtherDriver, driver ?? string.Empty);
+                case G19UsbScreen.State.Binding when !lgs:
+                    return new(KeyboardScreenRoute.G19Preparing);
+            }
+            return lgs && lgsSeesColor ? new(KeyboardScreenRoute.Lgs) : new(KeyboardScreenRoute.NotFound);
         }
 
         private KeyboardScreenStatus ArxStatusNow()
@@ -384,23 +488,30 @@ namespace PadForge.Common.Input.KeyboardScreens
             return _strike7.Shown ? new(KeyboardScreenRoute.Strike7Showing) : new(KeyboardScreenRoute.Strike7Waiting);
         }
 
+        /// <summary>Stops the worker, wakes it and waits up to
+        /// <see cref="JoinMs"/> for it to finish its pass and shut the
+        /// engines down (<see cref="Run"/>). A worker still inside a pass
+        /// when the wait ends shuts them down itself when the pass ends, and
+        /// the next host's worker waits for it. A G19 bind in flight sees the
+        /// stop before it changes a driver.</summary>
         public void Dispose()
         {
-            _stop = true;
+            lock (_lock)
+            {
+                if (_stop) return;
+                _stop = true;
+            }
+            _stopping.Cancel();
             _wake.Set();
             var thread = _thread;
             _thread = null;
-            // The worker finishes its pass first: a bind in flight runs on
-            // its own task and ends on its own.
-            if (thread != null && !thread.Join(5000)) return;
-            try { _lgs.Dispose(); } catch (Exception) { }
-            try { _hid.Dispose(); } catch (Exception) { }
-            try { _g19.Dispose(); } catch (Exception) { }
-            try { _arx.Dispose(); } catch (Exception) { }
-            try { _strike7.Dispose(); } catch (Exception) { }
+            bool done = true;
+            if (thread == null) Close();
+            else done = thread.Join(JoinMs);
             KeyboardScreensRuntime.Screens = Array.Empty<KeyboardScreenInfo>();
             KeyboardScreenKeys.ClearAll();
-            _wake.Dispose();
+            // A worker still running waits on the event.
+            if (done) _wake.Dispose();
         }
     }
 }

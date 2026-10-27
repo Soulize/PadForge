@@ -25,22 +25,14 @@ namespace PadForge
                 if (_viewModel.Devices.SelectedDevice is { } row) ConfigureKeyboardScreen(row.InstanceGuid);
             };
 
+            // A download that lands is the library from now on, in place of a
+            // copy picked before. A failed one leaves the pick alone.
             settings.DownloadStrike7LibraryRequested += async (_, _) =>
-            {
-                await RunDriverOperationAsync(
-                    Strings.Instance.Status_DownloadingStrike7,
+                await KeyboardScreenService.DownloadStrike7Library(
+                    operation => RunDriverOperationAsync(Strings.Instance.Status_DownloadingStrike7, operation, () => { }),
                     () => DriverInstaller.InstallStrike7Library(
                         KeyboardScreenService.DownloadedStrike7Library, KeyboardScreenService.Strike7LibrarySha256),
-                    () => { });
-                // The download is the library from now on, in place of a copy
-                // picked before.
-                if (System.IO.File.Exists(KeyboardScreenService.DownloadedStrike7Library)
-                    && !string.IsNullOrEmpty(settings.Strike7LibraryPath))
-                {
-                    settings.Strike7LibraryPath = null;
-                    _settingsService.MarkDirty();
-                }
-            };
+                    settings, () => _settingsService.MarkDirty());
 
             settings.PickStrike7LibraryRequested += (_, _) =>
             {

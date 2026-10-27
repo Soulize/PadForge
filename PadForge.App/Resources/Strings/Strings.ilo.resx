@@ -976,7 +976,7 @@
   <data name="RemoteLink_AssignmentBusy" xml:space="preserve">
     <value>Agur-uray iti sabali a PC...</value>
   </data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Agnayon iti agtultuloy a rumble bayat nga umadayo iti tengnga ti napili a virtual stick axis. Usarenna ti output dagiti mapping manipud kadagiti amin a naituding a source. No "Naisina segun iti direksion", ti negatibo a panagkuti ket mapan iti kannigid a motor ken ti positibo a panagkuti ket mapan iti kannawan. Ti "Kannigid a motor" wenno "Kannawan a motor" ket mangikabil iti dua a direksion iti dayta maymaysa a motor. Para iti Xbox ken PlayStation nga output nga addaan kadagiti rumble a device. Saan a mairaman ti native a force feedback ti wheel.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Agnayon iti agtultuloy a rumble bayat nga umadayo iti tengnga ti napili a virtual stick axis. Usarenna ti output dagiti mapping manipud kadagiti amin a naituding a source. No "Naisina segun iti direksion", ti negatibo a panagkuti ket mapan iti kannigid a motor ken ti positibo a panagkuti ket mapan iti kannawan. Ti "Kannigid a motor" wenno "Kannawan a motor" ket mangikabil iti dua a direksion iti dayta maymaysa a motor. Para iti Xbox ken PlayStation nga output nga addaan kadagiti rumble a device. Saan a mairaman dagiti wheel, dagiti sabali pay a device nga addaan iti agtultuloy a force feedback, ken dagiti pedal ti Fanatec.</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Kanigid a Stick X</value></data>
   <data name="Pad_SteeringAngleRumble_LY" xml:space="preserve"><value>Kanigid a Stick Y</value></data>
   <data name="Pad_SteeringAngleRumble_RX" xml:space="preserve"><value>Kannawan a Stick X</value></data>
@@ -1045,6 +1045,7 @@
   <data name="KeyboardScreens_Status_Off" xml:space="preserve"><value>naiddep</value></data>
   <data name="KeyboardScreens_Status_Lgs" xml:space="preserve"><value>babaen ti Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>direkta iti {0}</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>ti screen ti G19 ket adda iti driver ti sabali a programa ({0}), a saan a sagiden ti PadForge</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>kasapulan ti Logitech Gaming Software 8.52 wenno nabarbaro</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>lukatam ti Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>agur-uray iti telepono nga addaan Arx Control</value></data>
@@ -1082,14 +1083,16 @@
   <data name="DeviceType_NovintFalcon" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} ti mangbalbaliw kadagiti trigger daytoy a controller.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} ti mangbalbaliw kadagiti silaw daytoy a controller.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} ti mangbalbaliw kadagiti silaw daytoy a device.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} ti mangbalbaliw kadagiti trigger ken silaw daytoy a controller.</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Kannigid/Kannawan</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Ngato/Baba</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Uneg/Ruar</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Butones {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Saan a nai-load ti dhd64.dll a pinilim, isu nga usaren ti PadForge ti kopia iti ngato.</value></data>
   <data name="Falcon_Status_Open" xml:space="preserve"><value>nakalukat</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Ti Falcon ket adda iti driver ti Force Dimension, ket saan a nalukatan ti library ti Force Dimension: {0}. Kitaen ti kuryente ken ti USB a kable daytoy.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Pilien ti dhd64.dll…</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Ikabil ti driver ti Falcon</value></data>
   <data name="Falcon_OpenDownload" xml:space="preserve"><value>Alaen ti SDK ti Force Dimension</value></data>

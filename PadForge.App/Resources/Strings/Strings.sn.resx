@@ -1183,6 +1183,7 @@
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>zvakananga pa{0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>kubatanidza WinUSB nesikirini yeG19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>sikirini yeG19 iri pane imwe dhiraivha ({0}), saka vhura Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>sikirini yeG19 iri pane dhiraivha yeimwe purogiramu ({0}), iyo PadForge isingabati</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>inoda Logitech Gaming Software 8.52 kana pamusoro</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>vhura Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>kumirira foni ine Arx Control</value></data>
@@ -1229,14 +1230,15 @@
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Mubato</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} iri kuseta ma-trigger ekontiroura iyi.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} iri kuseta mwenje wekontiroura iyi.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} iri kuseta mwenje wemudziyo uyu.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} iri kuseta ma-trigger nemwenje zvekontiroura iyi.</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Kuruboshwe/Kurudyi</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Kumusoro/Pasi</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Mukati/Kunze</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Bhatani {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, yakavhurwa kubva ku{1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>dhd64.dll yawasarudza haina kuvhurwa, saka PadForge inoshandisa kopi iri pamusoro.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Raibhurari yeForce Dimension inoshanda chete muvhezheni ye x64 ye-PadForge.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>dhd64.dll yawanikwa, asi haina kukwanisa kuvhurwa.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>dhd64.dll iyi haisi raibhurari yeForce Dimension inotarisirwa ne-PadForge.</value></data>
@@ -1244,9 +1246,11 @@
   <data name="Falcon_Status_Open" xml:space="preserve"><value>yakavhurwa</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Falcon yakavhurwa mune imwe purogiramu, seFalconJoyForce kana zvishandiso zveForce Dimension pachayo. Ivhare ikoko.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon iri pane imwe dhiraivha ({0}), saka raibhurari yeForce Dimension haigoni kuivhura. MuDevice Manager, vandudza dhiraivha yeFalcon uchishandisa folda drivers\usb iri mufolda ye-SDK yeForce Dimension.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon iri pane dhiraivha yeForce Dimension, asi raibhurari yeForce Dimension haina kukwanisa kuivhura: {0}. Tarisa magetsi ayo netambo yayo ye-USB.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Falcon yakabatanidzwa isina dhiraivha. "Isa dhiraivha yeFalcon" inoipa dhiraivha yeForce Dimension.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Hapana Falcon yawanikwa. Batanidza magetsi ayo netambo yayo ye-USB.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Sarudza dhd64.dll…</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Inovhura kopi iyi yeraibhurari yeForce Dimension panzvimbo peimwe ipi neipi. Falcon yakavhurwa pane imwe kopi inovharwa yobva yavhurwazve pane iyi. Makopi anoiswa ne-SDK anowanikwa pasina iyi.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Raibhurari (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Isa dhiraivha yeFalcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Inoisa dhiraivha yeForce Dimension, kubva mufolda ye-SDK, paFalcon isina dhiraivha. Windows ingatanga yakubvunza kana uchivimba neForce Dimension.</value></data>
@@ -1254,7 +1258,7 @@
   <data name="Falcon_Reach_Format" xml:space="preserve"><value>Chinhambwe: {0:0} mm kuruboshwe nekurudyi, {1:0} mm kumusoro nepasi, {2:0} mm mukati nekunze.</value></data>
   <data name="Settings_Falcon_Title" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Shandisa Novint Falcon</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Raibhurari yeFalcon yava {0}. Kopi iri kushandiswa izvozvi inoramba iripo kusvikira PadForge yatangazve.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Raibhurari yeFalcon yava {0}. PadForge inoivhura mukati memasekondi mashoma, uye Falcon yakavhurwa pane imwe kopi inovhurwazve pane iyi.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Kuisa dhiraivha yeFalcon yeForce Dimension…</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Hapana Falcon yakabatanidzwa.</value></data>
   <data name="Status_FalconOnAnotherDriver_Format" xml:space="preserve"><value>Falcon iri pane imwe dhiraivha ({0}), saka PadForge inoisiya yakadaro. Device Manager inogona kuichinja kuenda kudhiraivha yeForce Dimension.</value></data>

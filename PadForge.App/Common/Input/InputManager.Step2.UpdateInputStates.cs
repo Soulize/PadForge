@@ -826,8 +826,8 @@ namespace PadForge.Common.Input
                 (ud.ProdId == 0x0CE6   // DualSense
               || ud.ProdId == 0x0DF2   // DualSense Edge
               || ud.ProdId == 0x05C4   // DS4 v1
-              || ud.ProdId == 0x09CC   // DS4 v1 alt
-              || ud.ProdId == 0x0BA0)) // DS4 v2
+              || ud.ProdId == 0x09CC   // DS4 v2
+              || ud.ProdId == 0x0BA0)) // DS4 wireless adapter
                 return;
 
             // Find ALL pad slots this device is mapped to (multi-slot assignment).
@@ -838,10 +838,10 @@ namespace PadForge.Common.Input
             if (slotCount == 0)
             {
                 // A Falcon no slot is assigned holds itself up and does
-                // nothing else (#521).
+                // nothing else (#521), unless a peer's game drives it.
                 if (isFalcon)
                 {
-                    falcon.Handoff = PadForge.Common.Input.Falcon.FalconHandoff.Unassigned;
+                    UnassignFalcon(ud, falcon);
                     return;
                 }
                 if (RemoteLinkOutputRouter.IsPeerPath(ud.DevicePath))
@@ -1130,7 +1130,7 @@ namespace PadForge.Common.Input
                 // No slot gave a force this pass. A Falcon's haptic thread
                 // would play its last one on, so it loses the game's force
                 // and keeps its feel (#521).
-                if (isFalcon) falcon.SilenceGame();
+                if (isFalcon) SilenceFalconGame(ud, falcon);
                 return;
             }
 
@@ -1181,7 +1181,7 @@ namespace PadForge.Common.Input
             // writer. Its haptic thread renders it, so nothing is written here.
             if (isFalcon)
             {
-                HandFalconForce(falcon, firstPadSetting, _combinedVibration, combinedL, combinedR, combinedLT, combinedRT);
+                HandFalconForce(ud, falcon, firstPadSetting, _combinedVibration, combinedL, combinedR, combinedLT, combinedRT);
                 return;
             }
 
@@ -1194,12 +1194,16 @@ namespace PadForge.Common.Input
             if (RemoteLinkOutputRouter.IsPeerPath(ud.DevicePath)
                 && !(isVendorFfb && !isFanatecPedal))
             {
+                // A Novint Falcon on the other PC (#521) takes this slot's
+                // Falcon settings with the force, Overall among them, which
+                // its force model applies to the effect itself.
+                bool peerFalcon = ud.Device?.GetInputDeviceType() == InputDeviceType.NovintFalcon;
                 // Bake the consumer's Overall Strength into the directional/condition fields
                 // before shipping: the owner replays with ForceOverall=100, and unlike the
                 // scalar motors (already pre-scaled above) these are copied raw, so the slider
-                // would otherwise be lost. DeviceGain stays raw — the owner applies it once.
+                // would otherwise be lost. DeviceGain stays raw, and the owner applies it once.
                 // Scale a COPY of the condition axes so the shared source state isn't mutated (#138 F30).
-                if (_combinedVibration.HasDirectionalData || _combinedVibration.HasConditionData)
+                if (!peerFalcon && (_combinedVibration.HasDirectionalData || _combinedVibration.HasConditionData))
                 {
                     int og = int.TryParse((directionalPadSetting ?? firstPadSetting)?.ForceOverall, out int fg) ? System.Math.Clamp(fg, 0, 100) : 100;
                     if (og != 100)
@@ -1232,7 +1236,8 @@ namespace PadForge.Common.Input
                     _combinedVibration.LeftMotorSpeed = foldL;
                     _combinedVibration.RightMotorSpeed = foldR;
                 }
-                RemoteLinkOutputRouter.ShipVibration(ud.DevicePath, _combinedVibration);
+                RemoteLinkOutputRouter.ShipVibration(ud.DevicePath, _combinedVibration,
+                    peerFalcon ? PadForge.Common.Input.Falcon.FalconSettings.ToWire(firstPadSetting) : null);
                 return;
             }
 

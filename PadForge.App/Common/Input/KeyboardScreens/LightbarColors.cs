@@ -35,26 +35,42 @@ namespace PadForge.Common.Input.KeyboardScreens
 
         /// <summary>The same, among the slots <paramref name="slots"/>
         /// allows, or every slot when it is null: a keyboard screen follows
-        /// the slots its row feeds.</summary>
+        /// the slots its row feeds.
+        ///
+        /// <para><paramref name="current"/> and <paramref name="slots"/> run
+        /// outside the lock. The screen service's checks take the device and
+        /// settings locks, and the effects dispatcher calls
+        /// <see cref="Record"/> while it holds the device lock, so asking
+        /// them under this lock would take the two locks in the opposite
+        /// order and freeze the UI and the poll thread. The entries are
+        /// copied under the lock, judged outside it, and a device that left
+        /// is removed only while its entry is still the one judged, so a
+        /// color recorded meanwhile stays.</para></summary>
         public static bool TryGetLowest(Func<Guid, int, bool> current, Func<int, bool> slots, out (byte R, byte G, byte B) color)
         {
             color = default;
             int best = int.MaxValue;
-            List<Guid> gone = null;
-            lock (_lock)
+            List<KeyValuePair<Guid, (int Slot, byte R, byte G, byte B)>> entries, gone = null;
+            lock (_lock) entries = new(_byDevice);
+            foreach (var pair in entries)
             {
-                foreach (var (device, entry) in _byDevice)
+                var entry = pair.Value;
+                if (current != null && !current(pair.Key, entry.Slot))
                 {
-                    if (current != null && !current(device, entry.Slot))
-                    {
-                        (gone ??= new List<Guid>()).Add(device);
-                        continue;
-                    }
-                    if (entry.Slot >= best || (slots != null && !slots(entry.Slot))) continue;
-                    best = entry.Slot;
-                    color = (entry.R, entry.G, entry.B);
+                    (gone ??= new()).Add(pair);
+                    continue;
                 }
-                if (gone != null) foreach (var device in gone) _byDevice.Remove(device);
+                if (entry.Slot >= best || (slots != null && !slots(entry.Slot))) continue;
+                best = entry.Slot;
+                color = (entry.R, entry.G, entry.B);
+            }
+            if (gone != null)
+            {
+                lock (_lock)
+                {
+                    foreach (var pair in gone)
+                        if (_byDevice.TryGetValue(pair.Key, out var now) && now == pair.Value) _byDevice.Remove(pair.Key);
+                }
             }
             return best != int.MaxValue;
         }

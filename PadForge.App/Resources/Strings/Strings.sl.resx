@@ -319,6 +319,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Deluje z modifikacijami, narejenimi za DSX, na primer za igre GTA V, Red Dead Redemption 2, Skyrim in Forza. Medtem ko strežnik posluša, PadForge zapiše svoja vrata tja, kjer jih iščejo te modifikacije.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Posluša na :{0}. {1} pošilja na navidezni krmilnik {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Posluša na :{0}. {1} pošilja, vendar noben navidezni krmilnik nima krmilnika PlayStation.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Posluša na :{0}. {1} pošilja na indeks krmilnika {2}, noben navidezni krmilnik s krmilnikom PlayStation pa nima tega indeksa.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Vrata {0} uporablja drug program, na primer DSX. Zaprite ga ali izberite druga vrata.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Modifikacija igre</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Deluje s programom OpenTrack in vsakim sledilnikom, ki pošilja izhod prek UDP ali zapisuje v skupni pomnilnik FreeTrack 2.0, ter z izvajalnim okoljem OpenXR na tem računalniku, ki lahko izvaja sejo v ozadju.</value></data>
@@ -4127,7 +4128,7 @@ Ali želite, da jih PadForge zdaj odstrani? To zahteva skrbniške pravice in lah
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Čakanje na podatke skupnega pomnilnika FreeTrack.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>Skupni pomnilnik FreeTrack ni na voljo.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Vibriranje glede na kot krmiljenja</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Doda neprekinjeno vibriranje, ko se izbrana os navidezne palice oddaljuje od središča. Uporablja preslikani izhod vseh dodeljenih virov. Pri možnosti Razdeli po smeri negativno gibanje poganja levi motor, pozitivno pa desnega. Če izberete Levi motor ali Desni motor, sta obe smeri na tem enem motorju. Za izhod Xbox in PlayStation z napravami z vibriranjem. Izvorna povratna sila volana je izključena.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Doda neprekinjeno vibriranje, ko se izbrana os navidezne palice oddaljuje od središča. Uporablja preslikani izhod vseh dodeljenih virov. Pri možnosti Razdeli po smeri negativno gibanje poganja levi motor, pozitivno pa desnega. Če izberete Levi motor ali Desni motor, sta obe smeri na tem enem motorju. Za izhod Xbox in PlayStation z napravami z vibriranjem. Preskoči volane, druge naprave s stalno povratno silo in pedale Fanatec.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Omogoči vibriranje glede na kot krmiljenja</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Navidezna os</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Leva palica X</value></data>
@@ -4330,6 +4331,7 @@ Ali želite, da jih PadForge zdaj odstrani? To zahteva skrbniške pravice in lah
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>neposredno na {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>povezovanje WinUSB z zaslonom G19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>zaslon G19 uporablja drug gonilnik ({0}), zato zaženi Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>zaslon G19 uporablja gonilnik drugega programa ({0}), ki ga PadForge pusti pri miru</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>zahteva Logitech Gaming Software 8.52 ali novejši</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>zaženi Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>čakanje na telefon z Arx Control</value></data>
@@ -4401,6 +4403,7 @@ Ali želite, da jih PadForge zdaj odstrani? To zahteva skrbniške pravice in lah
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Ročaj</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} nastavlja sprožilce tega krmilnika.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} nastavlja lučke tega krmilnika.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} nastavlja lučke te naprave.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} nastavlja sprožilce in lučke tega krmilnika.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} predvaja vibracije sprožilcev na impulznih sprožilcih tega krmilnika.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Počisti učinke modifikacij</value></data>
@@ -4408,10 +4411,10 @@ Ali želite, da jih PadForge zdaj odstrani? To zahteva skrbniške pravice in lah
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Levo/desno</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Gor/dol</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Noter/ven</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Gumb {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, naložen iz {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Izbrana datoteka dhd64.dll se ni naložila, zato PadForge uporablja kopijo zgoraj.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Knjižnica Force Dimension deluje samo v različici PadForge x64.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>Datoteka dhd64.dll je bila najdena, vendar je ni bilo mogoče naložiti.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Ta dhd64.dll ni knjižnica Force Dimension, ki jo PadForge pričakuje.</value></data>
@@ -4421,11 +4424,12 @@ Ali želite, da jih PadForge zdaj odstrani? To zahteva skrbniške pravice in lah
   <data name="Falcon_Status_Open" xml:space="preserve"><value>odprto</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Falcon je odprt v drugem programu, na primer FalconJoyForce ali orodjih Force Dimension. Tam ga zapri.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon uporablja drug gonilnik ({0}), zato ga knjižnica Force Dimension ne more odpreti. V upravitelju naprav posodobi gonilnik naprave Falcon iz mape drivers\usb v mapi SDK Force Dimension.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon uporablja gonilnik Force Dimension, knjižnica Force Dimension pa ga ni mogla odpreti: {0}. Preveri napajanje in kabel USB.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Falcon je priključen brez gonilnika. Z gumbom Namesti gonilnik Falcon dobi gonilnik Force Dimension.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Falcon je priključen brez gonilnika, mapa SDK pa nima paketa gonilnika zanj. Znova namesti Force Dimension SDK.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Falcon ni bil najden. Priključi napajanje in kabel USB.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Izberi dhd64.dll …</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Pred vsemi drugimi naloži to kopijo knjižnice Force Dimension. Kopije, ki jih namesti SDK, se najdejo tudi brez tega.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Namesto vseh drugih naloži to kopijo knjižnice Force Dimension. Falcon, odprt na drugi kopiji, se zapre in znova odpre na tej. Kopije, ki jih namesti SDK, se najdejo tudi brez tega.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Knjižnice (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Namesti gonilnik Falcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Namesti gonilnik Force Dimension iz mape SDK v napravo Falcon, ki ga nima. Windows te bo morda najprej vprašal, ali zaupaš podjetju Force Dimension.</value></data>
@@ -4442,7 +4446,7 @@ Ali želite, da jih PadForge zdaj odstrani? To zahteva skrbniške pravice in lah
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Igra igre z napravo Novint Falcon prek Force Dimension SDK, ki ga namestiš od podjetja Force Dimension. Ročaj je palica, štirje gumbi na ročaju so gumbi, PadForge pa vibriranje in učinke igre prenese na ročaj kot silo. Zavihek Povratna sila vsake reže nastavi, kakšen je občutek Falcon.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Upravljaj Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Vsak Falcon odpre prek Force Dimension dhd64.dll. Odprt Falcon pripada samo PadForge, zato ga FalconJoyForce in orodja Force Dimension ne morejo odpreti, dokler je to vklopljeno. Ko je izklopljeno, PadForge zapre vse naprave Falcon.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Knjižnica Falcon je nastavljena na {0}. Že uporabljena kopija ostane, dokler se PadForge ne zažene znova.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Knjižnica Falcon je nastavljena na {0}. PadForge jo naloži v nekaj sekundah, Falcon, odprt na drugi kopiji, pa se znova odpre na tej.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Nameščanje gonilnika Force Dimension za Falcon …</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Paket gonilnika Force Dimension za Falcon ali njegov katalog manjka: {0}. Znova namesti Force Dimension SDK.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Noben Falcon ni priključen.</value></data>

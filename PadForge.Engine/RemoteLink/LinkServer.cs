@@ -2282,6 +2282,7 @@ namespace PadForge.Engine.RemoteLink
                     existing.Info.AnalogKeyOrder = info.AnalogKeyOrder;
                     existing.Info.BlissBoxRestMask = info.BlissBoxRestMask;
                     existing.Info.CapSenseChannelMask = info.CapSenseChannelMask;
+                    existing.Info.HasVoicePhrases = info.HasVoicePhrases;
                     // Every DualShock 3 on the owner's own path shares one row,
                     // so another pad connecting there changes the identity.
                     existing.Info.Ds3Identity = info.Ds3Identity;

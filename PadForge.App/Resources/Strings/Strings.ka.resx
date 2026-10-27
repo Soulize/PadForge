@@ -304,6 +304,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>მუშაობს DSX-ისთვის შექმნილ მოდებთან, მაგალითად GTA V-ის, Red Dead Redemption 2-ის, Skyrim-ისა და Forza-სთვის. სანამ სერვერი ისმენს, PadForge თავის პორტს იქ ჩაწერს, სადაც ამ მოდებს მისი ძებნა სჩვევია.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>ისმენს :{0}. {1} აგზავნის ვირტუალურ კონტროლერზე {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>ისმენს :{0}. {1} აგზავნის, მაგრამ არც ერთ ვირტუალურ კონტროლერზე PlayStation კონტროლერი არ არის.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>ისმენს :{0}. {1} აგზავნის კონტროლერის ინდექსზე {2}, ხოლო PlayStation-ის კონტროლერის მქონე არცერთ ვირტუალურ კონტროლერს ეს ინდექსი არ აქვს.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>პორტი {0} დაკავებულია სხვა პროგრამით, მაგალითად DSX-ით. დახურეთ ის ან აირჩიეთ სხვა პორტი.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>თამაშის მოდი</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>მუშაობს OpenTrack-თან და ნებისმიერ ტრეკერთან, რომელიც UDP გამოსვლას აგზავნის ან FreeTrack 2.0 გაზიარებულ მეხსიერებაში წერს, ასევე OpenXR გაშვების გარემოსთან ამ კომპიუტერზე, რომელსაც სესიის ფონზე გაშვება შეუძლია.</value></data>
@@ -4101,7 +4102,7 @@
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>ველოდებით FreeTrack-ის გაზიარებული მეხსიერების მონაცემებს.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>FreeTrack-ის გაზიარებული მეხსიერება მიუწვდომელია.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>საჭის კუთხის ვიბრაცია</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>ამატებს უწყვეტ ვიბრაციას, როცა არჩეული ვირტუალური სტიკის ღერძი ცენტრიდან დაშორდება. იყენებს ყველა მიმაგრებული წყაროს მიბმულ გამოსავალს. პარამეტრით „მიმართულების მიხედვით გაყოფა“ უარყოფითი მოძრაობა მარცხენა ძრავას მართავს, დადებითი მარჯვენას. „მარცხენა ძრავა“ ან „მარჯვენა ძრავა“ ორივე მიმართულებას ამ ერთ ძრავაზე აყენებს. განკუთვნილია Xbox-ისა და PlayStation-ის გამოსავლისთვის ვიბრაციის მქონე მოწყობილობებით. საჭის ძალისმიერი უკუკავშირი არ შედის.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>ამატებს უწყვეტ ვიბრაციას, როცა არჩეული ვირტუალური სტიკის ღერძი ცენტრიდან დაშორდება. იყენებს ყველა მიმაგრებული წყაროს მიბმულ გამოსავალს. პარამეტრით „მიმართულების მიხედვით გაყოფა“ უარყოფითი მოძრაობა მარცხენა ძრავას მართავს, დადებითი მარჯვენას. „მარცხენა ძრავა“ ან „მარჯვენა ძრავა“ ორივე მიმართულებას ამ ერთ ძრავაზე აყენებს. განკუთვნილია Xbox-ისა და PlayStation-ის გამოსავლისთვის ვიბრაციის მქონე მოწყობილობებით. გამოტოვებს საჭეებს, მუდმივი ძალისმიერი უკუკავშირის მქონე სხვა მოწყობილობებს და Fanatec-ის პედლებს.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>საჭის კუთხის ვიბრაციის ჩართვა</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>ვირტუალური ღერძი</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>მარცხენა სტიკი X</value></data>
@@ -4296,6 +4297,7 @@
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>პირდაპირ {0}-ზე</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>G19-ის ეკრანის ინტერფეისთან WinUSB-ის დაკავშირება</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>G19-ის ეკრანი სხვა დრაივერზეა ({0}), ამიტომ გაუშვით Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>G19-ის ეკრანი სხვა პროგრამის დრაივერზეა ({0}), რომელსაც PadForge არ ეხება</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>საჭიროა Logitech Gaming Software 8.52 ან უფრო ახალი</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>გაუშვით Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>ელოდება ტელეფონს Arx Control-ით</value></data>
@@ -4367,6 +4369,7 @@
   <data name="Devices_FalconHandle" xml:space="preserve"><value>სახელური</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} ადგენს ამ კონტროლერის ტრიგერებს.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} ადგენს ამ კონტროლერის განათებას.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} ადგენს ამ მოწყობილობის განათებას.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} ადგენს ამ კონტროლერის ტრიგერებსა და განათებას.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} უკრავს ტრიგერის ვიბრაციებს ამ კონტროლერის იმპულსურ ტრიგერებზე.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>მოდის ეფექტების გასუფთავება</value></data>
@@ -4374,10 +4377,10 @@
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>მარცხნივ/მარჯვნივ</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>ზემოთ/ქვემოთ</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>შიგნით/გარეთ</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>ღილაკი {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, ჩატვირთულია აქედან: {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>თქვენ მიერ არჩეული dhd64.dll ვერ ჩაიტვირთა, ამიტომ PadForge ზემოთ დასახელებულ ასლს იყენებს.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Force Dimension-ის ბიბლიოთეკა მხოლოდ PadForge-ის x64 ვერსიაში მუშაობს.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>dhd64.dll ნაპოვნია, მაგრამ ვერ ჩაიტვირთა.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>ეს dhd64.dll არ არის Force Dimension-ის ბიბლიოთეკა, რომელსაც PadForge ელოდება.</value></data>
@@ -4387,11 +4390,12 @@
   <data name="Falcon_Status_Open" xml:space="preserve"><value>ღიაა</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Falcon სხვა პროგრამაშია გახსნილი, მაგალითად FalconJoyForce-ში ან Force Dimension-ის საკუთარ ხელსაწყოებში. დახურეთ იქ.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon სხვა დრაივერზეა ({0}), ამიტომ Force Dimension-ის ბიბლიოთეკას მისი გახსნა არ შეუძლია. მოწყობილობათა მმართველში განაახლეთ Falcon-ის დრაივერი Force Dimension-ის SDK საქაღალდეში არსებული drivers\usb საქაღალდიდან.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon Force Dimension-ის დრაივერზეა, მაგრამ Force Dimension-ის ბიბლიოთეკამ მისი გახსნა ვერ შეძლო: {0}. შეამოწმეთ მისი კვება და USB კაბელი.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Falcon მიერთებულია დრაივერის გარეშე. „Falcon-ის დრაივერის დაყენება“ მას Force Dimension-ის დრაივერს აყენებს.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Falcon მიერთებულია დრაივერის გარეშე, SDK საქაღალდეში კი მისთვის დრაივერის პაკეტი არ არის. თავიდან დააყენეთ Force Dimension-ის SDK.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Falcon ვერ მოიძებნა. შეაერთეთ მისი კვების კაბელი და USB კაბელი.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>dhd64.dll-ის არჩევა…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>ტვირთავს Force Dimension-ის ბიბლიოთეკის ამ ასლს სხვებზე ადრე. SDK-ის მიერ დაყენებული ასლები მის გარეშეც მოიძებნება.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>ტვირთავს Force Dimension-ის ბიბლიოთეკის ამ ასლს სხვა ასლის ნაცვლად. სხვა ასლზე გახსნილი Falcon იხურება და ამ ასლზე ხელახლა იხსნება. SDK-ის მიერ დაყენებული ასლები მის გარეშეც მოიძებნება.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|ბიბლიოთეკები (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Falcon-ის დრაივერის დაყენება</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>აყენებს Force Dimension-ის დრაივერს SDK საქაღალდიდან Falcon-ზე, რომელსაც დრაივერი არ აქვს. Windows-მა შეიძლება ჯერ იკითხოს, ენდობით თუ არა Force Dimension-ს.</value></data>
@@ -4408,7 +4412,7 @@
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>თამაშობს Novint Falcon-ით Force Dimension-ის SDK-ის მეშვეობით, რომელსაც Force Dimension-ისგან აყენებთ. სახელური სტიკია, სახელურის ოთხი ღილაკი ღილაკებია, PadForge კი თამაშის ვიბრაციასა და ეფექტებს სახელურზე ძალად გადასცემს. თითოეული სლოტის ძალისმიერი უკუკავშირის ჩანართში განისაზღვრება, როგორ იგრძნობა Falcon.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Novint Falcon-ის მართვა</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>ხსნის ყველა Falcon-ს Force Dimension-ის dhd64.dll-ის მეშვეობით. გახსნილი Falcon მხოლოდ PadForge-ს ეკუთვნის, ამიტომ ჩართვისას FalconJoyForce და Force Dimension-ის ხელსაწყოები მას ვერ გახსნიან. გამორთვისას PadForge ყველა Falcon-ს ხურავს.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon-ის ბიბლიოთეკად არჩეულია {0}. უკვე გამოყენებული ასლი PadForge-ის ხელახლა გაშვებამდე რჩება.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon-ის ბიბლიოთეკად არჩეულია {0}. PadForge მას რამდენიმე წამში ტვირთავს, ხოლო სხვა ასლზე გახსნილი Falcon ამ ასლზე ხელახლა იხსნება.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>მიმდინარეობს Force Dimension-ის Falcon-დრაივერის დაყენება…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Force Dimension-ის Falcon-დრაივერის პაკეტი ან მისი კატალოგი აკლია: {0}. თავიდან დააყენეთ Force Dimension-ის SDK.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>არცერთი Falcon არ არის მიერთებული.</value></data>

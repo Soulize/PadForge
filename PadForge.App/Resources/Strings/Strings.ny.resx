@@ -117,6 +117,7 @@
   <data name="FirstRun_Skip" xml:space="preserve"><value>Dumphani</value></data>
   <data name="FirstRun_Next" xml:space="preserve"><value>Chotsatira</value></data>
   <data name="Pad_ScopeDevice" xml:space="preserve"><value>Chipangizo</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Ikumvetsera pa :{0}. {1} ikutumiza ku nambala {2} ya kontrola, koma palibe kontrola ya pakompyuta yokhala ndi kontrola ya PlayStation yomwe ili ndi nambala imeneyo.</value></data>
   <data name="RemoteLink_Connect" xml:space="preserve"><value>Lumikizani</value></data>
   <data name="RemoteLink_Reject" xml:space="preserve"><value>Kanani</value></data>
   <data name="Dashboard_NoDevice" xml:space="preserve"><value>Palibe chipangizo</value></data>
@@ -1187,6 +1188,7 @@
   <data name="KeyboardScreens_Status_Lgs" xml:space="preserve"><value>kudzera mu Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>mwachindunji pa {0}</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>sikirini ya G19 ili pa dalaivala wina ({0}), choncho yambitsani Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>sikirini ya G19 ili pa dalaivala wa pulogalamu ina ({0}), imene PadForge siyikhudza</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>ikufuna Logitech Gaming Software 8.52 kapena yatsopano</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>yambitsani Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>ikudikira foni yokhala ndi Arx Control</value></data>
@@ -1220,19 +1222,23 @@
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Chogwirira</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} ikukhazikitsa ma trigger a kontrola iyi.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} ikukhazikitsa magetsi a kontrola iyi.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} ikukhazikitsa magetsi a chipangizo ichi.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} ikukhazikitsa ma trigger ndi magetsi a kontrola iyi.</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Kumanzere/Kumanja</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Mmwamba/Pansi</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Mkati/Kunja</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Batani {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>dhd64.dll imene mwasankha sinatsegulidwe, choncho PadForge ikugwiritsa ntchito kopi ili pamwambapa.</value></data>
   <data name="Falcon_Status_Rate_Format" xml:space="preserve"><value>ikuyenda pa {0:0.0} kHz</value></data>
   <data name="Falcon_Status_Open" xml:space="preserve"><value>yatseguka</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon ili pa dalaivala wa Force Dimension, koma laibulale ya Force Dimension sinathe kuitsegula: {0}. Onani mphamvu yake ndi chingwe chake cha USB.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Sankhani dhd64.dll…</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Imatsegula kopi iyi ya laibulale ya Force Dimension m'malo mwa ina iliyonse. Falcon yotsegulidwa pa kopi ina imatsekedwa ndi kutsegulidwanso pa iyi. Makopi amene SDK imaika amapezeka popanda iyi.</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Ikani dalaivala ya Falcon</value></data>
   <data name="Falcon_OpenDownload" xml:space="preserve"><value>Tengani SDK ya Force Dimension</value></data>
   <data name="Settings_Falcon_Title" xml:space="preserve"><value>Novint Falcon</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Laibulale ya Falcon yakhazikitsidwa ku {0}. PadForge imaitsegula pakatha masekondi ochepa, ndipo Falcon yotsegulidwa pa kopi ina imatsegulidwanso pa iyi.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Palibe Falcon yolumikizidwa.</value></data>
   <data name="Pad_Falcon_Header" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Pad_Falcon_ResetAll" xml:space="preserve"><value>Bwezeretsani Novint Falcon</value></data>

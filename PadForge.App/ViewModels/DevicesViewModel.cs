@@ -699,6 +699,11 @@ namespace PadForge.ViewModels
         /// every entry through GetDeviceObjects, and without this they fell
         /// to the numbered grid, so the G-Keys row showed Button 0 through
         /// Button 101 while its mapping picker named all 102.</para>
+        ///
+        /// <para>Each name is translated the way the mapping picker
+        /// translates it, so a row that publishes English names (a keyboard
+        /// screen's keys, a VR controller's controls) reads in the current
+        /// language here too.</para>
         /// </summary>
         public void RebuildNamedButtons(IReadOnlyList<PadForge.Engine.DeviceObjectItem> objects)
         {
@@ -710,7 +715,7 @@ namespace PadForge.ViewModels
                 if (o.ObjectTypeGuid != PadForge.Engine.ObjectGuid.Button) continue;
                 HandheldButtons.Add(new NfcTagDisplayItem
                 {
-                    Name = o.Name,
+                    Name = PadForge.Common.MappingDisplayResolver.LocalizeObjectName(o.Name),
                     Uid = string.Empty,
                     Button = o.InputIndex,
                 });
@@ -893,8 +898,6 @@ namespace PadForge.ViewModels
         /// <summary>Tracks which device's collections are currently populated.</summary>
         internal Guid LastRawStateDeviceGuid { get; set; }
 
-        /// <summary>Localized name of a head tracker axis slot (#355), null
-        /// past the six.</summary>
         /// <summary>A Falcon axis's name (#521), the names its mapping picker
         /// shows.</summary>
         internal static string FalconAxisName(int slot)
@@ -909,6 +912,8 @@ namespace PadForge.ViewModels
             };
         }
 
+        /// <summary>Localized name of a head tracker axis slot (#355), null
+        /// past the six.</summary>
         internal static string HeadTrackerAxisName(int slot)
         {
             var s = Strings.Instance;

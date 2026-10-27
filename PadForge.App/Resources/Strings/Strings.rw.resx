@@ -153,6 +153,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Ikora na mod zakorewe DSX, nk'izakorewe GTA V, Red Dead Redemption 2, Skyrim na Forza. Mu gihe seriveri irimo kumviriza, PadForge yandika port yayo aho izo mod ziyishakira.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Irimo kumviriza kuri :{0}. {1} irimo kohereza kuri kontorola y'ikoranabuhanga ya {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Irimo kumviriza kuri :{0}. {1} irimo kohereza, ariko nta kontorola y'ikoranabuhanga ifite kontorola ya PlayStation.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Irimo kumviriza kuri :{0}. {1} irimo kohereza kuri kontorola ya nimero {2}, kandi nta kontorola y'ikoranabuhanga iriho kontorola ya PlayStation ifite iyo nimero.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Port {0} irimo gukoreshwa n'indi porogaramu, nka DSX. Yifunge cyangwa uhitemo indi port.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Mod y'umukino</value></data>
   <data name="RemoteLink_Connect" xml:space="preserve"><value>Huza</value></data>
@@ -1542,6 +1543,7 @@
   <data name="KeyboardScreens_Status_Off" xml:space="preserve"><value>bizimye</value></data>
   <data name="KeyboardScreens_Status_Lgs" xml:space="preserve"><value>binyuze muri Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>ku {0} mu buryo butaziguye</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>ekarani ya G19 iri kuri driver y'indi porogaramu ({0}), PadForge idakoraho</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>bisaba Logitech Gaming Software 8.52 cyangwa iyisumbuye</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>tangiza Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>birategereza telefoni ifite Arx Control</value></data>
@@ -1587,17 +1589,19 @@
   <data name="DeviceType_NovintFalcon" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} irimo gushyiraho trigger z'iyi kontorola.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} irimo gushyiraho amatara y'iyi kontorola.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} irimo gushyiraho amatara y'iki gikoresho.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} irimo gushyiraho trigger n'amatara by'iyi kontorola.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} irimo kunyeganyeza impulse trigger z'iyi kontorola.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Siba ingaruka za mod</value></data>
   <data name="Devices_ClearModEffects_Tooltip" xml:space="preserve"><value>Ihagarika ibyo mod z'imikino zashyize kuri iyi kontorola. Igenamiterere ryayo rigaruka kugeza igihe mod yongeye kohereza.</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Ibumoso/Iburyo</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Hejuru/Hasi</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Buto {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>dhd64.dll wahisemo ntiyashoboye gufunguka, bityo PadForge ikoresha kopi iri hejuru.</value></data>
   <data name="Falcon_Status_Rate_Format" xml:space="preserve"><value>ikora kuri {0:0.0} kHz</value></data>
   <data name="Falcon_Status_Open" xml:space="preserve"><value>ifunguye</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon iri kuri driver ya Force Dimension, kandi isomero rya Force Dimension ntiryashoboye kuyifungura: {0}. Genzura umuriro wayo n'umugozi wayo wa USB.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Hitamo dhd64.dll…</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Shyiramo driver ya Falcon</value></data>
   <data name="Falcon_OpenDownload" xml:space="preserve"><value>Kuramo SDK ya Force Dimension</value></data>

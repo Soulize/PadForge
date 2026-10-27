@@ -1407,7 +1407,10 @@ namespace PadForge.ViewModels
                 case nameof(TriggerEffectMode):
                 {
                     // Back to Feedback, with its own starting values (#531).
+                    // The mode's setter starts the values over only when the
+                    // effect changes, so an edited Feedback gets them here.
                     TriggerEffectMode = TriggerEffectCatalog.ResistanceMode;
+                    ResetTriggerEffectValues();
                     break;
                 }
                 case nameof(TriggerEffectHold):

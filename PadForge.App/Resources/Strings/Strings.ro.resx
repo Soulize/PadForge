@@ -319,6 +319,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Funcționează cu modificări create pentru DSX, precum cele pentru GTA V, Red Dead Redemption 2, Skyrim și Forza. Cât timp serverul ascultă, PadForge își scrie portul acolo unde îl caută aceste modificări.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Ascultă pe :{0}. {1} trimite către controlerul virtual {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Ascultă pe :{0}. {1} trimite, dar niciun controler virtual nu are un controler PlayStation.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Ascultă pe :{0}. {1} trimite către indexul de controler {2}, iar niciun controler virtual cu un controler PlayStation nu are acel index.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Portul {0} este folosit de alt program, de exemplu DSX. Închideți-l sau alegeți alt port.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>O modificare de joc</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Funcționează cu OpenTrack și cu orice dispozitiv de urmărire care își trimite ieșirea prin UDP sau scrie în memoria partajată FreeTrack 2.0, precum și cu un mediu de execuție OpenXR de pe acest computer care poate rula o sesiune în fundal.</value></data>
@@ -4127,7 +4128,7 @@ Doriți ca PadForge să le dezinstaleze acum? Este nevoie de drepturi de adminis
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Se așteaptă date din memoria partajată FreeTrack.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>Memoria partajată FreeTrack nu este disponibilă.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Vibrații după unghiul de virare</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Adaugă vibrații continue pe măsură ce axa de stick virtuală selectată se depărtează de centru. Folosește ieșirea mapată de la toate sursele atribuite. Cu Împărțit pe direcție, mișcarea negativă acționează motorul stâng, iar cea pozitivă motorul drept. Motor stâng sau Motor drept pune ambele direcții pe acel motor. Pentru ieșirea Xbox și PlayStation cu dispozitive cu vibrații. Force feedback-ul nativ al volanului este exclus.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Adaugă vibrații continue pe măsură ce axa de stick virtuală selectată se depărtează de centru. Folosește ieșirea mapată de la toate sursele atribuite. Cu Împărțit pe direcție, mișcarea negativă acționează motorul stâng, iar cea pozitivă motorul drept. Motor stâng sau Motor drept pune ambele direcții pe acel motor. Pentru ieșirea Xbox și PlayStation cu dispozitive cu vibrații. Omite volanele, alte dispozitive cu force feedback constant și pedalele Fanatec.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Activare vibrații după unghiul de virare</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Axă virtuală</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Stick stâng X</value></data>
@@ -4330,6 +4331,7 @@ Doriți ca PadForge să le dezinstaleze acum? Este nevoie de drepturi de adminis
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>direct pe {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>se leagă WinUSB de ecranul lui G19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>ecranul lui G19 folosește alt driver ({0}), așa că porniți Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>ecranul lui G19 folosește driverul altui program ({0}), pe care PadForge îl lasă neatins</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>necesită Logitech Gaming Software 8.52 sau o versiune ulterioară</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>porniți Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>se așteaptă un telefon cu Arx Control</value></data>
@@ -4401,6 +4403,7 @@ Doriți ca PadForge să le dezinstaleze acum? Este nevoie de drepturi de adminis
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Mâner</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} setează trăgacele acestui controler.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} setează luminile acestui controler.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} setează luminile acestui dispozitiv.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} setează trăgacele și luminile acestui controler.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} redă vibrații de trăgaci pe trăgacele cu impuls ale acestui controler.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Ștergere efecte modificări</value></data>
@@ -4408,10 +4411,10 @@ Doriți ca PadForge să le dezinstaleze acum? Este nevoie de drepturi de adminis
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Stânga/Dreapta</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Sus/Jos</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Înăuntru/Afară</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Butonul {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, încărcat din {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Fișierul dhd64.dll ales nu s-a încărcat, deci PadForge folosește copia de mai sus.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Biblioteca Force Dimension rulează doar în versiunea x64 a PadForge.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>dhd64.dll a fost găsit, dar nu a putut fi încărcat.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Acel dhd64.dll nu este biblioteca Force Dimension pe care o așteaptă PadForge.</value></data>
@@ -4421,11 +4424,12 @@ Doriți ca PadForge să le dezinstaleze acum? Este nevoie de drepturi de adminis
   <data name="Falcon_Status_Open" xml:space="preserve"><value>deschis</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Un Falcon este deschis în alt program, cum ar fi FalconJoyForce sau instrumentele Force Dimension. Închideți-l acolo.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon folosește alt driver ({0}), deci biblioteca Force Dimension nu îl poate deschide. În Manager dispozitive, actualizați driverul Falcon din folderul drivers\usb al folderului SDK Force Dimension.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon folosește driverul Force Dimension, iar biblioteca Force Dimension nu l-a putut deschide: {0}. Verificați alimentarea și cablul USB.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Un Falcon este conectat, dar nu are driver. Instalare driver Falcon îi instalează driverul Force Dimension.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Un Falcon este conectat fără driver, iar folderul SDK nu conține un pachet de driver pe care să i-l ofere. Reinstalați Force Dimension SDK.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Nu s-a găsit niciun Falcon. Conectați-i alimentarea și cablul USB.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Alegere dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Încarcă această copie a bibliotecii Force Dimension înaintea oricărei alte copii. Copiile instalate de SDK sunt găsite și fără ea.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Încarcă această copie a bibliotecii Force Dimension în locul oricărei alte copii. Un Falcon deschis pe altă copie se închide și se deschide din nou pe aceasta. Copiile instalate de SDK sunt găsite și fără ea.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Biblioteci (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Instalare driver Falcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Instalează driverul Force Dimension, din folderul SDK, pe un Falcon care nu are driver. Windows poate întreba mai întâi dacă aveți încredere în Force Dimension.</value></data>
@@ -4442,7 +4446,7 @@ Doriți ca PadForge să le dezinstaleze acum? Este nevoie de drepturi de adminis
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Joacă jocuri cu un Novint Falcon prin Force Dimension SDK, pe care îl instalați de la Force Dimension. Mânerul este un stick, cele patru butoane ale mânerului sunt butoane, iar PadForge transmite mânerului vibrațiile și efectele jocului sub formă de forță. Fila Force feedback a fiecărui slot stabilește cum se simte Falcon.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Controlare Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Deschide fiecare Falcon prin dhd64.dll de la Force Dimension. Un Falcon deschis aparține exclusiv PadForge, deci FalconJoyForce și instrumentele Force Dimension nu îl pot deschide cât timp opțiunea este activată. Dezactivată, PadForge închide toate dispozitivele Falcon.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Biblioteca Falcon este setată la {0}. O copie deja în uz rămâne activă până la următoarea pornire a PadForge.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Biblioteca Falcon este setată la {0}. PadForge o încarcă în câteva secunde, iar un Falcon deschis pe altă copie se deschide din nou pe aceasta.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Se instalează driverul Falcon de la Force Dimension…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Pachetul de driver Falcon de la Force Dimension sau catalogul lui lipsește: {0}. Reinstalați Force Dimension SDK.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Niciun Falcon nu este conectat.</value></data>

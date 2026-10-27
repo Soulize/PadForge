@@ -319,6 +319,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Работи со модови направени за DSX, како оние за GTA V, Red Dead Redemption 2, Skyrim и Forza. Додека серверот слуша, PadForge ја запишува неговата порта таму каде што ја бараат тие модови.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Слуша на :{0}. {1} испраќа до виртуелен контролер {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Слуша на :{0}. {1} испраќа, но ниту еден виртуелен контролер нема PlayStation контролер.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Слуша на :{0}. {1} испраќа до индекс на контролер {2}, а ниеден виртуелен контролер со PlayStation контролер на него нема тој индекс.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Портата {0} ја користи друга програма, како DSX. Затворете ја или изберете друга порта.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Некој мод за игра</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Работи со OpenTrack и секој следач што го испраќа својот излез преку UDP или запишува во споделената меморија на FreeTrack 2.0, како и со извршна околина на OpenXR на овој компјутер што може да извршува сесија во заднина.</value></data>
@@ -4127,7 +4128,7 @@
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Се чекаат податоци од споделената меморија на FreeTrack.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>Споделената меморија на FreeTrack не е достапна.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Вибрации според аголот на управување</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Додава непрекинати вибрации додека избраната оска на виртуелната палка се оддалечува од центарот. Го користи мапираниот излез од сите доделени извори. Со „Поделено по насока“ негативното движење го управува левиот мотор, а позитивното десниот. Со „Лев мотор“ или „Десен мотор“ двете насоки одат на тој еден мотор. За излез Xbox и PlayStation со уреди со вибрации. Нативната повратна сила на воланите е исклучена.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Додава непрекинати вибрации додека избраната оска на виртуелната палка се оддалечува од центарот. Го користи мапираниот излез од сите доделени извори. Со „Поделено по насока“ негативното движење го управува левиот мотор, а позитивното десниот. Со „Лев мотор“ или „Десен мотор“ двете насоки одат на тој еден мотор. За излез Xbox и PlayStation со уреди со вибрации. Ги прескокнува воланите, другите уреди со постојана повратна сила и педалите Fanatec.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Овозможи вибрации според аголот на управување</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Виртуелна оска</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Лева палка X</value></data>
@@ -4330,6 +4331,7 @@
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>директно на {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>го врзува WinUSB за екранот на G19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>екранот на G19 е на друг двигател ({0}), затоа стартувај го Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>екранот на G19 е на двигател на друга програма ({0}), кој PadForge го остава на мира</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>бара Logitech Gaming Software 8.52 или понов</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>стартувај го Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>чека телефон со Arx Control</value></data>
@@ -4401,6 +4403,7 @@
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Рачка</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} ги поставува тригерите на овој контролер.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} ги поставува светлата на овој контролер.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} ги поставува светлата на овој уред.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} ги поставува тригерите и светлата на овој контролер.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} репродуцира вибрации на импулсните тригери на овој контролер.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Исчисти ги ефектите на модот</value></data>
@@ -4408,10 +4411,10 @@
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Лево/десно</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Горе/долу</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Внатре/надвор</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Копче {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, вчитан од {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>dhd64.dll што го избравте не се вчита, затоа PadForge ја користи копијата погоре.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Библиотеката на Force Dimension работи само во x64 верзијата на PadForge.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>Пронајден е dhd64.dll, но не можеше да се вчита.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Тој dhd64.dll не е библиотеката на Force Dimension што ја очекува PadForge.</value></data>
@@ -4421,11 +4424,12 @@
   <data name="Falcon_Status_Open" xml:space="preserve"><value>отворен</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Falcon е отворен во друга програма, на пример FalconJoyForce или алатките на Force Dimension. Затворете го таму.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon е на друг двигател ({0}), па библиотеката на Force Dimension не може да го отвори. Во Управувач со уреди, ажурирајте го двигателот на Falcon од папката drivers\usb во папката на SDK на Force Dimension.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon е на двигателот на Force Dimension, а библиотеката на Force Dimension не можеше да го отвори: {0}. Проверете го неговото напојување и USB-кабелот.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Falcon е приклучен без двигател. Со „Инсталирај двигател за Falcon“ го добива двигателот на Force Dimension.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Falcon е приклучен без двигател, а папката на SDK нема пакет со двигател што може да му се даде. Повторно инсталирајте го Force Dimension SDK.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Не е пронајден Falcon. Приклучете го струјата и USB-кабелот.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Избери dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Ја вчитува оваа копија од библиотеката на Force Dimension пред сите други. Копиите што ги инсталира SDK се наоѓаат и без ова.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Ја вчитува оваа копија од библиотеката на Force Dimension наместо која било друга. Falcon отворен на друга копија се затвора и се отвора повторно на оваа. Копиите што ги инсталира SDK се наоѓаат и без ова.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Библиотеки (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Инсталирај двигател за Falcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Го инсталира двигателот на Force Dimension, од папката на SDK, на Falcon што нема двигател. Windows може прво да праша дали му верувате на Force Dimension.</value></data>
@@ -4442,7 +4446,7 @@
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Играјте игри со Novint Falcon преку SDK на Force Dimension, што го инсталирате од Force Dimension. Рачката е палка, четирите копчиња на рачката се копчиња, а PadForge ги става вибрациите и ефектите од играта на рачката како сила. Табот „Повратна сила“ на секој слот поставува како се чувствува Falcon.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Управувај со Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Го отвора секој Falcon преку dhd64.dll на Force Dimension. Отворен Falcon му припаѓа само на PadForge, па FalconJoyForce и алатките на Force Dimension не можат да го отворат додека ова е вклучено. Кога е исклучено, PadForge го затвора секој Falcon.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Библиотеката за Falcon е поставена на {0}. Копија што веќе се користи останува додека PadForge не се стартува повторно.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Библиотеката за Falcon е поставена на {0}. PadForge ја вчитува за неколку секунди, а Falcon отворен на друга копија се отвора повторно на оваа.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Се инсталира двигателот на Force Dimension за Falcon…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Пакетот со двигател на Force Dimension за Falcon, или неговиот каталог, недостига: {0}. Повторно инсталирајте го Force Dimension SDK.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Нема приклучен Falcon.</value></data>

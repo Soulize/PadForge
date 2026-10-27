@@ -120,6 +120,30 @@ namespace PadForge.Tests
         }
 
         [Fact]
+        public void TheEffectsReset_RestoresItsValues_EvenWhenTheEffectIsAlreadyFeedback()
+        {
+            var action = Effect(TriggerEffectCatalog.ResistanceMode, MacroTriggerEffectSide.Right, MacroTriggerEffectHold.UntilRelease);
+            var strength = action.TriggerEffectRows[1];
+            strength.Value = 2;
+            Assert.Equal("3,2", action.TriggerEffectParameters);
+            var raised = new List<string>();
+            strength.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+            action.ResetSettingCommand.Execute(nameof(MacroAction.TriggerEffectMode));
+            Assert.Equal(TriggerEffectCatalog.ResistanceMode, action.TriggerEffectMode);
+            Assert.Equal(TriggerEffectCatalog.Defaults(TriggerEffectCatalog.ResistanceMode), action.TriggerEffectValues);
+            Assert.Equal(6, strength.Value);
+            Assert.Contains(nameof(TriggerEffectParameterValue.Value), raised);
+
+            // From another effect, the reset returns to Feedback at its values.
+            action.TriggerEffectMode = TriggerEffectCatalog.WeaponMode;
+            action.TriggerEffectRows[0].Value = 5;
+            action.ResetSettingCommand.Execute(nameof(MacroAction.TriggerEffectMode));
+            Assert.Equal(TriggerEffectCatalog.ResistanceMode, action.TriggerEffectMode);
+            Assert.Equal(TriggerEffectCatalog.Defaults(TriggerEffectCatalog.ResistanceMode), action.TriggerEffectValues);
+        }
+
+        [Fact]
         public void ANewEffect_StartsAtItsOwnValues_AndASavedListKeepsItsOwn()
         {
             var action = new MacroAction { Type = MacroActionType.TriggerEffect };
@@ -382,6 +406,21 @@ namespace PadForge.Tests
             Assert.False(im.MacroTriggerEffects[0].Any);
         }
 
+        /// <summary>The pass's release sweep costs the poll thread nothing
+        /// while no effect is held: no closure per slot per pass.</summary>
+        [Fact]
+        public void TheMacroPass_AllocatesNothing_WithNoMacrosAndNoHeldEffect()
+        {
+            SettingsManager.UserDevices = new DeviceCollection();
+            SettingsManager.UserSettings = new SettingsCollection();
+            var im = new InputManager();
+            var pass = (Action)Delegate.CreateDelegate(typeof(Action), im, RunMacroPass);
+            pass();
+            // Counted over windows the runtime left alone (AllocationWindow).
+            foreach (long bytes in AllocationWindow.Clean(pass, 1000))
+                Assert.Equal(0, bytes);
+        }
+
         [Fact]
         public void BothEvaluators_DispatchBothActions()
         {
@@ -475,6 +514,45 @@ namespace PadForge.Tests
 
             store.Clear();
             Assert.False(UserEffectsDispatcher.TryGetInboundTriggerEffects(5, left, right));
+        }
+    }
+
+    /// <summary>
+    /// The trigger effect editor's parameter captions follow a language
+    /// change (#531). A switch is process-wide, so this runs with the other
+    /// culture tests.
+    /// </summary>
+    [Collection("CultureSwitching")]
+    public sealed class MacroTriggerEffectCultureTests
+    {
+        [Fact]
+        public void TheParameterCaptions_FollowALanguageChange()
+        {
+            var before = System.Globalization.CultureInfo.CurrentUICulture;
+            try
+            {
+                Strings.ChangeCulture(System.Globalization.CultureInfo.GetCultureInfo("en"));
+                var action = new MacroAction { Type = MacroActionType.TriggerEffect };
+                var rows = action.TriggerEffectRows;
+                Assert.Equal(2, rows.Count);
+                var raised = new List<string>();
+                foreach (var row in rows)
+                    row.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+                string english = rows[1].Label;
+
+                Strings.ChangeCulture(System.Globalization.CultureInfo.GetCultureInfo("de"));
+
+                // The rows are the same objects, so the view rereads each
+                // caption only on its own Label notification.
+                Assert.Same(rows[1], action.TriggerEffectRows[1]);
+                Assert.Equal(rows.Count, raised.Count(n => n == nameof(TriggerEffectParameterValue.Label)));
+                Assert.NotEqual(english, rows[1].Label);
+                Assert.Equal(Strings.Instance.Pad_AT_Strength, rows[1].Label);
+            }
+            finally
+            {
+                Strings.ChangeCulture(before);
+            }
         }
     }
 }

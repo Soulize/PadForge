@@ -671,6 +671,7 @@
   <data name="KeyboardScreens_Status_ArxOnPhone" xml:space="preserve"><value>ena dua na talevoni</value></data>
   <data name="Common_Pixels" xml:space="preserve"><value>px</value></data>
   <data name="DeviceType_NovintFalcon" xml:space="preserve"><value>Novint Falcon</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} e lewa tiko na rarama ni device oqo.</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Imawi/Imatau</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Cake/Ra</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Loma/Tuba</value></data>

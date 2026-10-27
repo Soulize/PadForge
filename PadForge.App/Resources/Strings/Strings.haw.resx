@@ -878,12 +878,13 @@
   <data name="Common_Pixels" xml:space="preserve"><value>px</value></data>
   <data name="DeviceType_NovintFalcon" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Devices_FalconHandle" xml:space="preserve"><value>ʻAu</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>Ke hoʻonoho nei ʻo {0} i nā kukui o kēia hāmeʻa.</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Hema/ʻĀkau</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Luna/Lalo</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Loko/Waho</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Pihi {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>ʻAʻole i hoʻouka ʻia ka dhd64.dll āu i koho ai, no laila hoʻohana ʻo PadForge i ka dhd64.dll i kākau ʻia ma luna.</value></data>
   <data name="Falcon_Status_Open" xml:space="preserve"><value>wehe ʻia</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Koho i dhd64.dll…</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Hoʻokomo i ka driver Falcon</value></data>

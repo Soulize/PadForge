@@ -56,7 +56,11 @@ namespace PadForge.Common.Input.Telemetry
 
         /// <summary>True while UDP packets can carry this format, false for
         /// Assetto Corsa, which only the shared memory reader feeds.</summary>
-        public bool ReadsUdp => Format != GameTelemetryFormat.AssettoCorsa;
+        public bool ReadsUdp => FormatReadsUdp(Format);
+
+        /// <summary>The rule <see cref="ReadsUdp"/> follows, shared with the
+        /// Dashboard, which turns the port boxes off while it is false.</summary>
+        internal static bool FormatReadsUdp(GameTelemetryFormat format) => format != GameTelemetryFormat.AssettoCorsa;
 
         /// <summary>True while the shared memory pages are polled.</summary>
         public bool ReadsSharedMemory => Format is GameTelemetryFormat.Auto or GameTelemetryFormat.AssettoCorsa;

@@ -319,6 +319,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>با مودهای ساخته‌شده برای DSX کار می‌کند، مانند مودهای GTA V، Red Dead Redemption 2، Skyrim و Forza. تا زمانی که سرور گوش می‌دهد، PadForge پورت خود را همان‌جا می‌نویسد که این مودها دنبالش می‌گردند.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>در حال گوش دادن روی :{0}. {1} به کنترلر مجازی {2} می‌فرستد.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>در حال گوش دادن روی :{0}. {1} می‌فرستد، اما هیچ کنترلر مجازی‌ای کنترلر PlayStation ندارد.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>در حال گوش دادن روی :{0}. {1} به شماره کنترلر {2} می‌فرستد، و هیچ کنترلر مجازی دارای کنترلر PlayStation این شماره را ندارد.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>پورت {0} توسط برنامه دیگری مانند DSX در حال استفاده است. آن را ببندید یا پورت دیگری انتخاب کنید.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>یک مود بازی</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>با OpenTrack و هر ردیابی که خروجی UDP آن را می‌فرستد یا در حافظه مشترک FreeTrack 2.0 می‌نویسد کار می‌کند، و نیز با یک محیط اجرای OpenXR روی همین رایانه که بتواند نشستی را در پس‌زمینه اجرا کند.</value></data>
@@ -4127,7 +4128,7 @@
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>در انتظار داده‌های حافظه مشترک FreeTrack.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>حافظه مشترک FreeTrack در دسترس نیست.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>لرزش زاویه هدایت</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>با دور شدن محور استیک مجازی انتخاب‌شده از مرکز، لرزش پیوسته‌ای اضافه می‌کند. از خروجی نگاشت‌شده همه منبع‌های اختصاص‌یافته استفاده می‌کند. با «تقسیم بر اساس جهت»، حرکت منفی موتور چپ و حرکت مثبت موتور راست را به کار می‌اندازد. «موتور چپ» یا «موتور راست» هر دو جهت را روی همان یک موتور می‌گذارد. برای خروجی Xbox و PlayStation با دستگاه‌های دارای لرزش. فورس فیدبک بومی فرمان شامل نمی‌شود.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>با دور شدن محور استیک مجازی انتخاب‌شده از مرکز، لرزش پیوسته‌ای اضافه می‌کند. از خروجی نگاشت‌شده همه منبع‌های اختصاص‌یافته استفاده می‌کند. با «تقسیم بر اساس جهت»، حرکت منفی موتور چپ و حرکت مثبت موتور راست را به کار می‌اندازد. «موتور چپ» یا «موتور راست» هر دو جهت را روی همان یک موتور می‌گذارد. برای خروجی Xbox و PlayStation با دستگاه‌های دارای لرزش. فرمان‌ها، دستگاه‌های دیگر دارای فورس فیدبک ثابت و پدال‌های Fanatec را نادیده می‌گیرد.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>فعال کردن لرزش زاویه هدایت</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>محور مجازی</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>استیک چپ X</value></data>
@@ -4330,6 +4331,7 @@
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>مستقیم روی {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>اتصال WinUSB به صفحه‌نمایش G19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>صفحه‌نمایش G19 روی درایور دیگری ({0}) است، پس Logitech Gaming Software را اجرا کنید</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>صفحه‌نمایش G19 روی درایور برنامه‌ای دیگر ({0}) است که PadForge آن را دست‌نخورده می‌گذارد</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>به Logitech Gaming Software نسخه 8.52 یا جدیدتر نیاز دارد</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>Logitech Gaming Software را اجرا کنید</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>در انتظار تلفن دارای Arx Control</value></data>
@@ -4401,6 +4403,7 @@
   <data name="Devices_FalconHandle" xml:space="preserve"><value>دسته</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} ماشه‌های این کنترلر را تنظیم می‌کند.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} چراغ‌های این کنترلر را تنظیم می‌کند.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} چراغ‌های این دستگاه را تنظیم می‌کند.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} ماشه‌ها و چراغ‌های این کنترلر را تنظیم می‌کند.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} روی ماشه‌های ایمپالس این کنترلر لرزش ماشه پخش می‌کند.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>پاک کردن جلوه‌های مود</value></data>
@@ -4408,10 +4411,10 @@
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>چپ/راست</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>بالا/پایین</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>داخل/خارج</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>دکمه {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}، بارگذاری‌شده از {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>dhd64.dll انتخاب‌شده بارگذاری نشد، بنابراین PadForge از نسخه بالا استفاده می‌کند.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>کتابخانه Force Dimension فقط در نسخه x64 برنامه PadForge اجرا می‌شود.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>dhd64.dll پیدا شد، اما بارگذاری نشد.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>این dhd64.dll کتابخانه Force Dimension مورد انتظار PadForge نیست.</value></data>
@@ -4421,11 +4424,12 @@
   <data name="Falcon_Status_Open" xml:space="preserve"><value>باز</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>یک Falcon در برنامه‌ای دیگر باز است، مانند FalconJoyForce یا ابزارهای خود Force Dimension. آن را همان‌جا ببندید.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon با درایور دیگری ({0}) کار می‌کند، بنابراین کتابخانه Force Dimension نمی‌تواند آن را باز کند. در مدیریت دستگاه، درایور Falcon را از پوشه drivers\usb در پوشه SDK مربوط به Force Dimension به‌روزرسانی کنید.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon روی درایور Force Dimension است و کتابخانه Force Dimension نتوانست آن را باز کند: {0}. برق و کابل USB آن را بررسی کنید.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>یک Falcon بدون درایور وصل شده است. دکمه «نصب درایور Falcon» درایور Force Dimension را برای آن نصب می‌کند.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>یک Falcon بدون درایور وصل شده است و پوشه SDK بسته درایوری برای نصب ندارد. Force Dimension SDK را دوباره نصب کنید.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>هیچ Falcon پیدا نشد. برق و کابل USB آن را وصل کنید.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>انتخاب dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>این نسخه از کتابخانه Force Dimension را پیش از هر نسخه دیگر بارگذاری می‌کند. نسخه‌هایی که SDK نصب می‌کند بدون آن هم پیدا می‌شوند.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>این نسخه از کتابخانه Force Dimension را به‌جای هر نسخه دیگر بارگذاری می‌کند. Falcon بازشده روی نسخه‌ای دیگر بسته می‌شود و دوباره روی این نسخه باز می‌شود. نسخه‌هایی که SDK نصب می‌کند بدون آن هم پیدا می‌شوند.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|کتابخانه‌ها (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>نصب درایور Falcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>درایور Force Dimension را از پوشه SDK روی دستگاه Falcon بدون درایور نصب می‌کند. ممکن است Windows ابتدا بپرسد که به Force Dimension اعتماد شود یا نه.</value></data>
@@ -4442,7 +4446,7 @@
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>با Novint Falcon از طریق Force Dimension SDK بازی می‌کند. این SDK را از Force Dimension نصب می‌کنید. دسته یک استیک است، چهار دکمه دسته دکمه هستند و PadForge لرزش و جلوه‌های بازی را به‌صورت نیرو روی دسته اعمال می‌کند. زبانه فورس فیدبک هر اسلات حس Falcon را تنظیم می‌کند.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>کنترل Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>هر Falcon را از طریق dhd64.dll مربوط به Force Dimension باز می‌کند. Falcon بازشده فقط به PadForge تعلق دارد، پس تا زمانی که این گزینه روشن است FalconJoyForce و ابزارهای Force Dimension نمی‌توانند آن را باز کنند. با خاموش کردن آن، PadForge همه دستگاه‌های Falcon را می‌بندد.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>کتابخانه Falcon روی {0} تنظیم شد. نسخه‌ای که از قبل در حال استفاده است تا شروع دوباره PadForge می‌ماند.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>کتابخانه Falcon روی {0} تنظیم شد. PadForge ظرف چند ثانیه آن را بارگذاری می‌کند و Falcon بازشده روی نسخه‌ای دیگر دوباره روی این نسخه باز می‌شود.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>در حال نصب درایور Falcon از Force Dimension…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>بسته درایور Falcon از Force Dimension یا کاتالوگ آن وجود ندارد: {0}. Force Dimension SDK را دوباره نصب کنید.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>هیچ Falcon وصل نیست.</value></data>

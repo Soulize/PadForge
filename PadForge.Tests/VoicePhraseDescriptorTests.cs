@@ -156,6 +156,36 @@ namespace PadForge.Tests
             Assert.Equal(expected, ud.HasVoicePhrases);
         }
 
+        /// <summary>With the DualShock 4 microphone lane off, no DualShock 4
+        /// carries phrases, matching IsPadWithEmbeddedMic and the Manage
+        /// Voice Macros button. The DualSense keeps them.</summary>
+        [Fact]
+        public void HasVoicePhrases_FollowsTheDualShock4MicrophoneSwitch()
+        {
+            var previous = UserDevice.Ds4BtMicEnabled;
+            try
+            {
+                UserDevice.Ds4BtMicEnabled = () => false;
+                Assert.False(new UserDevice { VendorId = 0x054C, ProdId = 0x09CC, DevicePath = Ds4BtPath }.HasVoicePhrases);
+                Assert.False(new UserDevice { VendorId = 0x054C, ProdId = 0x05C4, DevicePath = Ds4V1BtPath }.HasVoicePhrases);
+                Assert.True(new UserDevice { VendorId = 0x054C, ProdId = 0x0CE6 }.HasVoicePhrases);
+                UserDevice.Ds4BtMicEnabled = () => true;
+                Assert.True(new UserDevice { VendorId = 0x054C, ProdId = 0x09CC, DevicePath = Ds4BtPath }.HasVoicePhrases);
+            }
+            finally
+            {
+                UserDevice.Ds4BtMicEnabled = previous;
+            }
+
+            // The App answers with its own switch.
+            var dir = new System.IO.DirectoryInfo(System.AppContext.BaseDirectory);
+            while (dir != null && !System.IO.File.Exists(System.IO.Path.Combine(dir.FullName, "PadForge.sln")))
+                dir = dir.Parent;
+            Assert.NotNull(dir);
+            string src = System.IO.File.ReadAllText(System.IO.Path.Combine(dir.FullName, "PadForge.App", "Services", "InputService.cs"));
+            Assert.Contains("PadForge.Engine.Data.UserDevice.Ds4BtMicEnabled = () => PadForge.Common.Input.AudioPassthroughService.EnableDs4BtMic;", src);
+        }
+
         /// <summary>The Manage Voice Macros button follows the same pads: a
         /// DualShock 4 shows it on Bluetooth while its microphone lane is on,
         /// as the DualSense shows it on Bluetooth (#528).</summary>

@@ -398,7 +398,7 @@ namespace PadForge.Tests
         public static IEnumerable<object[]> AskedBeforeTheBind() => new[]
         {
             new object[] { "PadForge.App/Common/Input/HeadTrackerDevice.cs", "internal sealed class HeadTrackerDevice : ISdlInputDevice", "PadForge.Engine.Common.NetworkListenerGate.Enter(UdpBindAddress);", "new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp)" },
-            new object[] { "PadForge.App/Common/Input/Telemetry/GameTelemetryDevice.cs", "public bool Open()", "NetworkListenerGate.Enter(BindAddress);", "new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp)" },
+            new object[] { "PadForge.App/Common/Input/Telemetry/GameTelemetryDevice.cs", "private void BindUdp()", "NetworkListenerGate.Enter(BindAddress);", "new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp)" },
             new object[] { Telemetry + "CodemastersUdpTelemetrySource.cs", "public void Start()", EnterAny, "new UdpClient(" },
             new object[] { Telemetry + "ForzaUdpTelemetrySource.cs", "public void Start()", EnterAny, "new UdpClient(" },
             new object[] { Telemetry + "OutGaugeTelemetrySource.cs", "public void Start()", EnterAny, "new UdpClient(" },

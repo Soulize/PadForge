@@ -1126,6 +1126,7 @@
   <data name="KeyboardScreens_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="KeyboardScreens_Status_Off" xml:space="preserve"><value>agbanyụọla</value></data>
   <data name="KeyboardScreens_Status_Lgs" xml:space="preserve"><value>site na Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>ihuenyo nke G19 dị na driver nke mmemme ọzọ ({0}), nke PadForge anaghị emetụ aka</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>chọrọ Logitech Gaming Software 8.52 ma ọ bụ nke ọhụrụ karịa</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>malite Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>na-eche ekwentị nwere Arx Control</value></data>
@@ -1162,13 +1163,14 @@
   <data name="DeviceType_NovintFalcon" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} na-ahazi trigger nke controller a.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} na-ahazi ọkụ nke controller a.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} na-ahazi ọkụ nke ngwaọrụ a.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} na-ahazi trigger na ọkụ nke controller a.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Hichapụ mmetụta mod</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Aka ekpe/Aka nri</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Elu/Ala</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Bọtịn {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon dị na driver nke Force Dimension, ma library nke Force Dimension enweghị ike imeghe ya: {0}. Lelee ọkụ ya na eriri USB ya.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Achọtaghị Falcon ọ bụla. Tinye ọkụ ya na eriri USB ya.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Họrọ dhd64.dll…</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Wụnye driver Falcon</value></data>

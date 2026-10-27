@@ -18,6 +18,9 @@ namespace PadForge.Common.Input
             internal readonly object Gate = new();
             internal byte[] Sony;
             internal (ushort, ushort, ushort, ushort, int, bool)? Vibration;
+            /// <summary>The Falcon settings the last Vibration frame carried
+            /// (#521), null for any other device.</summary>
+            internal OutputEffectCodec.FalconTail? Falcon;
             internal byte[] Wheel;
             internal (float Hz, float Amp)? Tone;
             internal int? Player;
@@ -150,13 +153,17 @@ namespace PadForge.Common.Input
             }
         }
 
-        public static bool ShipVibration(string path, Vibration vibration)
+        /// <summary>Ships a peer row's combined force. A Novint Falcon's frame
+        /// carries its slot's settings in <paramref name="falcon"/> (#521), and
+        /// a change to them ships the frame as a change to the force
+        /// does.</summary>
+        public static bool ShipVibration(string path, Vibration vibration, OutputEffectCodec.FalconTail? falcon = null)
         {
             if (vibration == null || !_byPath.TryGetValue(path, out var target)) return false;
-            lock (target.Gate) return ShipVibration(target, vibration);
+            lock (target.Gate) return ShipVibration(target, vibration, falcon);
         }
 
-        private static bool ShipVibration(Target target, Vibration vibration)
+        private static bool ShipVibration(Target target, Vibration vibration, OutputEffectCodec.FalconTail? falcon)
         {
             int signature = vibration.HasDirectionalData || vibration.HasConditionData
                 ? unchecked((int)(vibration.EffectType * 31 + (uint)vibration.SignedMagnitude * 7
@@ -166,9 +173,11 @@ namespace PadForge.Common.Input
                 || vibration.HasDirectionalData || vibration.HasConditionData;
             var key = (vibration.LeftMotorSpeed, vibration.RightMotorSpeed, vibration.LeftTriggerMotorSpeed,
                 vibration.RightTriggerMotorSpeed, signature, active);
-            if (!vibration.HasDirectionalData && !vibration.HasConditionData && target.Vibration == key) return true;
-            if (!Dispatch(target, LinkMessageType.Output, OutputEffectCodec.EncodeVibration(vibration))) return false;
+            if (!vibration.HasDirectionalData && !vibration.HasConditionData && target.Vibration == key
+                && Nullable.Equals(target.Falcon, falcon)) return true;
+            if (!Dispatch(target, LinkMessageType.Output, OutputEffectCodec.EncodeVibration(vibration, falcon))) return false;
             target.Vibration = key;
+            target.Falcon = falcon;
             return true;
         }
 
@@ -184,10 +193,14 @@ namespace PadForge.Common.Input
                 // until something else changed the value. A pad left rumbling is
                 // the one case here with a hardware consequence. The latch gate
                 // is unchanged, so a target with nothing running still answers
-                // false and ships nothing.
-                if (target.Vibration is not { Item6: true }) return false;
+                // false and ships nothing. A Novint Falcon the slots held runs
+                // its feel with no force playing (#521), so its stop is owed
+                // too, and it tells the owner the slots let the Falcon go.
+                bool falconHeld = target.Falcon is { Assigned: true };
+                if (target.Vibration is not { Item6: true } && !falconHeld) return false;
                 target.Vibration = default;
-                return ShipVibration(target, new Vibration());
+                return ShipVibration(target, new Vibration(),
+                    falconHeld ? OutputEffectCodec.FalconTail.Unassigned : target.Falcon);
             }
         }
 

@@ -402,6 +402,7 @@ public class Strings : INotifyPropertyChanged
     public string Dashboard_GameModsFooter => Get("Dashboard_GameModsFooter");
     public string GameMods_Sending_Format => Get("GameMods_Sending_Format");
     public string GameMods_SendingNoController_Format => Get("GameMods_SendingNoController_Format");
+    public string GameMods_SendingPastControllers_Format => Get("GameMods_SendingPastControllers_Format");
     public string GameMods_PortInUse_Format => Get("GameMods_PortInUse_Format");
     public string GameMods_UnknownSender => Get("GameMods_UnknownSender");
     public string Dashboard_HeadTrackingFooter => Get("Dashboard_HeadTrackingFooter");
@@ -4092,6 +4093,7 @@ public class Strings : INotifyPropertyChanged
     public string KeyboardScreens_Status_Direct_Format => Get("KeyboardScreens_Status_Direct_Format");
     public string KeyboardScreens_Status_G19Preparing => Get("KeyboardScreens_Status_G19Preparing");
     public string KeyboardScreens_Status_G19OtherDriver_Format => Get("KeyboardScreens_Status_G19OtherDriver_Format");
+    public string KeyboardScreens_Status_G19ForeignDriver_Format => Get("KeyboardScreens_Status_G19ForeignDriver_Format");
     public string KeyboardScreens_Status_ArxNoLibrary => Get("KeyboardScreens_Status_ArxNoLibrary");
     public string KeyboardScreens_Status_ArxNotRunning => Get("KeyboardScreens_Status_ArxNotRunning");
     public string KeyboardScreens_Status_ArxWaiting => Get("KeyboardScreens_Status_ArxWaiting");
@@ -4163,6 +4165,7 @@ public class Strings : INotifyPropertyChanged
     public string Devices_FalconHandle => Get("Devices_FalconHandle");
     public string Devices_GameModTriggers_Format => Get("Devices_GameModTriggers_Format");
     public string Devices_GameModLights_Format => Get("Devices_GameModLights_Format");
+    public string Devices_GameModPeripheralLights_Format => Get("Devices_GameModPeripheralLights_Format");
     public string Devices_GameModTriggersAndLights_Format => Get("Devices_GameModTriggersAndLights_Format");
     public string Devices_GameModImpulse_Format => Get("Devices_GameModImpulse_Format");
     public string Devices_ClearModEffects => Get("Devices_ClearModEffects");
@@ -4170,10 +4173,11 @@ public class Strings : INotifyPropertyChanged
     public string Falcon_Axis_LeftRight => Get("Falcon_Axis_LeftRight");
     public string Falcon_Axis_UpDown => Get("Falcon_Axis_UpDown");
     public string Falcon_Axis_InOut => Get("Falcon_Axis_InOut");
-    public string Falcon_Button_Format => Get("Falcon_Button_Format");
     public string Falcon_Name_Format => Get("Falcon_Name_Format");
     public string Falcon_Status_Line_Format => Get("Falcon_Status_Line_Format");
     public string Falcon_Status_Library_Format => Get("Falcon_Status_Library_Format");
+    public string Falcon_Status_PickNotLoaded => Get("Falcon_Status_PickNotLoaded");
+    public string Falcon_Status_OwnDriverNotOpen_Format => Get("Falcon_Status_OwnDriverNotOpen_Format");
     public string Falcon_Status_Arm64 => Get("Falcon_Status_Arm64");
     public string Falcon_Status_LoadFailed => Get("Falcon_Status_LoadFailed");
     public string Falcon_Status_NotLibrary => Get("Falcon_Status_NotLibrary");

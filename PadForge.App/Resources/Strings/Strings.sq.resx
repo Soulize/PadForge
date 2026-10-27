@@ -304,6 +304,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Punon me mode të bëra për DSX, si ato për GTA V, Red Dead Redemption 2, Skyrim dhe Forza. Ndërsa serveri dëgjon, PadForge shkruan portën e tij aty ku i kërkojnë këto mode.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Dëgjon te :{0}. {1} po dërgon te kontrolluesi virtual {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Dëgjon te :{0}. {1} po dërgon, por asnjë kontrollues virtual nuk ka një kontrollues PlayStation.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Dëgjon te :{0}. {1} po dërgon te indeksi {2} i kontrolluesit, dhe asnjë kontrollues virtual me kontrollues PlayStation nuk e ka atë indeks.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Porta {0} është në përdorim nga një program tjetër, si DSX. Mbylle ose zgjidh një portë tjetër.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Një mod loje</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Funksionon me OpenTrack dhe çdo gjurmues që dërgon daljen e vet UDP ose shkruan memorie të përbashkët FreeTrack 2.0, dhe me një runtime OpenXR në këtë kompjuter që mund të ekzekutojë një seancë në sfond.</value></data>
@@ -4053,7 +4054,7 @@ Doni që PadForge t'i çinstalojë tani? Kjo kërkon privilegje administratori d
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Po pritet për të dhënat e memories së përbashkët FreeTrack.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>Memoria e përbashkët FreeTrack nuk është e disponueshme.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Dridhja e këndit të drejtimit</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Shton dridhje të vazhdueshme ndërsa boshti i zgjedhur virtual i levës largohet nga qendra. Përdor daljen e hartëzuar nga të gjitha burimet e caktuara. Me "Ndarë sipas drejtimit", lëvizja negative drejton motorin e majtë dhe ajo pozitive motorin e djathtë. "Motori i majtë" ose "Motori i djathtë" i vendos të dyja drejtimet në atë motor. Për dalje Xbox dhe PlayStation me pajisje dridhjeje. Force feedback-u vendas i timonit përjashtohet.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Shton dridhje të vazhdueshme ndërsa boshti i zgjedhur virtual i levës largohet nga qendra. Përdor daljen e hartëzuar nga të gjitha burimet e caktuara. Me "Ndarë sipas drejtimit", lëvizja negative drejton motorin e majtë dhe ajo pozitive motorin e djathtë. "Motori i majtë" ose "Motori i djathtë" i vendos të dyja drejtimet në atë motor. Për dalje Xbox dhe PlayStation me pajisje dridhjeje. Anashkalon timonët, pajisjet e tjera me force feedback konstant dhe pedalet Fanatec.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Aktivizo dridhjen e këndit të drejtimit</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Boshti virtual</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Leva e majtë X</value></data>
@@ -4256,6 +4257,7 @@ Doni që PadForge t'i çinstalojë tani? Kjo kërkon privilegje administratori d
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>drejtpërdrejt në {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>po lidhet WinUSB me ekranin e G19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>ekrani i G19 është në një drajver tjetër ({0}), prandaj nisni Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>ekrani i G19 është në drajverin e një programi tjetër ({0}), të cilin PadForge e lë të paprekur</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>kërkon Logitech Gaming Software 8.52 ose më të ri</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>nisni Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>në pritje të një telefoni me Arx Control</value></data>
@@ -4327,6 +4329,7 @@ Doni që PadForge t'i çinstalojë tani? Kjo kërkon privilegje administratori d
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Dorezë</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} po vendos këmbëzat e këtij kontrolluesi.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} po vendos dritat e këtij kontrolluesi.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} po vendos dritat e kësaj pajisjeje.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} po vendos këmbëzat dhe dritat e këtij kontrolluesi.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} po luan dridhje këmbëzash në këmbëzat e impulsit të këtij kontrolluesi.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Pastro efektet e modit</value></data>
@@ -4334,10 +4337,10 @@ Doni që PadForge t'i çinstalojë tani? Kjo kërkon privilegje administratori d
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Majtas/Djathtas</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Lart/Poshtë</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Brenda/Jashtë</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Butoni {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, ngarkuar nga {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>dhd64.dll që zgjodhe nuk u ngarkua, prandaj PadForge përdor kopjen e mësipërme.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Biblioteka e Force Dimension punon vetëm në versionin x64 të PadForge.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>dhd64.dll u gjet, por nuk mund të ngarkohej.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Ky dhd64.dll nuk është biblioteka e Force Dimension që pret PadForge.</value></data>
@@ -4347,11 +4350,12 @@ Doni që PadForge t'i çinstalojë tani? Kjo kërkon privilegje administratori d
   <data name="Falcon_Status_Open" xml:space="preserve"><value>hapur</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Një Falcon është i hapur në një program tjetër, si FalconJoyForce ose mjetet e vetë Force Dimension. Mbylle atje.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon është me një drajver tjetër ({0}), prandaj biblioteka e Force Dimension nuk mund ta hapë. Në Menaxherin e pajisjeve, përditëso drajverin e Falcon nga dosja drivers\usb brenda dosjes së SDK-së së Force Dimension.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon është me drajverin e Force Dimension dhe biblioteka e Force Dimension nuk mundi ta hapë: {0}. Kontrollo rrymën dhe kabllon USB.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Një Falcon është i lidhur pa drajver. Butoni Instalo drajverin e Falcon i jep drajverin e Force Dimension.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Një Falcon është i lidhur pa drajver dhe dosja e SDK-së nuk ka paketë drajveri për t'ia dhënë. Riinstalo SDK-në e Force Dimension.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Asnjë Falcon nuk u gjet. Lidh rrymën dhe kabllon USB.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Zgjidh dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Ngarkon këtë kopje të bibliotekës së Force Dimension përpara çdo tjetre. Kopjet që instalon SDK gjenden edhe pa të.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Ngarkon këtë kopje të bibliotekës së Force Dimension në vend të çdo tjetre. Një Falcon i hapur në një kopje tjetër mbyllet dhe hapet përsëri në këtë. Kopjet që instalon SDK gjenden edhe pa të.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Bibliotekat (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Instalo drajverin e Falcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Instalon drajverin e Force Dimension, nga dosja e SDK-së, te një Falcon që nuk ka asnjë. Windows mund të pyesë së pari nëse i beson Force Dimension.</value></data>
@@ -4368,7 +4372,7 @@ Doni që PadForge t'i çinstalojë tani? Kjo kërkon privilegje administratori d
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Luan me një Novint Falcon përmes SDK-së së Force Dimension, që e instalon nga Force Dimension. Doreza është një levë, katër butonat e kapëses janë butona dhe PadForge e vendos dridhjen dhe efektet e lojës te doreza si forcë. Skeda Force feedback e secilit slot cakton si ndihet Falcon.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Drejto Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>E hap çdo Falcon përmes dhd64.dll të Force Dimension. Një Falcon i hapur i përket vetëm PadForge, ndaj FalconJoyForce dhe mjetet e Force Dimension nuk mund ta hapin ndërsa kjo është e aktivizuar. Kur është e çaktivizuar, PadForge mbyll çdo Falcon.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Biblioteka e Falcon u caktua te {0}. Një kopje që është tashmë në përdorim mbetet derisa PadForge të niset përsëri.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Biblioteka e Falcon u caktua te {0}. PadForge e ngarkon brenda pak sekondash, dhe një Falcon i hapur në një kopje tjetër hapet përsëri në këtë.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Po instalohet drajveri i Falcon i Force Dimension…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Paketa e drajverit të Falcon të Force Dimension, ose katalogu i saj, mungon: {0}. Riinstalo SDK-në e Force Dimension.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Asnjë Falcon nuk është i lidhur.</value></data>

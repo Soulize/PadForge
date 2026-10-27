@@ -569,6 +569,87 @@ namespace PadForge.Tests
             Assert.Equal(0, right);
         }
 
+        [Fact]
+        public void AMoveInTheControllerOrder_TellsEverySlotInTheOldAndTheNewOrder()
+        {
+            int[] order = { 7, 6 };
+            GameModEffects.OrderedSlotsOverrideForTest = () => order;
+            Send(@"{""instructions"":[{""type"":2,""parameters"":[0,1,2,3]}]}");
+            GameModEffects.RefreshOrder();
+            var told = new List<int>();
+            GameModEffects.NotifiedForTest = slot => { lock (told) told.Add(slot); };
+
+            // The same order tells no one, and a resent value publishes
+            // nothing, so neither wakes a pass.
+            GameModEffects.RefreshOrder();
+            Send(@"{""instructions"":[{""type"":2,""parameters"":[0,1,2,3]}]}");
+            Assert.Empty(told);
+
+            // Pad 7's virtual controller turned off: the mod's controller 0
+            // is pad 6 now. Pad 7 gives the light back and pad 6 takes it,
+            // each told once.
+            order = new[] { 6 };
+            GameModEffects.RefreshOrder();
+            Assert.Equal(new[] { 6, 7 }, told.OrderBy(s => s).ToArray());
+
+            // The polling thread's cached read sees the move back as well.
+            told.Clear();
+            order = new[] { 7, 6 };
+            System.Threading.Thread.Sleep(300);
+            Assert.Same(Controller0, GameModEffects.ForSlotCached(7));
+            Assert.Equal(new[] { 6, 7 }, told.OrderBy(s => s).ToArray());
+
+            // With nothing held, a move tells no one.
+            told.Clear();
+            GameModEffects.Reset(-1);
+            told.Clear();
+            order = new[] { 6 };
+            GameModEffects.RefreshOrder();
+            Assert.Empty(told);
+        }
+
+        [Fact]
+        public void APeripheralTheSlotLights_ShowsTheModsLightsLine()
+        {
+            var savedSettings = SettingsManager.UserSettings;
+            var mouse = Guid.NewGuid();
+            try
+            {
+                var settings = new SettingsCollection();
+                settings.Items.Add(new PadForge.Engine.Data.UserSetting { InstanceGuid = mouse, MapTo = 7 });
+                SettingsManager.UserSettings = settings;
+                var ud = new PadForge.Engine.Data.UserDevice
+                {
+                    InstanceGuid = mouse, ProductGuid = mouse, VendorId = 0x046D, ProdId = 0xC08B, IsOnline = true,
+                };
+                Send(@"{""instructions"":[{""type"":2,""parameters"":[0,1,2,3]}]}");
+
+                // Not lit from pad 7: no line.
+                Assert.Equal(string.Empty, InputService.GameModDeviceLine(ud));
+
+                // Lit from pad 7, the mod's controller 0, which holds a light.
+                PadForge.Common.Input.Peripherals.PeripheralOutputs.SetLighting(mouse, 7, 1, 1, 2, 3);
+                Assert.Equal(string.Format(PadForge.Resources.Strings.Strings.Instance.Devices_GameModPeripheralLights_Format, "Mod.exe"),
+                    InputService.GameModDeviceLine(ud));
+
+                // Lit from another slot only: the mod's light is not on it.
+                PadForge.Common.Input.Peripherals.PeripheralOutputs.ReleaseLighting(mouse, 7);
+                PadForge.Common.Input.Peripherals.PeripheralOutputs.SetLighting(mouse, 3, 1, 1, 2, 3);
+                Assert.Equal(string.Empty, InputService.GameModDeviceLine(ud));
+
+                // A hold with no lightbar recolors nothing.
+                PadForge.Common.Input.Peripherals.PeripheralOutputs.SetLighting(mouse, 7, 1, 1, 2, 3);
+                GameModEffects.Reset(0);
+                Send(@"{""instructions"":[{""type"":5,""parameters"":[0,1]}]}");
+                Assert.Equal(string.Empty, InputService.GameModDeviceLine(ud));
+            }
+            finally
+            {
+                PadForge.Common.Input.Peripherals.PeripheralOutputs.ReleaseDevice(mouse);
+                SettingsManager.UserSettings = savedSettings;
+            }
+        }
+
         // ── The effects pass ──
 
         [Fact]
@@ -742,6 +823,50 @@ namespace PadForge.Tests
         }
 
         [Fact]
+        public void AModThatOpensASocketEveryTick_IsOneSender_AndEveryPacketIsAnsweredAtItsOwnPort()
+        {
+            // The GTA V mods make a new UdpClient on every Connect and call
+            // Connect every tick (DualSense4GTAV add.cs:28-31, 47-49), so one
+            // process sends from a new port each time.
+            int port;
+            using (var probe = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0)))
+                port = ((IPEndPoint)probe.Client.LocalEndPoint).Port;
+            using var server = new GameModServer();
+            Assert.True(server.Start(port, standIn: false));
+            int changes = 0;
+            server.StatusChanged += (_, _) => System.Threading.Interlocked.Increment(ref changes);
+
+            var target = new IPEndPoint(IPAddress.Loopback, port);
+            byte[] packet = Encoding.ASCII.GetBytes(@"{""instructions"":[{""type"":2,""parameters"":[0,1,2,3]}]}");
+            var mods = new List<UdpClient>();
+            try
+            {
+                for (int i = 0; i < 20; i++)
+                {
+                    var mod = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
+                    mods.Add(mod);
+                    mod.Client.ReceiveTimeout = 5000;
+                    mod.Send(packet, packet.Length, target);
+                    var from = new IPEndPoint(IPAddress.Loopback, 0);
+                    using var reply = JsonDocument.Parse(mod.Receive(ref from));
+                    Assert.Equal(GameModProtocol.ReplyStatus, reply.RootElement.GetProperty("Status").GetString());
+                }
+
+                // The reply goes before the apply, so wait for the last port.
+                var watch = Stopwatch.StartNew();
+                while (server.PortCountForTest < 20 && watch.ElapsedMilliseconds < 5000) System.Threading.Thread.Sleep(10);
+                Assert.Equal(20, server.PortCountForTest);
+                Assert.Equal(1, server.SenderCountForTest);
+                Assert.Equal(Environment.ProcessId, Controller0.Owners[(int)GameModEffects.Part.Lightbar].ProcessId);
+                Assert.Equal(1, System.Threading.Volatile.Read(ref changes));
+            }
+            finally
+            {
+                foreach (var mod in mods) mod.Dispose();
+            }
+        }
+
+        [Fact]
         public void TheReply_CarriesDsxsFieldsAndNames()
         {
             var devices = new[]
@@ -776,8 +901,183 @@ namespace PadForge.Tests
                 GameModServer.FormatStatus(GameModServer.ServerState.Listening, 6969, "GTA5.exe", 0));
             Assert.Equal(string.Format(s.GameMods_PortInUse_Format, 7000),
                 GameModServer.FormatStatus(GameModServer.ServerState.PortInUse, 7000, null, 0));
+            // An index past the addressable controllers names the index,
+            // and says nothing about controllers that are there.
+            Assert.Equal(string.Format(s.GameMods_SendingPastControllers_Format, 6969, "GTA5.exe", 2),
+                GameModServer.FormatStatus(GameModServer.ServerState.Listening, 6969, "GTA5.exe", 0, pastIndex: 2));
+        }
+
+        [Fact]
+        public void AnIndexPastTheAddressableControllers_GetsItsOwnLine()
+        {
+            var s = PadForge.Resources.Strings.Strings.Instance;
+            int port;
+            using (var probe = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0)))
+                port = ((IPEndPoint)probe.Client.LocalEndPoint).Port;
+            using var server = new GameModServer();
+            Assert.True(server.Start(port, standIn: false));
+            using var mod = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
+            mod.Client.ReceiveTimeout = 5000;
+            string name = Process.GetCurrentProcess().MainModule.ModuleName;
+
+            // Two addressable controllers (pads 7 and 6): index 5 is past them.
+            byte[] packet = Encoding.ASCII.GetBytes(@"{""instructions"":[{""type"":2,""parameters"":[5,1,2,3]}]}");
+            mod.Send(packet, packet.Length, new IPEndPoint(IPAddress.Loopback, port));
+            var from = new IPEndPoint(IPAddress.Loopback, 0);
+            mod.Receive(ref from);
+            string expected = string.Format(s.GameMods_SendingPastControllers_Format, port, name, 5);
+            var watch = Stopwatch.StartNew();
+            while (server.FormatStatus() != expected && watch.ElapsedMilliseconds < 5000) System.Threading.Thread.Sleep(10);
+            Assert.Equal(expected, server.FormatStatus());
+
+            // With none addressable, the line says so.
+            GameModEffects.OrderedSlotsOverrideForTest = () => Array.Empty<int>();
+            Assert.Equal(string.Format(s.GameMods_SendingNoController_Format, port, name), server.FormatStatus());
             Assert.Equal(s.Common_Stopped, GameModServer.FormatStatus(GameModServer.ServerState.Stopped, 6969, null, 0));
         }
+
+        [Fact]
+        public void AServerKeptFromItsPort_BindsOnceTheOtherProgramLeaves()
+        {
+            var vm = new PadForge.ViewModels.MainViewModel();
+            using var service = new InputService(vm);
+            var holder = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
+            int port = ((IPEndPoint)holder.Client.LocalEndPoint).Port;
+            Service(service, "_inputManager").SetValue(service,
+                System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(typeof(InputManager)));
+            try
+            {
+                vm.Dashboard.GameModDsxStandIn = false;
+                vm.Dashboard.GameModServerPort = port;
+                vm.Dashboard.EnableGameModServer = true;
+                Call(service, "StartGameModServerIfEnabled");
+                Assert.Null(Service(service, "_gameModServer").GetValue(service));
+
+                // Inside the interval nothing is tried, and while the other
+                // program holds the port a try fails again.
+                Call(service, "UpdateGameModLines");
+                Assert.Null(Service(service, "_gameModServer").GetValue(service));
+                Service(service, "_gameModFailedMs").SetValue(service, Environment.TickCount64 - InputService.PortInUseRetryMs);
+                Call(service, "UpdateGameModLines");
+                Assert.Null(Service(service, "_gameModServer").GetValue(service));
+
+                // The other program leaves: the next try past the interval
+                // listens.
+                holder.Dispose();
+                Call(service, "UpdateGameModLines");
+                Assert.Null(Service(service, "_gameModServer").GetValue(service));
+                Service(service, "_gameModFailedMs").SetValue(service, Environment.TickCount64 - InputService.PortInUseRetryMs);
+                Call(service, "UpdateGameModLines");
+                var server = (GameModServer)Service(service, "_gameModServer").GetValue(service);
+                Assert.NotNull(server);
+                Assert.Equal(GameModServer.ServerState.Listening, server.State);
+                Assert.Equal(port, server.Port);
+
+                // Stopped by the switch, nothing is tried again.
+                Call(service, "StopGameModServer");
+                Service(service, "_gameModFailedMs").SetValue(service, 0L);
+                Call(service, "UpdateGameModLines");
+                Assert.Null(Service(service, "_gameModServer").GetValue(service));
+            }
+            finally
+            {
+                holder.Dispose();
+                Call(service, "StopGameModServer");
+                Service(service, "_inputManager").SetValue(service, null);
+            }
+        }
+
+        [Fact]
+        public void TheMotionServerKeptFromItsPort_BindsOnceTheOtherProgramLeaves()
+        {
+            var vm = new PadForge.ViewModels.MainViewModel();
+            using var service = new InputService(vm);
+            var holder = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
+            int port = ((IPEndPoint)holder.Client.LocalEndPoint).Port;
+            Service(service, "_inputManager").SetValue(service,
+                System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(typeof(InputManager)));
+            try
+            {
+                vm.Dashboard.DsuMotionServerPort = port;
+                vm.Dashboard.EnableDsuMotionServer = true;
+                Call(service, "StartDsuServerIfEnabled");
+                Assert.Null(Service(service, "_dsuServer").GetValue(service));
+
+                Call(service, "RetryDsuServerOnPortInUse");
+                Assert.Null(Service(service, "_dsuServer").GetValue(service));
+                holder.Dispose();
+                Call(service, "RetryDsuServerOnPortInUse");
+                Assert.Null(Service(service, "_dsuServer").GetValue(service));
+                Service(service, "_dsuFailedMs").SetValue(service, Environment.TickCount64 - InputService.PortInUseRetryMs);
+                Call(service, "RetryDsuServerOnPortInUse");
+                var server = (DsuMotionServer)Service(service, "_dsuServer").GetValue(service);
+                Assert.NotNull(server);
+                Assert.False(server.PortInUse);
+
+                Call(service, "StopDsuServer");
+                Service(service, "_dsuFailedMs").SetValue(service, 0L);
+                Call(service, "RetryDsuServerOnPortInUse");
+                Assert.Null(Service(service, "_dsuServer").GetValue(service));
+
+                // The dashboard tick runs it, beside the game mod lines.
+                string input = Source("PadForge.App", "Services", "InputService.cs");
+                Assert.Contains("            UpdateGameModLines();\n            RetryDsuServerOnPortInUse();\n", input);
+            }
+            finally
+            {
+                holder.Dispose();
+                Call(service, "StopDsuServer");
+                Service(service, "_inputManager").SetValue(service, null);
+            }
+        }
+
+        [Fact]
+        public void AFailedStartsReason_SurvivesALanguageChange()
+        {
+            var vm = new PadForge.ViewModels.MainViewModel();
+            using var service = new InputService(vm);
+            using var holder = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
+            int port = ((IPEndPoint)holder.Client.LocalEndPoint).Port;
+            Service(service, "_inputManager").SetValue(service,
+                System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(typeof(InputManager)));
+            try
+            {
+                var s = PadForge.Resources.Strings.Strings.Instance;
+                vm.Dashboard.GameModDsxStandIn = false;
+                vm.Dashboard.GameModServerPort = port;
+                vm.Dashboard.EnableGameModServer = true;
+                vm.Dashboard.DsuMotionServerPort = port;
+                vm.Dashboard.EnableDsuMotionServer = true;
+                Call(service, "StartGameModServerIfEnabled");
+                Call(service, "StartDsuServerIfEnabled");
+
+                // What a language change runs.
+                Call(service, "RefreshServerStatusStrings");
+                Assert.Equal(string.Format(s.GameMods_PortInUse_Format, port), vm.Dashboard.GameModServerStatus);
+                Assert.Equal(string.Format(s.Server_PortInUse_Format, port), vm.Dashboard.DsuServerStatus);
+
+                // Stopped, the reason is gone.
+                Call(service, "StopGameModServer");
+                Call(service, "StopDsuServer");
+                Call(service, "RefreshServerStatusStrings");
+                Assert.Equal(s.Common_Stopped, vm.Dashboard.GameModServerStatus);
+                Assert.Equal(s.Common_Stopped, vm.Dashboard.DsuServerStatus);
+            }
+            finally
+            {
+                Call(service, "StopGameModServer");
+                Call(service, "StopDsuServer");
+                Service(service, "_inputManager").SetValue(service, null);
+            }
+        }
+
+        private static System.Reflection.FieldInfo Service(InputService service, string name) =>
+            typeof(InputService).GetField(name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+            ?? throw new MissingFieldException(nameof(InputService), name);
+
+        private static void Call(InputService service, string name) =>
+            (typeof(InputService).GetMethod(name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                ?? throw new MissingMethodException(nameof(InputService), name)).Invoke(service, null);
 
         // ── Senders ──
 

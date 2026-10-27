@@ -326,13 +326,7 @@ namespace PadForge.Common.Input
                     // haptic channels' loudness joins the merge (discussion
                     // #522). Read through the CURRENT feed position, which
                     // a reorder moves with its controller, as the pack is.
-                    long hapticLevel = PersonaHapticLevel(slot, now);
-                    if (hapticLevel != 0L)
-                    {
-                        pack = Engine.Common.LfeOutputState.MaxMerge(pack,
-                            Engine.Common.LfeOutputState.Low(hapticLevel),
-                            Engine.Common.LfeOutputState.High(hapticLevel), 0, 0);
-                    }
+                    pack = WithPersonaHaptics(slot, pack, now);
                     if (pack != 0)
                     {
                         // Per-voice enable masks (the four fixed unipolar
@@ -3126,6 +3120,22 @@ namespace PadForge.Common.Input
             long level = PersonaHapticLevel(slot, nowMs);
             if (level == 0L || !PersonaHapticRumble.TakesRumble(slot, device, nowMs)) return raw;
             return PersonaHapticRumble.Merge(raw, level, scratch);
+        }
+
+        /// <summary><paramref name="pack"/> with the slot's persona haptics
+        /// layered on its two body voices as a per-voice max, the trigger
+        /// voices untouched: the step every reader of the slot's inbound
+        /// pack takes (the shaker lane and the Rumble source family). A game
+        /// that plays the DualSense's haptics through the persona's audio
+        /// sends no rumble, so without it those readers read silence
+        /// (discussion #522). Any thread.</summary>
+        internal long WithPersonaHaptics(int slot, long pack, long nowMs)
+        {
+            long level = PersonaHapticLevel(slot, nowMs);
+            if (level == 0L) return pack;
+            return Engine.Common.LfeOutputState.MaxMerge(pack,
+                Engine.Common.LfeOutputState.Low(level),
+                Engine.Common.LfeOutputState.High(level), 0, 0);
         }
 
         private volatile AudioPassthroughService.PersonaOwner _personaAudioOwner = new();

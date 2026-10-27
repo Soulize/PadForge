@@ -191,6 +191,51 @@ namespace PadForge.Tests
             return us.GetPadSetting();
         }
 
+        /// <summary>The pad page reloads these settings on every peripheral
+        /// status change, and every region change the reload raises marks the
+        /// settings dirty. A reload that changes nothing therefore raises
+        /// nothing, with or without an imported region on a mapping source,
+        /// or PadForge.xml is rewritten on every reload (audit of
+        /// 2026-10-27: every 30 s on a PC with a Logitech receiver).</summary>
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void AReloadThatChangesNothing_RaisesNoRegionChange(bool imported)
+        {
+            var savedSets = SettingsManager.SlotMappingSets;
+            var sets = new MappingSet[InputManager.MaxPads];
+            if (imported)
+            {
+                sets[0] = new MappingSet();
+                sets[0].Rows.Add(new MappingRow
+                {
+                    Target = "KbmMouseX",
+                    Sources = { new MappingSource { Descriptor = "Touchpad 0 Pointer X", ParamPointerExtent = 1.2, ParamPointerCenter = 0.7 } },
+                });
+            }
+            SettingsManager.SlotMappingSets = sets;
+            try
+            {
+                Arrange(null);
+                var vm = new PadViewModel(0);
+                vm.LoadTouchpadGestureSettingsForActiveDevice();
+                // The imported region shows on the card (positive control).
+                Assert.Equal(imported ? 1.2 : 1.0, vm.TouchpadPointerRegionSizeX, 9);
+                Assert.Equal(imported ? 0.7 : 0.5, vm.TouchpadPointerRegionCenterX, 9);
+
+                var raised = new System.Collections.Generic.List<string>();
+                vm.PropertyChanged += (_, e) =>
+                {
+                    if (e.PropertyName != null && e.PropertyName.StartsWith("TouchpadPointerRegion", StringComparison.Ordinal))
+                        raised.Add(e.PropertyName);
+                };
+                vm.LoadTouchpadGestureSettingsForActiveDevice();
+                Assert.Empty(raised);
+                Assert.Equal(imported ? 1.2 : 1.0, vm.TouchpadPointerRegionSizeX, 9);
+            }
+            finally { SettingsManager.SlotMappingSets = savedSets; }
+        }
+
         [Fact]
         public void Push_StampsRegionSchema_SoADeliberateFullScreenResetSurvives()
         {

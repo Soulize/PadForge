@@ -130,6 +130,7 @@ namespace PadForge.Services
         public const int MinFrameMs = 100;
         private const int TickMs = 250;
         private const int MaxQueuedRequests = 64;
+        internal const int PictureRetryMs = 5000;
 
         /// <summary>The S.T.R.I.K.E. 7 library PadForge downloads: Mad Catz's
         /// SDK, kept under the temp folder beside the voice models.</summary>
@@ -157,7 +158,9 @@ namespace PadForge.Services
         /// runs four times a second, so a picture is drawn again only when
         /// what it shows changes.</summary>
         private readonly Dictionary<string, (string What, byte[] Frame)> _composed = new(StringComparer.Ordinal);
-        private readonly Dictionary<string, BitmapSource> _pictures = new(StringComparer.OrdinalIgnoreCase);
+        /// <summary>Each picture file's decoded picture, or a failed load and
+        /// when to try it again.</summary>
+        private readonly Dictionary<string, (BitmapSource Picture, long RetryAt)> _pictures = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, Shown> _shown = new(StringComparer.Ordinal);
         private long _nextTick;
         private bool _playStarted;
@@ -249,6 +252,17 @@ namespace PadForge.Services
             _markDirty();
         }
 
+        /// <summary>Remove Device on a screen's row: its choices go with the
+        /// row. The row's GUID comes from the screen's identity, so a screen
+        /// still plugged in returns at the defaults. True when an entry
+        /// went.</summary>
+        internal static bool Forget(ViewModels.SettingsViewModel settings, Guid device)
+        {
+            string key = device.ToString("D");
+            return settings.KeyboardScreens.RemoveAll(
+                screen => string.Equals(screen.Device, key, StringComparison.OrdinalIgnoreCase)) > 0;
+        }
+
         /// <summary>The screens present now, empty while the service is not
         /// running.</summary>
         internal KeyboardScreenInfo[] Screens => _host?.Screens ?? Array.Empty<KeyboardScreenInfo>();
@@ -317,6 +331,26 @@ namespace PadForge.Services
             return DownloadedStrike7Library;
         }
 
+        /// <summary>Download Strike7API.dll: runs the download through
+        /// <paramref name="run"/>, which reports a failure itself and
+        /// returns, and drops the copy the user picked only when this
+        /// download produced the library. A failed download leaves an earlier
+        /// one on disk, and the pick stays in its place.</summary>
+        internal static async System.Threading.Tasks.Task DownloadStrike7Library(
+            Func<Action, System.Threading.Tasks.Task> run, Action download,
+            ViewModels.SettingsViewModel settings, Action markDirty)
+        {
+            bool downloaded = false;
+            await run(() =>
+            {
+                download();
+                downloaded = true;
+            });
+            if (!downloaded || string.IsNullOrEmpty(settings.Strike7LibraryPath)) return;
+            settings.Strike7LibraryPath = null;
+            markDirty();
+        }
+
         private void EnsureHost()
         {
             if (_host != null) return;
@@ -326,9 +360,10 @@ namespace PadForge.Services
         }
 
         /// <summary>The engine stopped, or the feature was switched off: the
-        /// host closes every screen's session, and the shows and requests go.
-        /// Play time starts over with the next start. The stopwatch keeps its
-        /// time.</summary>
+        /// host closes every screen's session, and the shows, requests and
+        /// loaded pictures go, so the next start reads each picture file
+        /// again. Play time starts over with the next start. The stopwatch
+        /// keeps its time.</summary>
         public void Reset()
         {
             var host = _host;
@@ -337,6 +372,7 @@ namespace PadForge.Services
             _shows.Clear();
             _shown.Clear();
             _composed.Clear();
+            _pictures.Clear();
             _playStarted = false;
             DropRequests();
             KeyboardScreensRuntime.Screens = Array.Empty<KeyboardScreenInfo>();
@@ -415,19 +451,19 @@ namespace PadForge.Services
         private void PanScreen(KeyboardScreenInfo screen, int dx, int dy)
         {
             var data = Get(screen.RowGuid);
-            var picture = Picture(data?.Picture);
+            var picture = Picture(data?.Picture, Environment.TickCount64);
             if (picture == null) return;
             var (maxX, maxY) = KeyboardScreenRenderer.PanLimits(picture, screen.Kind);
             int x = Math.Clamp(data.PanX + dx, 0, maxX), y = Math.Clamp(data.PanY + dy, 0, maxY);
             if (x == data.PanX && y == data.PanY) return;
-            var pictures = new Dictionary<string, BitmapSource>(_pictures, StringComparer.OrdinalIgnoreCase);
+            var pictures = new Dictionary<string, (BitmapSource Picture, long RetryAt)>(_pictures, StringComparer.OrdinalIgnoreCase);
             Update(screen.RowGuid, d =>
             {
                 d.PanX = x;
                 d.PanY = y;
             });
             // A pan is no change to the picture, so the decoded one stays.
-            foreach (var (path, bitmap) in pictures) _pictures[path] = bitmap;
+            foreach (var (path, cached) in pictures) _pictures[path] = cached;
         }
 
         private void TrackPlayTime(long now)
@@ -489,7 +525,7 @@ namespace PadForge.Services
                 case KeyboardScreenMode.ProfilePicture:
                 {
                     string path = ActiveProfilePicture();
-                    var picture = Picture(path);
+                    var picture = Picture(path, now);
                     return picture != null
                         ? Memo(screen.Id, "fitted|" + path, () => KeyboardScreenRenderer.RenderFitted(picture, kind))
                         : Text(screen, DreamcastScreenService.ActiveProfileName());
@@ -501,7 +537,7 @@ namespace PadForge.Services
                         TimeSpan.FromMilliseconds(Math.Max(0, now - (_playStarted ? _playStart : now)))));
                 case KeyboardScreenMode.Picture:
                 {
-                    var picture = Picture(data?.Picture);
+                    var picture = Picture(data?.Picture, now);
                     if (picture != null)
                         return Memo(screen.Id, string.Format(CultureInfo.InvariantCulture, "window|{0}|{1}|{2}", data.Picture, data.PanX, data.PanY),
                             () => KeyboardScreenRenderer.RenderWindow(picture, kind, data.PanX, data.PanY));
@@ -571,14 +607,16 @@ namespace PadForge.Services
             return frame;
         }
 
-        private BitmapSource Picture(string storedPath)
+        private BitmapSource Picture(string storedPath, long now)
         {
             if (string.IsNullOrWhiteSpace(storedPath)) return null;
-            if (_pictures.TryGetValue(storedPath, out var cached)) return cached;
+            if (_pictures.TryGetValue(storedPath, out var cached) && (cached.Picture != null || now < cached.RetryAt))
+                return cached.Picture;
             var picture = KeyboardScreenRenderer.LoadPicture(storedPath);
-            // A picture that will not load is asked for again only after the
-            // next change, not four times a second.
-            _pictures[storedPath] = picture;
+            // A picture that will not load is asked for again after
+            // PictureRetryMs, not four times a second, so a file on a drive
+            // that was not ready at start shows once it is.
+            _pictures[storedPath] = (picture, picture == null ? now + PictureRetryMs : 0);
             return picture;
         }
 
@@ -651,9 +689,9 @@ namespace PadForge.Services
         }
 
         /// <summary>The Settings card's lines: only what belongs to the
-        /// feature as a whole. Arx Control's and the S.T.R.I.K.E. 7's
-        /// libraries while neither has a screen, and no screen found when
-        /// there is none at all. Each screen's own line is on its row. Empty
+        /// feature as a whole. Arx Control's library while no Arx screen is
+        /// present, the S.T.R.I.K.E. 7's while no S.T.R.I.K.E. 7 is, and no
+        /// screen found when there is none at all. Each screen's own line is on its row. Empty
         /// while the service is not running.</summary>
         internal string SubsystemLines()
         {
@@ -684,6 +722,7 @@ namespace PadForge.Services
                 KeyboardScreenRoute.Direct => string.Format(culture, s.KeyboardScreens_Status_Direct_Format, status.Detail),
                 KeyboardScreenRoute.G19Preparing => s.KeyboardScreens_Status_G19Preparing,
                 KeyboardScreenRoute.G19OtherDriver => string.Format(culture, s.KeyboardScreens_Status_G19OtherDriver_Format, status.Detail),
+                KeyboardScreenRoute.G19ForeignDriver => string.Format(culture, s.KeyboardScreens_Status_G19ForeignDriver_Format, status.Detail),
                 KeyboardScreenRoute.ArxNoLibrary => s.KeyboardScreens_Status_ArxNoLibrary,
                 KeyboardScreenRoute.ArxNotRunning => s.KeyboardScreens_Status_ArxNotRunning,
                 KeyboardScreenRoute.ArxWaiting => s.KeyboardScreens_Status_ArxWaiting,
@@ -766,17 +805,25 @@ namespace PadForge.Services
         {
             var list = new List<byte[]>();
             if (string.IsNullOrEmpty(frames)) return list;
-            var (width, height) = KeyboardScreenFormats.SizeOf(kind);
             foreach (var part in frames.Split(','))
             {
                 if (list.Count == MaxFrames) break;
-                byte[] png;
-                try { png = Convert.FromBase64String(part.Trim()); }
-                catch (FormatException) { continue; }
-                var picture = BoundedBitmap.FromBytes(png, width, height);
+                var picture = FramePicture(kind, part);
                 if (picture != null) list.Add(KeyboardScreenRenderer.RenderFitted(picture, kind));
             }
             return list;
+        }
+
+        /// <summary>One entry of a Show Keyboard Screen action's pictures,
+        /// decoded no larger than the kind's screen, or null when it holds no
+        /// picture. <see cref="DecodeFrames"/> skips such an entry.</summary>
+        internal static BitmapSource FramePicture(KeyboardScreenKind kind, string part)
+        {
+            byte[] png;
+            try { png = Convert.FromBase64String((part ?? string.Empty).Trim()); }
+            catch (FormatException) { return null; }
+            var (width, height) = KeyboardScreenFormats.SizeOf(kind);
+            return BoundedBitmap.FromBytes(png, width, height);
         }
 
         /// <summary>A picture file as one Show Keyboard Screen frame: fitted to

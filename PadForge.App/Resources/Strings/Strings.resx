@@ -319,6 +319,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Works with mods made for DSX, such as those for GTA V, Red Dead Redemption 2, Skyrim and Forza. While the server listens, PadForge writes its port where those mods look for it.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Listening on :{0}. {1} is sending to virtual controller {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Listening on :{0}. {1} is sending, but no virtual controller has a PlayStation controller on it.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Listening on :{0}. {1} is sending to controller index {2}, and no virtual controller with a PlayStation controller on it has that index.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Port {0} is in use by another program, such as DSX. Close it or choose another port.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>A game mod</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Works with OpenTrack and any tracker that sends its UDP output or writes FreeTrack 2.0 shared memory, and with an OpenXR runtime on this machine that can run a session in the background.</value></data>
@@ -4153,7 +4154,7 @@ Would you like PadForge to uninstall them now? This requires elevation and may t
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Waiting for FreeTrack shared memory data.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>FreeTrack shared memory is unavailable.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Steering Angle Rumble</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Adds continuous rumble as the selected virtual stick axis moves away from center. Uses the mapped output from all assigned sources. With Split by Direction, negative movement drives the left motor and positive movement the right. Left Motor or Right Motor puts both directions on that one motor. For Xbox and PlayStation output with rumble devices. Native wheel force feedback is excluded.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Adds continuous rumble as the selected virtual stick axis moves away from center. Uses the mapped output from all assigned sources. With Split by Direction, negative movement drives the left motor and positive movement the right. Left Motor or Right Motor puts both directions on that one motor. For Xbox and PlayStation output with rumble devices. It skips wheels, other devices with constant force feedback, and Fanatec pedals.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Enable Steering Angle Rumble</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Virtual Axis</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Left Stick X</value></data>
@@ -4356,6 +4357,7 @@ Would you like PadForge to uninstall them now? This requires elevation and may t
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>directly on the {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>binding WinUSB to the G19's screen</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>the G19's screen is on another driver ({0}), so start Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>the G19's screen is on another program's driver ({0}), which PadForge leaves alone</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>needs Logitech Gaming Software 8.52 or later</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>start Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>waiting for a phone with Arx Control</value></data>
@@ -4427,6 +4429,7 @@ Would you like PadForge to uninstall them now? This requires elevation and may t
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Handle</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} is setting this controller's triggers.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} is setting this controller's lights.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} is setting this device's lights.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} is setting this controller's triggers and lights.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} is playing trigger vibrations on this controller's impulse triggers.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Clear Mod Effects</value></data>
@@ -4434,10 +4437,10 @@ Would you like PadForge to uninstall them now? This requires elevation and may t
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Left/Right</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Up/Down</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>In/Out</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Button {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, loaded from {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>The dhd64.dll you chose did not load, so PadForge uses the copy above.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Force Dimension's library runs only in the x64 build of PadForge.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>Found dhd64.dll and could not load it.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>That dhd64.dll is not the Force Dimension library PadForge expects.</value></data>
@@ -4447,11 +4450,12 @@ Would you like PadForge to uninstall them now? This requires elevation and may t
   <data name="Falcon_Status_Open" xml:space="preserve"><value>open</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>A Falcon is open in another program, such as FalconJoyForce or Force Dimension's own tools. Close it there.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>The Falcon is on another driver ({0}), so Force Dimension's library cannot open it. In Device Manager, update the Falcon's driver from the drivers\usb folder in Force Dimension's SDK folder.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>The Falcon is on Force Dimension's driver, and Force Dimension's library could not open it: {0}. Check its power and its USB cable.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>A Falcon is plugged in with no driver. Install Falcon Driver gives it Force Dimension's.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>A Falcon is plugged in with no driver, and the SDK folder has no driver package to give it. Reinstall Force Dimension's SDK.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>No Falcon found. Plug in its power and its USB cable.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Choose dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Loads this copy of Force Dimension's library before any other. The copies the SDK installs are found without it.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Loads this copy of Force Dimension's library in place of any other. A Falcon open on another copy closes and opens again on this one. The copies the SDK installs are found without it.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Libraries (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Install Falcon Driver</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Installs Force Dimension's driver, from the SDK folder, on a Falcon that has none. Windows may first ask whether to trust Force Dimension.</value></data>
@@ -4468,7 +4472,7 @@ Would you like PadForge to uninstall them now? This requires elevation and may t
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Plays games with a Novint Falcon through Force Dimension's SDK, which you install from Force Dimension. The handle is a stick, the grip's four buttons are buttons, and PadForge puts the game's rumble and effects on the handle as force. Each slot's Force Feedback tab sets how the Falcon feels.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Drive Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Opens each Falcon through Force Dimension's dhd64.dll. An open Falcon belongs to PadForge alone, so FalconJoyForce and Force Dimension's tools cannot open it while this is on. Off, PadForge closes every Falcon.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon library set to {0}. A copy already in use stays until PadForge starts again.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon library set to {0}. PadForge loads it within a few seconds, and a Falcon open on another copy opens again on this one.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Installing Force Dimension's Falcon driver…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Force Dimension's Falcon driver package, or its catalog, is missing: {0}. Reinstall Force Dimension's SDK.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>No Falcon is plugged in.</value></data>

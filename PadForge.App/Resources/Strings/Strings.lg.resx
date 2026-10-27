@@ -665,10 +665,10 @@
   <data name="Macro_Pan_Direction" xml:space="preserve"><value>Oludda</value></data>
   <data name="Common_Pixels" xml:space="preserve"><value>px</value></data>
   <data name="DeviceType_NovintFalcon" xml:space="preserve"><value>Novint Falcon</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} etereeza ettaala z'ekyuma kino.</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Kkono/Ddyo</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Waggulu/Wansi</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Munda/Wabweru</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Eppeesa {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Londa dhd64.dll…</value></data>

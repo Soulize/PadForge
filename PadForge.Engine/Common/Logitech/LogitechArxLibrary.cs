@@ -3,6 +3,19 @@ using System.Runtime.InteropServices;
 
 namespace PadForge.Engine.Common.Logitech
 {
+    /// <summary>The calls an Arx applet makes on <see cref="LogitechArxLibrary"/>,
+    /// so its owner can be driven by a stand-in in the tests.</summary>
+    public interface ILogitechArx
+    {
+        bool Init(string identifier, string friendlyName, Action<uint, uint> onEvent);
+        bool AddContent(byte[] content, string fileName, string mimeType);
+        bool AddImage(byte[] bgra, int width, int height, string fileName);
+        bool SetIndex(string fileName);
+        bool SetTagProperty(string tagId, string property, string value);
+        int LastError { get; }
+        void Shutdown();
+    }
+
     /// <summary>
     /// Logitech Gaming Software's Arx Control library (issue #519), the
     /// surface <c>LogitechGArxControlLib.h</c> declares: one applet, a set of
@@ -16,8 +29,15 @@ namespace PadForge.Engine.Common.Logitech
     /// structure it is handed in, for as long as the session lasts, the
     /// G-key source's rule, and its subscriber only queues.</para>
     /// </summary>
-    public sealed class LogitechArxLibrary
+    public sealed class LogitechArxLibrary : ILogitechArx
     {
+        /// <summary><see cref="LastError"/>'s codes for a session that is
+        /// gone: "SDK not initialized" and "Connection with Logitech Gaming
+        /// Software broken", after which LGS takes no further call (the SDK
+        /// guide, page 15).</summary>
+        public const int ErrorNotInitialized = 4;
+        public const int ErrorConnectionBroken = 6;
+
         public const uint EventFocusActive = 0x01;
         public const uint EventFocusInactive = 0x02;
         public const uint EventTapOnTag = 0x04;

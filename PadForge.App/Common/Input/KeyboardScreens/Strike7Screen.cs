@@ -19,12 +19,20 @@ namespace PadForge.Common.Input.KeyboardScreens
     /// picture the way Mad Catz's map applet scrolls its map: each step the
     /// distance from the last touch, until the finger lifts.</para>
     ///
+    /// <para>A library that will not load for want of the Visual C++ 2008
+    /// runtime is not loaded again until the runtime is there: a failed
+    /// load hashes the file and asks Windows to bind the runtime each time.
+    /// The screen looks for the runtime every <see cref="RuntimeCheckMs"/>,
+    /// and loads at once when the Install Visual C++ 2008 Runtime button's own check
+    /// found it (<see cref="Strike7Library.RuntimeFoundCount"/>).</para>
+    ///
     /// <para>The callbacks run on the library's thread and only queue. Every
     /// draw is made on the host's worker.</para>
     /// </summary>
     internal sealed class Strike7Screen : IDisposable
     {
-        private const int OpenRetryMs = 10000;
+        internal const int OpenRetryMs = 10000;
+        internal const int RuntimeCheckMs = 60000;
         private const int IdleShutdownMs = 2000;
         private const int MinDrawMs = 50;
 
@@ -45,6 +53,11 @@ namespace PadForge.Common.Input.KeyboardScreens
         private long _drawn = -1, _nextOpen, _nextDraw, _idleSince = -1;
         private bool _pressed;
         private int _lastX, _lastY;
+        private readonly Func<string, (Strike7Library Library, string Reason)> _tryLoad;
+        private readonly Func<bool> _runtimeInstalled;
+        private readonly Func<long> _runtimeFound;
+        private bool _waitingForRuntime;
+        private long _runtimeSeen;
 
         /// <summary>Why the library is not loaded: "gate", "platform",
         /// "missing", "hash", "runtime", "load" or "exports", or empty once it
@@ -57,10 +70,23 @@ namespace PadForge.Common.Input.KeyboardScreens
         public bool Shown => _applet != 0 && _shown;
 
         public Strike7Screen(byte[] iconBgra, int iconWidth, int iconHeight)
+            : this(iconBgra, iconWidth, iconHeight,
+                path => (Strike7Library.TryLoad(path, out string reason), reason),
+                Strike7Library.IsVc2008RuntimeInstalled, () => Strike7Library.RuntimeFoundCount)
+        {
+        }
+
+        /// <summary>Test seam: the library's load, the runtime check and the
+        /// count of checks that found the runtime.</summary>
+        internal Strike7Screen(byte[] iconBgra, int iconWidth, int iconHeight,
+            Func<string, (Strike7Library Library, string Reason)> tryLoad, Func<bool> runtimeInstalled, Func<long> runtimeFound)
         {
             _icon = iconBgra;
             _iconWidth = iconWidth;
             _iconHeight = iconHeight;
+            _tryLoad = tryLoad;
+            _runtimeInstalled = runtimeInstalled;
+            _runtimeFound = runtimeFound;
         }
 
         /// <summary>A drag's step, for the screen service to pan the
@@ -85,13 +111,26 @@ namespace PadForge.Common.Input.KeyboardScreens
                 _library = null;
                 _path = path;
                 _nextOpen = 0;
+                _waitingForRuntime = false;
             }
             if (_library == null)
             {
-                if (now < _nextOpen) return;
+                bool installed = _waitingForRuntime && _runtimeFound() != _runtimeSeen;
+                if (now < _nextOpen && !installed) return;
+                if (_waitingForRuntime && !installed)
+                {
+                    _nextOpen = now + RuntimeCheckMs;
+                    if (!_runtimeInstalled()) return;
+                }
                 _nextOpen = now + OpenRetryMs;
-                _library = Load(path, expectedSha256, out string reason);
+                _library = Load(path, expectedSha256, _tryLoad, out string reason);
                 LoadReason = reason;
+                _waitingForRuntime = _library == null && reason == "runtime";
+                if (_waitingForRuntime)
+                {
+                    _runtimeSeen = _runtimeFound();
+                    _nextOpen = now + RuntimeCheckMs;
+                }
                 if (_library == null) return;
                 _nextOpen = 0;
             }
@@ -157,7 +196,8 @@ namespace PadForge.Common.Input.KeyboardScreens
         /// copy PadForge downloaded is checked against the SDK's own hash
         /// before it loads, so a damaged copy is reported and never
         /// loaded.</summary>
-        private static Strike7Library Load(string path, string expectedSha256, out string reason)
+        private static Strike7Library Load(string path, string expectedSha256,
+            Func<string, (Strike7Library Library, string Reason)> tryLoad, out string reason)
         {
             reason = "missing";
             if (string.IsNullOrWhiteSpace(path)) return null;
@@ -181,7 +221,7 @@ namespace PadForge.Common.Input.KeyboardScreens
                     return null;
                 }
             }
-            var lib = Strike7Library.TryLoad(path, out reason);
+            (var lib, reason) = tryLoad(path);
             if (lib == null) return null;
             lock (s_lock) s_libraries[path] = lib;
             reason = string.Empty;

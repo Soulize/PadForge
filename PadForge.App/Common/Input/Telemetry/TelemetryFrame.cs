@@ -84,7 +84,9 @@ namespace PadForge.Common.Input.Telemetry
         /// in their own units after scaling.</summary>
         public float[] Variables = Array.Empty<float>();
         public TelemetrySource Source;
-        /// <summary>The F1 year (2022 to 2025), for the status line.</summary>
+        /// <summary>The F1 game's year, for the status line: the game year
+        /// byte when the packet carries one that is not 0, the packet
+        /// format's year otherwise.</summary>
         public int F1Year;
         /// <summary>The custom format's name when <see cref="Source"/> is
         /// Custom.</summary>

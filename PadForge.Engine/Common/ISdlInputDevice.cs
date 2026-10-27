@@ -105,6 +105,10 @@ namespace PadForge.Engine
         /// SDL_GAMEPAD_CAPSENSE_* indices. 0 by default: only the SDL wrapper
         /// reads them.</summary>
         int CapSenseChannelMask => 0;
+        /// <summary>Whether the pad carries voice phrases, as another PC that
+        /// owns it answers (Remote Link). Null by default: the device's own
+        /// record decides (UserDevice.HasVoicePhrases).</summary>
+        bool? OwnerHasVoicePhrases => null;
         bool? TouchpadPressureSupported => null;
         bool? TouchpadClickSupported => null;
         HapticEffectStrategy HapticStrategy { get; }

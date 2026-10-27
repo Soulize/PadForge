@@ -97,6 +97,49 @@ public class HeadTrackingInputTests
     }
 
     [Fact]
+    public void AUdpPortAnotherProgramHeld_IsTriedAgain_AndListensOnceThatProgramLeaves()
+    {
+        var occupied = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        occupied.ExclusiveAddressUse = true;
+        occupied.Bind(new IPEndPoint(IPAddress.Loopback, 0));
+        int port = ((IPEndPoint)occupied.LocalEndPoint).Port;
+        long now = 10000;
+        int firewallCalls = 0;
+        using var device = new HeadTrackerDevice(true, port, false, 0, () => now, null, _ => firewallCalls++)
+            { UdpBindAddress = IPAddress.Loopback };
+        try
+        {
+            Assert.True(device.Open());
+            Assert.True(device.UdpBindFailed);
+            Assert.Equal(0, firewallCalls);
+
+            // Still held at the interval: the try fails and waits again.
+            now += HeadTrackerDevice.UdpRetryMs;
+            device.GetCurrentState();
+            Assert.True(device.UdpBindFailed);
+
+            // Released, but inside the interval: nothing is tried.
+            occupied.Dispose();
+            now += HeadTrackerDevice.UdpRetryMs - 1;
+            device.GetCurrentState();
+            Assert.True(device.UdpBindFailed);
+
+            int version = device.StatusVersion;
+            now += 1;
+            device.GetCurrentState();
+            Assert.False(device.UdpBindFailed);
+            Assert.Equal(port, device.BoundUdpPort);
+            Assert.NotEqual(version, device.StatusVersion);
+            Assert.Equal(1, firewallCalls);
+            Assert.Equal(string.Format(Strings.Instance.HeadTracker_StatusWaiting_Format, port), Status(device));
+        }
+        finally
+        {
+            occupied.Dispose();
+        }
+    }
+
+    [Fact]
     public void FreeTrackOnlyWaitingStatusDoesNotClaimAUdpListener()
     {
         Assert.Equal("FT_SharedMem", FreeTrackReader.HeapName);

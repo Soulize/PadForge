@@ -435,14 +435,26 @@ namespace PadForge.Engine.Data
         /// on Bluetooth does too (#528): PadForge reads the microphone of a
         /// headset plugged into its jack from its input reports, so the path
         /// must carry the Bluetooth HID service class, as the audio service
-        /// tests it. Standalone microphone devices are NOT gated by this:
-        /// they expose phrases as named raw buttons directly (the PC/SC-reader
-        /// pattern). Computed, not stored.</summary>
+        /// tests it, and only while the App reads that microphone at all
+        /// (<see cref="Ds4BtMicEnabled"/>). A Remote Link copy, whose peer://
+        /// path is never Bluetooth, takes its owner's answer when the owner
+        /// sends one (<see cref="ISdlInputDevice.OwnerHasVoicePhrases"/>).
+        /// Standalone microphone devices are NOT gated by this: they expose
+        /// phrases as named raw buttons directly (the PC/SC-reader pattern).
+        /// Computed, not stored.</summary>
         [XmlIgnore]
-        public bool HasVoicePhrases => VendorId == 0x054C
+        public bool HasVoicePhrases => Device?.OwnerHasVoicePhrases ?? (VendorId == 0x054C
             && (ProdId == 0x0CE6 || ProdId == 0x0DF2
                 || ((ProdId == 0x05C4 || ProdId == 0x09CC)
-                    && (DevicePath ?? "").IndexOf("{00001124", StringComparison.OrdinalIgnoreCase) >= 0));
+                    && (Ds4BtMicEnabled?.Invoke() ?? true)
+                    && (DevicePath ?? "").IndexOf("{00001124", StringComparison.OrdinalIgnoreCase) >= 0)));
+
+        /// <summary>Whether the App reads a Bluetooth DualShock 4's headset
+        /// microphone (AudioPassthroughService.EnableDs4BtMic), the switch
+        /// the App's own voice gates follow. The Engine cannot see the App,
+        /// so InputService wires it at startup, the SdlDeviceWrapper provider
+        /// idiom. Unwired, it reads as on.</summary>
+        public static Func<bool> Ds4BtMicEnabled;
 
         // Wii IR pointer tuning (sensor-bar position/compensation, smoothing)
         // moved to PadSetting (issue #146 follow-up) so each (device, slot)
@@ -616,7 +628,7 @@ namespace PadForge.Engine.Data
         public string GunCalibration { get; set; } = string.Empty;
 
         /// <summary>A Novint Falcon's reach (#521) as "x,y,z" in millimeters,
-        /// set by the Calibrate sweep on the Force Feedback tab. Empty means
+        /// set by Calibrate Reach on the Falcon's Devices panel. Empty means
         /// 60 mm on each axis. It belongs to the Falcon, so it is kept per
         /// device, which a Falcon's serial number identifies.</summary>
         [XmlElement]

@@ -283,6 +283,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>DSX 向けに作られた MOD に対応しています。GTA V、Red Dead Redemption 2、Skyrim、Forza 向けの MOD などがあります。サーバーがリッスンしている間、PadForge は MOD が探す場所にポート番号を書き込みます。</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>:{0} でリッスン中。{1} が仮想コントローラー {2} に送信中です。</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>:{0} でリッスン中。{1} が送信中ですが、PlayStation コントローラーを持つ仮想コントローラーがありません。</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>:{0} でリッスン中。{1} がコントローラー インデックス {2} に送信していますが、PlayStation コントローラーが接続された仮想コントローラーにそのインデックスはありません。</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>ポート {0} は DSX などの別のプログラムが使用中です。そのプログラムを閉じるか、別のポートを選んでください。</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>ゲーム MOD</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>OpenTrack や、UDP 出力を送信するまたは FreeTrack 2.0 の共有メモリに書き込むあらゆるトラッカー、およびこのマシンにインストールされた、バックグラウンドでセッションを実行できる OpenXR ランタイムで動作します。</value></data>
@@ -4078,7 +4079,7 @@
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>FreeTrack共有メモリのデータを待機中。</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>FreeTrack共有メモリを利用できません。</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>ステアリング角度による振動</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>選択した仮想スティック軸が中央から離れるほど、継続的な振動が強くなります。割り当てたすべての入力をマッピングした出力を使用します。「方向ごとに分割」では、負方向で左モーター、正方向で右モーターが振動します。「左モーター」または「右モーター」を選ぶと、両方向がそのモーターで振動します。振動対応デバイスを使うXboxおよびPlayStation出力向けです。ハンドルのネイティブフォースフィードバックは対象外です。</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>選択した仮想スティック軸が中央から離れるほど、継続的な振動が強くなります。割り当てたすべての入力をマッピングした出力を使用します。「方向ごとに分割」では、負方向で左モーター、正方向で右モーターが振動します。「左モーター」または「右モーター」を選ぶと、両方向がそのモーターで振動します。振動対応デバイスを使うXboxおよびPlayStation出力向けです。ハンドル、定数フォースフィードバックを備えた他のデバイス、Fanatec のペダルは対象外です。</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>ステアリング角度による振動を有効化</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>仮想軸</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>左スティックX</value></data>
@@ -4281,6 +4282,7 @@
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>{0} に直接表示</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>G19 の画面に WinUSB をバインド中</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>G19 の画面は別のドライバー ({0}) を使用しています。Logitech Gaming Software を起動してください</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>G19 の画面は別のプログラムのドライバー ({0}) を使用しており、PadForge はそのままにします</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>Logitech Gaming Software 8.52 以降が必要です</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>Logitech Gaming Software を起動してください</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>Arx Control を使用するスマートフォンを待機中</value></data>
@@ -4352,6 +4354,7 @@
   <data name="Devices_FalconHandle" xml:space="preserve"><value>ハンドル</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} がこのコントローラーのトリガーを設定しています。</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} がこのコントローラーのライトを設定しています。</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} がこのデバイスのライトを設定しています。</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} がこのコントローラーのトリガーとライトを設定しています。</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} がこのコントローラーのインパルストリガーでトリガーの振動を再生しています。</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>MOD エフェクトを解除</value></data>
@@ -4359,10 +4362,10 @@
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>左右</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>上下</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>手前/奥</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>ボタン {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}、{1} から読み込み済み</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>選択した dhd64.dll は読み込めなかったため、PadForge は上記のコピーを使用します。</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Force Dimension のライブラリは、PadForge の x64 ビルドでのみ動作します。</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>dhd64.dll は見つかりましたが読み込めませんでした。</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>この dhd64.dll は、PadForge が必要とする Force Dimension のライブラリではありません。</value></data>
@@ -4372,11 +4375,12 @@
   <data name="Falcon_Status_Open" xml:space="preserve"><value>開いています</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Falcon が別のプログラム (FalconJoyForce や Force Dimension 純正のツールなど) で開かれています。そちらで閉じてください。</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon は別のドライバー ({0}) を使用しているため、Force Dimension のライブラリで開けません。デバイス マネージャーで、Force Dimension の SDK フォルダー内の drivers\usb フォルダーから Falcon のドライバーを更新してください。</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon は Force Dimension のドライバーを使用していますが、Force Dimension のライブラリで開けませんでした: {0}。電源と USB ケーブルを確認してください。</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Falcon が接続されていますが、ドライバーがありません。Falcon ドライバーをインストールすると、Force Dimension のドライバーが適用されます。</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Falcon が接続されていますが、ドライバーがなく、SDK フォルダーにも適用できるドライバー パッケージがありません。Force Dimension の SDK を再インストールしてください。</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Falcon が見つかりません。電源と USB ケーブルを接続してください。</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>dhd64.dll を選択…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Force Dimension のこのライブラリを最優先で読み込みます。SDK がインストールするコピーは、この設定がなくても見つかります。</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Force Dimension のこのライブラリを、他のコピーに代えて読み込みます。別のコピーで開いている Falcon は、いったん閉じてこのコピーで開き直します。SDK がインストールするコピーは、この設定がなくても見つかります。</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|ライブラリ (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Falcon ドライバーをインストール</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>ドライバーのない Falcon に、SDK フォルダー内の Force Dimension のドライバーをインストールします。先に Windows が Force Dimension を信頼するか確認する場合があります。</value></data>
@@ -4393,7 +4397,7 @@
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Force Dimension の SDK (Force Dimension からインストールしてください) を通じて、Novint Falcon でゲームを操作します。ハンドルはスティック、グリップの 4 つのボタンはボタンとして扱われ、PadForge はゲームの振動やエフェクトをハンドルの力として出力します。Falcon の感触は、各スロットのフォースフィードバック タブで設定します。</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Novint Falcon を制御する</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Force Dimension の dhd64.dll を通じて、すべての Falcon を開きます。開かれた Falcon は PadForge が専有するため、オンの間は FalconJoyForce や Force Dimension のツールでは開けません。オフにすると、PadForge はすべての Falcon を閉じます。</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon のライブラリを {0} に設定しました。すでに使用中のコピーは、PadForge を再起動するまでそのままです。</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon のライブラリを {0} に設定しました。PadForge は数秒以内に読み込み、別のコピーで開いている Falcon はこのコピーで開き直します。</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Force Dimension の Falcon ドライバーをインストールしています…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Force Dimension の Falcon ドライバー パッケージまたはそのカタログがありません: {0}。Force Dimension の SDK を再インストールしてください。</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Falcon が接続されていません。</value></data>

@@ -32,8 +32,48 @@ namespace PadForge.Common.Input.KeyboardScreens
     /// </summary>
     internal sealed class G15HidScreens : IDisposable
     {
-        private const int ScanMs = 3000;
+        internal const int ScanMs = 3000;
         private const string KeysSource = "hid";
+
+        /// <summary>A collection's key reader.</summary>
+        internal interface IKeyReader : IDisposable
+        {
+            /// <summary>False once the device went quiet for good.</summary>
+            bool IsAttached { get; }
+        }
+
+        /// <summary>One collection's caps, read through an open that asks
+        /// no access.</summary>
+        internal readonly record struct Caps(ushort OutputLength, ushort InputLength, ushort UsagePage, ushort Usage);
+
+        /// <summary>The calls the screens make on the PC, so a test can
+        /// stand in for each.</summary>
+        internal sealed class Hid
+        {
+            /// <summary>Every present HID interface of a monochrome screen
+            /// model, with its PID and Windows' container ID.</summary>
+            public Func<List<(string Path, ushort Pid, string Container)>> Paths { get; init; }
+
+            /// <summary>A collection's caps, null when it cannot be opened
+            /// or read.</summary>
+            public Func<string, Caps?> ReadCaps { get; init; }
+
+            /// <summary>A reader on a key collection handing each report to
+            /// the callback, null when it does not open.</summary>
+            public Func<string, ushort, ushort, Action<byte[], int>, IKeyReader> OpenReader { get; init; }
+
+            public Func<string, byte[], bool> Write { get; init; }
+            public Action<string> Reset { get; init; }
+
+            public static readonly Hid Real = new()
+            {
+                Paths = MonochromePaths,
+                ReadCaps = ReadRealCaps,
+                OpenReader = OpenRealReader,
+                Write = RawHidOutput.Write,
+                Reset = RawHidOutput.ResetDevice,
+            };
+        }
 
         private sealed class Collection
         {
@@ -41,7 +81,7 @@ namespace PadForge.Common.Input.KeyboardScreens
             public ushort ProductId;
             public bool Screen;
             public Keyboard Owner;
-            public VendorHidReader Reader;
+            public IKeyReader Reader;
             public long Written = -1;
         }
 
@@ -67,8 +107,11 @@ namespace PadForge.Common.Input.KeyboardScreens
         private readonly Dictionary<string, Collection> _collections = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, Keyboard> _keyboards = new(StringComparer.Ordinal);
         private readonly Dictionary<string, ushort> _inputLengths = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Hid _io;
         private long _nextScan;
         private volatile bool _appletKeyOnly;
+
+        public G15HidScreens(Hid io = null) => _io = io ?? Hid.Real;
 
         /// <summary>The keyboards whose screen collection is open, in id
         /// order.</summary>
@@ -128,12 +171,12 @@ namespace PadForge.Common.Input.KeyboardScreens
                 foreach (var c in k.Collections)
                 {
                     if (!c.Screen || c.Written == k.ReportVersion) continue;
-                    if (RawHidOutput.Write(c.Path, k.Report)) c.Written = k.ReportVersion;
+                    if (_io.Write(c.Path, k.Report)) c.Written = k.ReportVersion;
                     else
                     {
                         // Gone or refused: the next scan finds it again or drops
                         // it, and its cached handle and length go now.
-                        RawHidOutput.ResetDevice(c.Path);
+                        _io.Reset(c.Path);
                         _nextScan = 0;
                     }
                 }
@@ -155,23 +198,35 @@ namespace PadForge.Common.Input.KeyboardScreens
         private void Scan()
         {
             var present = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var (path, pid, devInst) in MonochromePaths())
+            foreach (var (path, pid, container) in _io.Paths())
             {
                 present.Add(path);
                 if (_collections.TryGetValue(path, out var known))
                 {
                     // A reader whose device went quiet for good is opened
-                    // again on this scan.
+                    // again on this scan. The keyboard was unplugged, maybe
+                    // plugged in again inside one scan's wait, so its screen
+                    // lost the picture: every collection of it forgets what
+                    // was written and its cached handle, and the next pass
+                    // draws the picture again.
                     if (known.Reader != null && !known.Reader.IsAttached)
                     {
                         known.Reader.Dispose();
                         known.Reader = null;
-                        if (known.Owner != null) KeyboardScreenKeys.Clear(known.Owner.Info.Id, KeysSource);
+                        if (known.Owner != null)
+                        {
+                            KeyboardScreenKeys.Clear(known.Owner.Info.Id, KeysSource);
+                            foreach (var c in known.Owner.Collections)
+                            {
+                                c.Written = -1;
+                                _io.Reset(c.Path);
+                            }
+                        }
                         OpenReader(known);
                     }
                     continue;
                 }
-                var info = KeyboardScreenInfo.Monochrome(pid, AnalogKeyboardHidRuntime.ContainerId(devInst), path);
+                var info = KeyboardScreenInfo.Monochrome(pid, container, path);
                 if (!_keyboards.TryGetValue(info.Id, out var owner))
                     owner = new Keyboard { Info = info };
                 var probed = Probe(path, pid, owner, out bool unreadable);
@@ -199,7 +254,7 @@ namespace PadForge.Common.Input.KeyboardScreens
         {
             if (!_collections.Remove(path, out var c)) return;
             c.Reader?.Dispose();
-            RawHidOutput.ResetDevice(path);
+            _io.Reset(path);
             var owner = c.Owner;
             if (owner == null) return;
             owner.Collections.Remove(c);
@@ -215,6 +270,31 @@ namespace PadForge.Common.Input.KeyboardScreens
         private Collection Probe(string path, ushort pid, Keyboard owner, out bool unreadable)
         {
             unreadable = true;
+            try
+            {
+                if (_io.ReadCaps(path) is not Caps caps) return null;
+                unreadable = false;
+                bool screen = caps.OutputLength == KeyboardScreenFormats.G15ReportLength;
+                // Windows keeps keyboards and mice to itself, so their
+                // collections are not asked for reads.
+                bool keys = caps.InputLength > 0
+                            && !(caps.UsagePage == 0x01 && (caps.Usage == 0x06 || caps.Usage == 0x02));
+                if (!screen && !keys) return null;
+                var c = new Collection { Path = path, ProductId = pid, Screen = screen, Owner = owner };
+                if (keys) OpenReader(c, caps.InputLength);
+                return c;
+            }
+            catch (Exception)
+            {
+                unreadable = true;
+                return null;
+            }
+        }
+
+        /// <summary>The caps through an open that asks no access,
+        /// VendorHidRuntime's probe, or null.</summary>
+        private static Caps? ReadRealCaps(string path)
+        {
             var handle = SonyHeadsetHid.CreateFile(path, 0,
                 SonyHeadsetHid.FILE_SHARE_READ | SonyHeadsetHid.FILE_SHARE_WRITE,
                 IntPtr.Zero, SonyHeadsetHid.OPEN_EXISTING, 0, IntPtr.Zero);
@@ -224,21 +304,7 @@ namespace PadForge.Common.Input.KeyboardScreens
             {
                 if (!SonyHeadsetHid.HidD_GetPreparsedData(handle, out preparsed)) return null;
                 if (SonyHeadsetHid.HidP_GetCaps(preparsed, out var caps) != SonyHeadsetHid.HIDP_STATUS_SUCCESS) return null;
-                unreadable = false;
-                bool screen = caps.OutputReportByteLength == KeyboardScreenFormats.G15ReportLength;
-                // Windows keeps keyboards and mice to itself, so their
-                // collections are not asked for reads.
-                bool keys = caps.InputReportByteLength > 0
-                            && !(caps.UsagePage == 0x01 && (caps.Usage == 0x06 || caps.Usage == 0x02));
-                if (!screen && !keys) return null;
-                var c = new Collection { Path = path, ProductId = pid, Screen = screen, Owner = owner };
-                if (keys) OpenReader(c, caps.InputReportByteLength);
-                return c;
-            }
-            catch (Exception)
-            {
-                unreadable = true;
-                return null;
+                return new Caps(caps.OutputReportByteLength, caps.InputReportByteLength, caps.UsagePage, caps.Usage);
             }
             finally
             {
@@ -247,22 +313,37 @@ namespace PadForge.Common.Input.KeyboardScreens
             }
         }
 
+        private sealed class RealReader : IKeyReader
+        {
+            public VendorHidReader Reader;
+            public bool IsAttached => Reader.IsAttached;
+            public void Dispose() => Reader.Dispose();
+        }
+
+        private static IKeyReader OpenRealReader(string path, ushort pid, ushort inputLength, Action<byte[], int> onReport)
+        {
+            var reader = new VendorHidReader(new VendorHidCollection
+            {
+                Path = path,
+                VendorId = KeyboardScreenDevices.LogitechVid,
+                ProductId = pid,
+                InputReportLength = inputLength,
+            });
+            reader.ReportReceived += (_, report, length) => onReport(report, length);
+            if (reader.Open()) return new RealReader { Reader = reader };
+            reader.Dispose();
+            return null;
+        }
+
         private void OpenReader(Collection c, ushort inputLength = 0)
         {
             if (c.Owner == null) return;
             if (inputLength > 0) _inputLengths[c.Path] = inputLength;
             else if (!_inputLengths.TryGetValue(c.Path, out inputLength)) return;
-            var reader = new VendorHidReader(new VendorHidCollection
-            {
-                Path = c.Path,
-                VendorId = KeyboardScreenDevices.LogitechVid,
-                ProductId = c.ProductId,
-                InputReportLength = inputLength,
-            });
             ushort pid = c.ProductId;
             var owner = c.Owner;
             string screen = owner.Info.Id;
-            reader.ReportReceived += (_, report, length) =>
+            c.Reader = _io.OpenReader(c.Path, pid, inputLength, (report, length) =>
             {
                 int bits = KeyboardScreenFormats.DecodeMonoKeys(pid, report.AsSpan(0, length));
                 if (bits < 0) return;
@@ -276,17 +357,15 @@ namespace PadForge.Common.Input.KeyboardScreens
                 }
                 if (_appletKeyOnly) bits &= 1 << KeyboardScreenFormats.MonoAppletKey;
                 KeyboardScreenKeys.Report(screen, KeysSource, bits);
-            };
-            if (reader.Open()) c.Reader = reader;
-            else reader.Dispose();
+            });
         }
 
         /// <summary>Every present HID interface of a monochrome screen
-        /// model, by the VID and PID its path carries, with its devnode for
-        /// the container lookup.</summary>
-        private static List<(string Path, ushort Pid, uint DevInst)> MonochromePaths()
+        /// model, by the VID and PID its path carries, with the container
+        /// ID of its devnode.</summary>
+        private static List<(string Path, ushort Pid, string Container)> MonochromePaths()
         {
-            var list = new List<(string, ushort, uint)>();
+            var list = new List<(string, ushort, string)>();
             SonyHeadsetHid.HidD_GetHidGuid(out Guid hidGuid);
             IntPtr set = SonyHeadsetHid.SetupDiGetClassDevs(ref hidGuid, IntPtr.Zero, IntPtr.Zero,
                 SonyHeadsetHid.DIGCF_PRESENT | SonyHeadsetHid.DIGCF_DEVICEINTERFACE);
@@ -301,7 +380,7 @@ namespace PadForge.Common.Input.KeyboardScreens
                 {
                     string path = AnalogKeyboardHidRuntime.GetInterfacePath(set, ref iface, out uint devInst);
                     if (TryReadIds(path, out ushort vid, out ushort pid) && KeyboardScreenDevices.IsMonochrome(vid, pid))
-                        list.Add((path, pid, devInst));
+                        list.Add((path, pid, AnalogKeyboardHidRuntime.ContainerId(devInst)));
                 }
             }
             finally

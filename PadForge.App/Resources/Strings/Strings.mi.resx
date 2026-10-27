@@ -165,6 +165,7 @@
   <data name="Dashboard_GameModStandIn" xml:space="preserve"><value>Whakahaere i tētahi whakakapi DSX.exe</value></data>
   <data name="Dashboard_GameModStandIn_Tooltip" xml:space="preserve"><value>Ka whakaweto ētahi mod, pērā i a DualSense4GTAV, i a rātou anō ki te kore he hōtaka ko DSX te ingoa e rere ana. Ka whakahaere tēnei i tētahi whakakapi iti ko taua ingoa anō i te wā e whakarongo ana te tūmau.</value></data>
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Ka mahi tahi me ngā mod i hangaia mō DSX, pērā i ērā mō GTA V, Red Dead Redemption 2, Skyrim me Forza. I te wā e whakarongo ana te tūmau, ka tuhi a PadForge i tōna port ki te wāhi e rapu ai aua mod.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Kei te whakarongo ki :{0}. Kei te tuku a {1} ki te tau controller {2}, engari kāore he controller mariko e whai ana i taua tau me tētahi controller PlayStation kei runga.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Kei te whakamahia te port {0} e tētahi atu hōtaka, pērā i a DSX. Katia, kōwhiria rānei tētahi atu port.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>He mod kēmu</value></data>
   <data name="RemoteLink_Connect" xml:space="preserve"><value>Tūhono</value></data>
@@ -1537,6 +1538,7 @@
   <data name="RemoteLink_AssignmentBusy" xml:space="preserve">
     <value>E tatari ana ki tērā atu PC...</value>
   </data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Ka tāpiri i te wiri haere tonu i te nekehanga atu o te tuaka stick mariko i kōwhiria i te pokapū. Ka whakamahia te putanga o ngā mapping mai i ngā pūtake katoa kua tautapahia. Mā "Wehe mā te ahunga", ka akiaki te nekehanga tōraro i te mōta mauī, ā, te nekehanga tōrunga i te mōta matau. Mā "Mōta mauī", "Mōta matau" rānei, ka tukuna ngā ahunga e rua ki taua mōta kotahi. Mō te putanga Xbox me PlayStation me ngā pūrere wiri. Ka hipa i ngā wheel, i ētahi atu pūrere force feedback pūmau, me ngā pedals Fanatec.</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Tuaka mariko</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Stick mauī X</value></data>
   <data name="Pad_SteeringAngleRumble_LY" xml:space="preserve"><value>Stick mauī Y</value></data>
@@ -1612,6 +1614,7 @@
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>hāngai tonu ki te {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>e here ana i a WinUSB ki te mata o te G19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>kei tētahi atu taraiwa te mata o te G19 ({0}), nō reira tīmatahia a Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>kei te taraiwa o tētahi atu hōtaka te mata o te G19 ({0}), ā, kāore a PadForge e raweke i taua taraiwa</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>e hiahia ana ki Logitech Gaming Software 8.52, ki tētahi putanga hou ake rānei</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>tīmatahia a Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>e tatari ana ki tētahi waea me Arx Control</value></data>
@@ -1662,23 +1665,27 @@
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Kakau</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} kei te whakarite i ngā trigger o tēnei controller.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} kei te whakarite i ngā rama o tēnei controller.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} kei te whakarite i ngā rama o tēnei pūrere.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} kei te whakarite i ngā trigger me ngā rama o tēnei controller.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Ūkui ngā pānga mod</value></data>
   <data name="Devices_ClearModEffects_Tooltip" xml:space="preserve"><value>Ka whakamutu i ngā mea i whakaritea e ngā mod kēmu ki tēnei controller. Ka hoki mai ōna ake tautuhinga kia tuku anō rā anō tētahi mod.</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Mauī/Matau</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Runga/Raro</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Roto/Waho</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Pātene {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, i utaina mai i {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Kāore i utaina te dhd64.dll i kōwhiria e koe, nō reira ka whakamahia e PadForge te tārua kei runga ake.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>I kitea a dhd64.dll, engari kāore i taea te uta.</value></data>
   <data name="Falcon_Status_Open" xml:space="preserve"><value>kua tuwhera</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Kei te taraiwa o Force Dimension te Falcon, engari kāore i taea e te pātaka a Force Dimension te huaki: {0}. Tirohia tōna hiko me tōna taura USB.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Kōwhiri dhd64.dll…</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Ka utaina tēnei tārua o te pātaka a Force Dimension hei whakakapi i ētahi atu. Ka katia tētahi Falcon e tuwhera ana i tētahi atu tārua, ā, ka huakina anō ki tēnei. Ka kitea aunoa ngā tārua i tāutahia e te SDK, kāore e hiahiatia tēnei.</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Tāuta taraiwa Falcon</value></data>
   <data name="Falcon_OpenDownload" xml:space="preserve"><value>Tikina te SDK a Force Dimension</value></data>
   <data name="Settings_Falcon_Title" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Whakahaere i te Novint Falcon</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Kua tautuhia te pātaka Falcon ki {0}. Ka utaina e PadForge i roto i ētahi hēkona, ā, ka huakina anō tētahi Falcon e tuwhera ana i tētahi atu tārua ki tēnei.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>E tāuta ana i te taraiwa Falcon a Force Dimension…</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Kāore he Falcon kua honoa.</value></data>
   <data name="Pad_Falcon_Header" xml:space="preserve"><value>Novint Falcon</value></data>

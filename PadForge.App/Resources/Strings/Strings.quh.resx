@@ -1278,6 +1278,7 @@
   <data name="KeyboardScreens_Mode_Stopwatch" xml:space="preserve"><value>Cronómetro</value></data>
   <data name="KeyboardScreens_Mode_Lightbar" xml:space="preserve"><value>Lightbarpa llimp'in</value></data>
   <data name="KeyboardScreens_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>G19-pa pantallan huk programapa controladorninpi kashan ({0}), PadForge chayta mana llamiykunchu</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>Logitech Gaming Software-ta qallarichiy</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>Arx Control-niyuq celularta suyachkan</value></data>
   <data name="KeyboardScreens_Status_ArxOnPhone" xml:space="preserve"><value>huk celularpi</value></data>
@@ -1311,15 +1312,17 @@
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Hap'ina</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} kay controlpa gatillonkunata churashan.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} kay controlpa k'anchayninkunata churashan.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} kay dispositivopa k'anchayninkunata churashan.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} kay controlpa gatillonkunata k'anchayninkunatapas churashan.</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Lluq'i/Paña</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Hanaq/Ura</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Ukhu/Hawa</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Botón {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Akllasqayki dhd64.dll mana cargakurqanchu, chayrayku PadForge hanaqpi kaq copiata llamk'achin.</value></data>
   <data name="Falcon_Status_Rate_Format" xml:space="preserve"><value>{0:0.0} kHz-pi llamk'ashan</value></data>
   <data name="Falcon_Status_Open" xml:space="preserve"><value>kichasqa</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon-qa Force Dimension-pa controladorninpi kashan, Force Dimension-pa bibliotecan mana kichayta atirqanchu: {0}. Energiantawan USB cablentawan qhaway.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>dhd64.dll-ta akllay…</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Bibliotecakuna (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Falcon controladorta instalay</value></data>

@@ -8,7 +8,6 @@ using PadForge.Engine;
 using PadForge.Engine.Common;
 using PadForge.Engine.Common.ForceDimension;
 using PadForge.Engine.Data;
-using PadForge.Resources.Strings;
 
 namespace PadForge.Common.Input.Falcon
 {
@@ -70,7 +69,8 @@ namespace PadForge.Common.Input.Falcon
         /// <c>CALIB_FILL</c>, <c>CALIB_MIN</c>, <c>CALIB_MAX</c> :122-124).</summary>
         public const double CalibrationMs = 4000, CalibrationFill = 0.95, CalibrationMin = 0.025, CalibrationMax = 0.120;
 
-        /// <summary>Failed reads in a row before the Falcon counts as gone.</summary>
+        /// <summary>Failed reads in a row, or failed force writes in a row,
+        /// before the Falcon counts as gone.</summary>
         public const int FailuresToDetach = 3;
 
         private readonly IFalconLink _link;
@@ -245,11 +245,23 @@ namespace PadForge.Common.Input.Falcon
 
         /// <summary>Starts a four-second sweep: move the handle to every
         /// extreme. The forces rest while it runs. <paramref name="done"/>
-        /// runs on the haptic thread. False while one already runs.</summary>
+        /// runs on the haptic thread, or at once on the caller's when that
+        /// thread has already ended, with no axis measured. False while one
+        /// already runs, and after Dispose.</summary>
         public bool BeginCalibration(Action<FalconCalibration> done)
         {
             if (done == null || _disposed) return false;
-            return Interlocked.CompareExchange(ref _calibrationDone, done, null) == null;
+            if (Interlocked.CompareExchange(ref _calibrationDone, done, null) != null) return false;
+            // The haptic thread clears _attached before it takes back the
+            // stored sweep on its way out. A sweep stored after that would
+            // never be answered, so it is taken back here. The exchange
+            // lets exactly one of the two answer it.
+            if (!_attached && Interlocked.CompareExchange(ref _calibrationDone, null, done) == done)
+            {
+                try { done(Measure(_reach.Value, 0, 0, 0)); }
+                catch (Exception) { }
+            }
+            return true;
         }
 
         // ─── ISdlInputDevice identity / capabilities ───
@@ -286,14 +298,19 @@ namespace PadForge.Common.Input.Falcon
 
         public bool Open() => IsAttached;
 
-        /// <summary>The three handle axes and the four grip buttons.</summary>
-        public DeviceObjectItem[] GetDeviceObjects()
+        /// <summary>The three handle axes and the four grip buttons, named in
+        /// English whatever the language: the row keeps its objects in the
+        /// settings file and is not opened again when the language changes.
+        /// MappingDisplayResolver.LocalizeObjectName translates the names
+        /// where they are shown.</summary>
+        public DeviceObjectItem[] GetDeviceObjects() => DeviceObjects();
+
+        internal static DeviceObjectItem[] DeviceObjects()
         {
-            var s = Strings.Instance;
             var items = new DeviceObjectItem[AxisCount + ButtonCount];
-            items[0] = Axis(s.Falcon_Axis_LeftRight, ObjectGuid.XAxis, AxisLeftRight);
-            items[1] = Axis(s.Falcon_Axis_UpDown, ObjectGuid.YAxis, AxisUpDown);
-            items[2] = Axis(s.Falcon_Axis_InOut, ObjectGuid.ZAxis, AxisInOut);
+            items[0] = Axis(AxisNameLeftRight, ObjectGuid.XAxis, AxisLeftRight);
+            items[1] = Axis(AxisNameUpDown, ObjectGuid.YAxis, AxisUpDown);
+            items[2] = Axis(AxisNameInOut, ObjectGuid.ZAxis, AxisInOut);
             for (int b = 0; b < ButtonCount; b++)
                 items[AxisCount + b] = new DeviceObjectItem
                 {
@@ -314,10 +331,15 @@ namespace PadForge.Common.Input.Falcon
             Offset = index * 4,
         };
 
-        /// <summary>A grip button's name, numbered in Force Dimension's
-        /// order.</summary>
+        internal const string AxisNameLeftRight = "Left/Right";
+        internal const string AxisNameUpDown = "Up/Down";
+        internal const string AxisNameInOut = "In/Out";
+
+        /// <summary>A grip button's English name, numbered from 1 in Force
+        /// Dimension's order. "Button N" is the name every numbered button
+        /// is translated from.</summary>
         internal static string ButtonName(int button)
-            => string.Format(CultureInfo.CurrentCulture, Strings.Instance.Falcon_Button_Format, button + 1);
+            => string.Format(CultureInfo.InvariantCulture, "Button {0}", button + 1);
 
         /// <summary>The reading as the row reports it: SDL's signed range
         /// moved to 0 to 65535, with up the low end as on a gamepad's Y axis,
@@ -349,7 +371,9 @@ namespace PadForge.Common.Input.Falcon
             int seed = Serial ?? Index;
             var controller = new FalconController(seed);
             double gravity = -1, cap = -1;
-            int failures = 0;
+            // Counted apart, so a good read between two failed writes never
+            // resets the writes' count.
+            int readFailures = 0, writeFailures = 0;
             var clock = Stopwatch.StartNew();
             double last = clock.Elapsed.TotalMilliseconds;
             double nextRate = last + 1000;
@@ -358,8 +382,20 @@ namespace PadForge.Common.Input.Falcon
             bool calibrating = false;
             try
             {
-                _link.SetGravityCompensation(_id, true);
-                _link.EnableForce(_id, true);
+                // Force Dimension's examples stop when dhdEnableForce fails
+                // (gravity.cpp, multithread.cpp). A Falcon whose gravity
+                // compensation or forces do not turn on closes here, and the
+                // next sweep opens it again.
+                if (_link.SetGravityCompensation(_id, true) < 0)
+                {
+                    LogClose("could not turn on gravity compensation");
+                    return;
+                }
+                if (_link.EnableForce(_id, true) < 0)
+                {
+                    LogClose("could not turn on its forces");
+                    return;
+                }
                 while (!_stop)
                 {
                     double now = clock.Elapsed.TotalMilliseconds;
@@ -370,11 +406,15 @@ namespace PadForge.Common.Input.Falcon
 
                     if (_link.GetPosition(_id, out double x, out double y, out double z) < 0)
                     {
-                        if (++failures >= FailuresToDetach) break;
+                        if (++readFailures >= FailuresToDetach)
+                        {
+                            LogClose("failed " + FailuresToDetach + " reads in a row");
+                            break;
+                        }
                         Thread.Sleep(1);
                         continue;
                     }
-                    failures = 0;
+                    readFailures = 0;
                     uint buttons = _link.ButtonMask(_id) & ((1u << ButtonCount) - 1);
                     var handoff = _handoff;
                     var set = handoff.Settings ?? FalconSettings.Unassigned;
@@ -424,8 +464,19 @@ namespace PadForge.Common.Input.Falcon
                             handoff.Game, handoff.Assigned, dt, now);
                     }
 
-                    if (_link.SetForce(_id, output.Fx, output.Fy, output.Fz) < 0 && ++failures >= FailuresToDetach)
-                        break;
+                    // dhdSetForce answers -1 for a failed write, and 0 or
+                    // DHD_MOTOR_SATURATED for one that went through. Force
+                    // Dimension's examples close the device at the first
+                    // failure (multithread.cpp, gravity.cpp).
+                    if (_link.SetForce(_id, output.Fx, output.Fy, output.Fz) < 0)
+                    {
+                        if (++writeFailures >= FailuresToDetach)
+                        {
+                            LogClose("failed " + FailuresToDetach + " force writes in a row");
+                            break;
+                        }
+                    }
+                    else writeFailures = 0;
                     _reading = new FalconReading(output.StickX, output.StickY, output.InOut, buttons);
 
                     if (now >= nextRate)
@@ -449,6 +500,13 @@ namespace PadForge.Common.Input.Falcon
                 try { done?.Invoke(Measure(_reach.Value, 0, 0, 0)); } catch (Exception) { }
             }
         }
+
+        /// <summary>Logs why the haptic thread closes the Falcon, with the
+        /// library's own reason. The library keeps its last error per thread,
+        /// so this runs on the haptic thread right after the failed
+        /// call.</summary>
+        private void LogClose(string why)
+            => SdlDiagLog.WriteLine($"Falcon: device {_id} {why}, so it closes: {_link.LastErrorText()}");
 
         /// <summary>A sweep's spans as reaches: 95% of half the span, kept
         /// only inside 25 to 120 mm, so a partial sweep leaves the old reach.</summary>

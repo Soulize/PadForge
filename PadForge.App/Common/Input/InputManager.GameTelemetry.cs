@@ -21,9 +21,10 @@ namespace PadForge.Common.Input
         internal GameTelemetryDevice GameTelemetry => _gameTelemetryDevice;
 
         /// <summary>Phase 1i2 (issue #531). One row while the switch is on,
-        /// recreated when the user removes it (the NFC recreate pattern) and
-        /// reopened when the port, the game or the custom formats change. Off
-        /// with nothing to retire: two volatile reads and out.</summary>
+        /// recreated when the user removes it (the NFC recreate pattern),
+        /// reopened when the port, the game or the custom formats change, and
+        /// its port tried again while another program holds it. Off with
+        /// nothing to retire: three volatile reads and out.</summary>
         private bool UpdateGameTelemetryDevice()
         {
             if (_gameTelemetryInputsSuppressed)
@@ -48,6 +49,13 @@ namespace PadForge.Common.Input
                     {
                         RetireGameTelemetryRow();
                         MarkChanged(ref changed, "telemetry", !enabled ? "- (feature off)" : removedByUser ? "- (removed by user)" : "- (reconfigured)");
+                    }
+                    else
+                    {
+                        // A port another program held when the row opened is
+                        // tried again on every sweep, so the row listens once
+                        // that program exits. A row that listens skips this.
+                        dev.RetryBind();
                     }
                 }
 

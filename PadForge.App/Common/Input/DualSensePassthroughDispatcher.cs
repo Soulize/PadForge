@@ -357,7 +357,10 @@ namespace PadForge.Common.Input
         /// too would fight it. Rumble is left alone for the same reason: it is
         /// already released, because the external override expires after
         /// ExternalSubsystemGraceMs and that pass then writes PadForge's own
-        /// zero.</para></summary>
+        /// zero. The idle release goes out through the same write as a game's
+        /// frame, so while that pass claims rumble of its own, the write
+        /// carries the claim (<see cref="InjectRumbleClaim"/>). The shutdown
+        /// release carries none (<see cref="RumbleClaimForWrite"/>).</para></summary>
         internal static byte[] BuildTriggerReleasePayload(byte[] buffer)
         {
             Array.Clear(buffer, 0, StandardPayloadSize);
@@ -521,6 +524,118 @@ namespace PadForge.Common.Input
         {
             if (older.Length < offset + count) return;
             older.Slice(offset, count).CopyTo(dest.Slice(offset, count));
+        }
+
+        // ── PadForge's rumble on a pass-through target ──
+        //
+        // Two writers share this pad: this lane forwarding the game's frames,
+        // and UserEffectsDispatcher's 30 Hz pass. While PadForge owns the
+        // rumble (macro rumble, audio rumble, steering angle rumble, test
+        // rumble, persona haptics as rumble) and the game drives nothing but
+        // audio haptics, the pass asserts haptics select with the motors and
+        // every game frame forwarded here leaves bit 1 clear. A frame without
+        // bit 1 puts the pad back on audio haptics (SDL3 SDL_hidapi_ps5.c
+        // HIDAPI_DriverPS5_UpdateEffects, "Leaving emulated rumble bits off
+        // will restore audio haptics", pydualsense's output flag notes, duaLib
+        // dataStructures.h UseRumbleNotHaptics), and the #434 bench measured
+        // the pad stopping within 100 ms of the first such frame. So the
+        // rumble alternated with the game's writes. The #300 lesson for the
+        // lightbar applies: one state on the wire from both writers. The pass
+        // publishes the rumble it asserts per device, and this lane writes
+        // that rumble into each forwarded frame that does not select rumble
+        // itself. A frame with bit 1 set is the game driving rumble and goes
+        // out as the game wrote it. The pass mirrors the game's rumble then
+        // and publishes nothing.
+
+        /// <summary>How long a published claim stands without a refresh:
+        /// three of the dispatcher's 33 ms passes. A pass that stops running
+        /// (its timer parked after the stop frame, the device handed to
+        /// another slot, the dispatcher disposed) lets its claim lapse instead
+        /// of pinning the pad's rumble.</summary>
+        internal const long RumbleClaimFreshMs = 100;
+
+        private sealed class RumbleClaimCell { public long Packed; }
+
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<Guid, RumbleClaimCell> s_rumbleClaims = new();
+
+        /// <summary>The claim a pass frame carrying <paramref name="rumble"/>
+        /// makes on the pass-through lane, packed as validFlag0 rumble bits in
+        /// byte 0, the validFlag2 improved emulation bit in byte 1, the right
+        /// motor in byte 2 and the left in byte 3, or 0 for no claim. A frame
+        /// that mirrors a game's rumble claims nothing, and so does one that
+        /// asserts no rumble bit. The stop frame claims nothing either: its
+        /// motors are zero, and the game's own frame without bit 1 already
+        /// stops emulated rumble, so writing the stop into it would only cut
+        /// the game's audio haptics. Pure.</summary>
+        internal static long RumbleClaimFor(in Ds5EffectSynthesizer.RumbleState rumble)
+        {
+            if (rumble.External) return 0L;
+            if ((rumble.Flag0Bits & 0x03) == 0 && (rumble.Flag2Bits & 0x04) == 0) return 0L;
+            if ((rumble.Right | rumble.Left) == 0) return 0L;
+            return (long)(uint)(rumble.Flag0Bits & 0x03)
+                | ((long)(rumble.Flag2Bits & 0x04) << 8)
+                | ((long)rumble.Right << 16)
+                | ((long)rumble.Left << 24);
+        }
+
+        /// <summary>Records what the dispatcher's pass asserts for rumble on
+        /// <paramref name="device"/> this pass. Called on every pass for every
+        /// DualSense the pass writes, so a claim that ends is replaced by
+        /// none. Lock-free for the reader.</summary>
+        internal static void PublishRumbleClaim(Guid device, in Ds5EffectSynthesizer.RumbleState rumble, long nowMs)
+        {
+            if (device == Guid.Empty) return;
+            long claim = RumbleClaimFor(rumble);
+            long packed = claim == 0 ? 0L : claim | ((long)(uint)nowMs << 32);
+            var cell = s_rumbleClaims.GetOrAdd(device, static _ => new RumbleClaimCell());
+            Volatile.Write(ref cell.Packed, packed);
+        }
+
+        /// <summary>The claim published for <paramref name="device"/>, or 0
+        /// when there is none or it is older than
+        /// <see cref="RumbleClaimFreshMs"/>. Any thread.</summary>
+        internal static long CurrentRumbleClaim(Guid device, long nowMs)
+        {
+            if (!s_rumbleClaims.TryGetValue(device, out var cell)) return 0L;
+            return FreshRumbleClaim(Volatile.Read(ref cell.Packed), nowMs);
+        }
+
+        /// <summary>The claim this lane writes into a frame for
+        /// <paramref name="device"/>: the published one, or none once the lane
+        /// is disposed. Disposal's release frame is the lane's last write and
+        /// hands the pad back as PadForge closes. A claim from the pass's
+        /// final frames would leave PadForge's rumble running on the pad after
+        /// it exits, where the release's clear bit 1 stops it.</summary>
+        internal long RumbleClaimForWrite(Guid device, long nowMs)
+            => _disposed ? 0L : CurrentRumbleClaim(device, nowMs);
+
+        /// <summary>The claim bytes of a published value, or 0 once it is
+        /// older than <see cref="RumbleClaimFreshMs"/>. Pure.</summary>
+        internal static long FreshRumbleClaim(long packed, long nowMs)
+        {
+            long claim = packed & 0xFFFFFFFFL;
+            if (claim == 0) return 0L;
+            uint age = unchecked((uint)nowMs - (uint)(packed >> 32));
+            return age <= RumbleClaimFreshMs ? claim : 0L;
+        }
+
+        /// <summary>Writes a claim into a report-ID-stripped effect payload
+        /// whose valid_flag0 bit 1 is clear: the claim's rumble bits ORed
+        /// into byte 0, its improved emulation bit into byte 38 when the
+        /// payload reaches it, and its motors at bytes 2 (right) and 3 (left),
+        /// the offsets of SDL3's DS5EffectsState_t (ucRumbleRight at 2,
+        /// ucRumbleLeft at 3). A payload with bit 1 set is left as it is,
+        /// because the game is driving rumble. Returns whether the payload
+        /// changed. Pure.</summary>
+        internal static bool InjectRumbleClaim(Span<byte> payload, long claim)
+        {
+            if (claim == 0 || payload.Length < 4) return false;
+            if ((payload[0] & 0x02) != 0) return false;
+            payload[0] |= (byte)(claim & 0x03);
+            if (payload.Length > 38) payload[38] |= (byte)((claim >> 8) & 0x04);
+            payload[2] = (byte)(claim >> 16);
+            payload[3] = (byte)(claim >> 24);
+            return true;
         }
 
         /// <summary>Forwards one packet and records the write cost.</summary>
@@ -1014,7 +1129,11 @@ namespace PadForge.Common.Input
                                 replay[7] = stash[5];   // audio_flags
                                 replay[37] = stash[6];  // audio_flags2
                             }
-                            try { WriteEffectReport(t, replay, StandardPayloadSize); }
+                            try
+                            {
+                                WriteEffectReport(t, replay, StandardPayloadSize,
+                                    RumbleClaimForWrite(t.DeviceGuid, Environment.TickCount64), out _);
+                            }
                             catch { }
                         }
                     }
@@ -1102,9 +1221,17 @@ namespace PadForge.Common.Input
 
                 try
                 {
-                    bool written = WriteEffectReport(target, buf, forwardLen);
-                    // Logged after the physical write with its result.
-                    Ds5WriteTrace.Log(written ? "lane" : "lane-fail", buf, 0, forwardLen);
+                    // PadForge's rumble on this pad goes into a frame that does
+                    // not select rumble itself (see RumbleClaimFreshMs).
+                    long claim = RumbleClaimForWrite(target.DeviceGuid, Environment.TickCount64);
+                    bool written = WriteEffectReport(target, buf, forwardLen, claim, out var report);
+                    // Logged after the physical write with its result, as the
+                    // pad received it.
+                    if (report != null)
+                    {
+                        int start = target.IsBt ? 3 : 1;
+                        Ds5WriteTrace.Log(written ? "lane" : "lane-fail", report, start, report.Length - start);
+                    }
                 }
                 catch
                 {
@@ -1121,12 +1248,16 @@ namespace PadForge.Common.Input
         /// pad over PadForge's own HID handle, framed for the pad's transport.
         /// Open-per-write: the shape PlayStationEffectWriter.WriteRaw kept
         /// after a held-open Bluetooth handle made rumble discontinuous on
-        /// hardware.</summary>
-        private static bool WriteEffectReport(in DualSenseTarget target, byte[] payload, int length)
+        /// hardware. <paramref name="rumbleClaim"/> is PadForge's rumble on
+        /// the pad (<see cref="CurrentRumbleClaim"/>), written into the
+        /// report's copy of the payload and never into the caller's.</summary>
+        private static bool WriteEffectReport(in DualSenseTarget target, byte[] payload, int length,
+            long rumbleClaim, out byte[] report)
         {
+            report = null;
             if (string.IsNullOrEmpty(target.DevicePath) || payload == null) return false;
             if (length > payload.Length) length = payload.Length;
-            byte[] report = BuildEffectReport(target.IsBt, payload.AsSpan(0, length));
+            report = BuildEffectReport(target.IsBt, payload.AsSpan(0, length), rumbleClaim);
             return RawHidOutput.WriteOnce(target.DevicePath, report, LaneWriteTimeoutMs);
         }
 
@@ -1143,8 +1274,11 @@ namespace PadForge.Common.Input
         /// sequence byte 0x00, magic 0x10, up to 75 payload bytes, and the
         /// CRC32 of the 0xA2 header byte plus bytes 0..73 little-endian at
         /// 74..77. A longer payload (the Edge form) is cut where SDL3 cuts
-        /// it.</summary>
-        internal static byte[] BuildEffectReport(bool bluetooth, ReadOnlySpan<byte> payload)
+        /// it. A <paramref name="rumbleClaim"/> goes into the report's payload
+        /// bytes (<see cref="InjectRumbleClaim"/>) before the CRC is stamped,
+        /// so the CRC covers it, and the caller's payload stays as the game
+        /// wrote it.</summary>
+        internal static byte[] BuildEffectReport(bool bluetooth, ReadOnlySpan<byte> payload, long rumbleClaim = 0)
         {
             if (bluetooth)
             {
@@ -1154,6 +1288,7 @@ namespace PadForge.Common.Input
                 report[2] = 0x10;
                 int n = Math.Min(payload.Length, BtEffectReportSize - 3);
                 payload.Slice(0, n).CopyTo(report.AsSpan(3));
+                InjectRumbleClaim(report.AsSpan(3, n), rumbleClaim);
                 PlayStationEffectWriter.StampSonyBtOutputCrc(report);
                 return report;
             }
@@ -1161,6 +1296,7 @@ namespace PadForge.Common.Input
             usb[0] = ReportIdUsbState;
             int m = Math.Min(payload.Length, UsbEffectReportSize - 1);
             payload.Slice(0, m).CopyTo(usb.AsSpan(1));
+            InjectRumbleClaim(usb.AsSpan(1, m), rumbleClaim);
             return usb;
         }
 
@@ -1265,12 +1401,13 @@ namespace PadForge.Common.Input
         /// <summary>Returns true when the specific device identified by
         /// <paramref name="deviceGuid"/> is a passthrough target for
         /// <paramref name="padIndex"/>. Used by
-        /// <c>SlotRumbleForDeviceProvider</c> to zero out rumble bytes for
-        /// the device that the passthrough dispatcher is also writing —
-        /// avoiding the dispatcher / passthrough double-fire on real
-        /// DualSenses while still letting non-DualSense Sony devices on
-        /// the same slot (DS4) and non-Sony devices (Xbox via Step 2)
-        /// receive rumble normally.</summary>
+        /// <c>UserEffectsDispatcher</c>'s Sony pass to zero its own rumble
+        /// bytes for this device while a game's rumble is mirrored, and to
+        /// stand its lightbar down while this lane holds the bar
+        /// (<c>ShouldAssertLightbar</c>), since the game's frames already
+        /// reach the device through this lane. Non-DualSense
+        /// Sony devices on the same slot (DS4) and non-Sony devices (Xbox via
+        /// Step 2) receive rumble normally.</summary>
         public static bool IsPassthroughTarget(int padIndex, Guid deviceGuid)
         {
             if (deviceGuid == Guid.Empty) return false;

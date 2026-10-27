@@ -52,6 +52,12 @@ namespace PadForge.Common.Input
         /// <summary>Poses older than this recenter the axes.</summary>
         public const int SilenceMs = 1000;
 
+        /// <summary>How often a UDP port whose bind failed is tried again,
+        /// so closing the program that held it (OpenTrack's own UDP
+        /// receiver, a second tracker) brings the listener up without the
+        /// row reopening. The game mod and motion servers' rule.</summary>
+        internal const int UdpRetryMs = 3000;
+
         private static readonly int[] s_axisIndices = { 0, 1, 2, 3, 4, 5 };
         private static readonly string[] s_axisNames =
             { "Head Yaw", "Head Pitch", "Head Roll", "Head X", "Head Y", "Head Z" };
@@ -79,6 +85,8 @@ namespace PadForge.Common.Input
         private Thread _thread;
         private volatile bool _running;
         private volatile bool _udpBindFailed;
+        private long _udpFailedTicks;
+        private int _udpRetrying;
         private volatile bool _freeTrackFailed;
 
         private FreeTrackReader _freeTrack;
@@ -232,45 +240,13 @@ namespace PadForge.Common.Input
         // ─── Lifecycle ───
 
         /// <summary>Opens each enabled input. The row opens even when both
-        /// fail, so the status
-        /// line can say why nothing arrives.</summary>
+        /// fail, so the status line can say why nothing arrives, and a UDP
+        /// port that failed is tried again from the read path
+        /// (<see cref="RetryUdpBind"/>).</summary>
         public bool Open()
         {
             if (_disposed) return false;
-            if (_udpEnabled)
-            {
-                try
-                {
-                    // The test host binds loopback alone (NetworkListenerGate).
-                    PadForge.Engine.Common.NetworkListenerGate.Enter(UdpBindAddress);
-                    var s = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-                    _socket = s;
-                    // Suppress ICMP port-unreachable surfacing as a SocketException
-                    // on the next receive (the DSU server's rule).
-                    try { s.IOControl(SIO_UDP_CONNRESET, new byte[4], null); } catch { }
-                    // Exclusive: a second listener (OpenTrack's own UDP tracker
-                    // on the same port) must surface as a conflict, not steal
-                    // half the datagrams.
-                    s.ExclusiveAddressUse = true;
-                    s.Bind(new IPEndPoint(UdpBindAddress, _port));
-                    _running = true;
-                    _thread = new Thread(ReceiveLoop)
-                    {
-                        Name = "PadForge.HeadTrackerUdp",
-                        IsBackground = true,
-                    };
-                    _thread.Start();
-                    SdlDiagLog.WriteLine($"Head tracker: listening on UDP port {_port}");
-                    _configureFirewall(_port);
-                }
-                catch (Exception ex)
-                {
-                    _udpBindFailed = true;
-                    try { _socket?.Dispose(); } catch { }
-                    _socket = null;
-                    SdlDiagLog.WriteLine($"Head tracker: UDP port {_port} bind failed: {ex.Message}");
-                }
-            }
+            if (_udpEnabled) BindUdp(retry: false);
 
             if (_freeTrackEnabled)
             {
@@ -312,6 +288,76 @@ namespace PadForge.Common.Input
 
             _attached = true;
             return true;
+        }
+
+        /// <summary>Binds the UDP port and starts its receive thread. A bind
+        /// that fails marks the row and is tried again from the read path
+        /// every <see cref="UdpRetryMs"/>. A retry logs only its success, so
+        /// a port held for an hour writes one failure line.</summary>
+        private void BindUdp(bool retry)
+        {
+            try
+            {
+                // The test host binds loopback alone (NetworkListenerGate).
+                PadForge.Engine.Common.NetworkListenerGate.Enter(UdpBindAddress);
+                var s = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                _socket = s;
+                // Suppress ICMP port-unreachable surfacing as a SocketException
+                // on the next receive (the DSU server's rule).
+                try { s.IOControl(SIO_UDP_CONNRESET, new byte[4], null); } catch { }
+                // Exclusive: a second listener (OpenTrack's own UDP tracker
+                // on the same port) must surface as a conflict, not steal
+                // half the datagrams.
+                s.ExclusiveAddressUse = true;
+                s.Bind(new IPEndPoint(UdpBindAddress, _port));
+                _running = true;
+                _thread = new Thread(ReceiveLoop)
+                {
+                    Name = "PadForge.HeadTrackerUdp",
+                    IsBackground = true,
+                };
+                _thread.Start();
+                if (_udpBindFailed)
+                {
+                    _udpBindFailed = false;
+                    _statusVersion++;
+                }
+                SdlDiagLog.WriteLine($"Head tracker: listening on UDP port {_port}");
+                _configureFirewall(_port);
+            }
+            catch (Exception ex)
+            {
+                _udpBindFailed = true;
+                Volatile.Write(ref _udpFailedTicks, _now());
+                try { _socket?.Dispose(); } catch { }
+                _socket = null;
+                if (!retry)
+                    SdlDiagLog.WriteLine($"Head tracker: UDP port {_port} bind failed: {ex.Message}");
+            }
+        }
+
+        /// <summary>Tries a failed UDP bind again once
+        /// <see cref="UdpRetryMs"/> has passed. One caller at a time, and
+        /// never after Dispose: a socket bound then would have no one to
+        /// close it.</summary>
+        private void RetryUdpBind()
+        {
+            if (!_udpBindFailed || _now() - Volatile.Read(ref _udpFailedTicks) < UdpRetryMs) return;
+            if (Interlocked.Exchange(ref _udpRetrying, 1) != 0) return;
+            try
+            {
+                if (_disposed) return;
+                BindUdp(retry: true);
+                if (_disposed)
+                {
+                    _running = false;
+                    try { _socket?.Close(); } catch { }
+                }
+            }
+            finally
+            {
+                Volatile.Write(ref _udpRetrying, 0);
+            }
         }
 
         /// <summary>What the OpenXR backend is doing, for the status line.
@@ -420,6 +466,7 @@ namespace PadForge.Common.Input
         public CustomInputState GetCurrentState(bool forceRaw = false)
         {
             if (_disposed || !_attached) return null;
+            RetryUdpBind();
             PollFreeTrack();
             // The OpenXR backend changes state without a pose arriving: it can
             // find no runtime, find no headset, or be refused a headless

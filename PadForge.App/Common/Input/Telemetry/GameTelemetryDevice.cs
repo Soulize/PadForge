@@ -51,7 +51,8 @@ namespace PadForge.Common.Input.Telemetry
     /// port goes back to the hub when the row closes.</para>
     ///
     /// <para>Seven axes (Speed, RPM, Throttle, Brake, Clutch, Handbrake,
-    /// Steering), one more per custom variable, and 21 buttons (Driving,
+    /// Steering), one more per custom variable at the axis that variable
+    /// keeps (<see cref="TelemetryVariable.Slot"/>), and 21 buttons (Driving,
     /// Reverse, Neutral, Gear 1 to Gear 18). After <see cref="SilenceMs"/>
     /// with no frame everything returns to rest, except the ETS2 plugin's
     /// values, held for <see cref="TruckSimulatorHoldMs"/> since it sends only
@@ -89,8 +90,12 @@ namespace PadForge.Common.Input.Telemetry
 
         private static readonly string[] s_axisNames =
             { "Speed", "RPM", "Throttle", "Brake", "Clutch", "Handbrake", "Steering" };
+        // Steering and the variables take a non-Slider axis GUID: the row
+        // writes them into the state's Axis array, and a Slider GUID makes
+        // the picker offer "Slider N", which reads the Sliders array instead
+        // (the rule SdlDeviceWrapper.GetDeviceObjects gives its extra axes).
         private static readonly Guid[] s_axisGuids =
-            { ObjectGuid.XAxis, ObjectGuid.YAxis, ObjectGuid.ZAxis, ObjectGuid.RxAxis, ObjectGuid.RyAxis, ObjectGuid.RzAxis, ObjectGuid.Slider };
+            { ObjectGuid.XAxis, ObjectGuid.YAxis, ObjectGuid.ZAxis, ObjectGuid.RxAxis, ObjectGuid.RyAxis, ObjectGuid.RzAxis, ObjectGuid.ZAxis };
 
         private readonly object _stateLock = new();
         private readonly CustomInputState _state = new();
@@ -107,6 +112,7 @@ namespace PadForge.Common.Input.Telemetry
         private IPEndPoint _forwardEndpoint;
         private Thread _thread;
         private bool _yieldedPort;
+        private bool _bindFailureLogged;
         private volatile bool _running;
         private volatile bool _attached;
         private volatile bool _disposed;
@@ -129,11 +135,11 @@ namespace PadForge.Common.Input.Telemetry
         public static GameTelemetryDevice FromCurrentSettings()
         {
             int version = GameTelemetryRuntime.Version;
-            var compiled = GameTelemetryRuntime.CompiledFormats;
+            GameTelemetryRuntime.ReadFormats(out var compiled, out var variables);
             var detectable = Array.FindAll(compiled, f => f.Detectable);
-            var reader = new TelemetryReader(GameTelemetryRuntime.Format, GameTelemetryRuntime.PinnedFormat,
-                detectable, GameTelemetryRuntime.Variables.Length);
-            return new GameTelemetryDevice(GameTelemetryRuntime.Port, reader, GameTelemetryRuntime.Variables, version, null);
+            var reader = new TelemetryReader(GameTelemetryRuntime.Format, GameTelemetryRuntime.FindPinned(compiled),
+                detectable, variables.Length);
+            return new GameTelemetryDevice(GameTelemetryRuntime.Port, reader, variables, version, null);
         }
 
         internal GameTelemetryDevice(int port, TelemetryReader reader, TelemetryVariable[] variables,
@@ -151,9 +157,16 @@ namespace PadForge.Common.Input.Telemetry
                     PadForge.Services.WebControllerServer.EnsureInboundFirewallRule(FirewallRuleName, "UDP", p));
             });
             _kunosFactory = kunosFactory ?? (() => new KunosSharedMemory());
-            int axes = GameTelemetryRuntime.StandardAxisCount + Math.Min(_variables.Length, GameTelemetryRuntime.MaxVariableAxes);
-            _axisIndices = new int[axes];
-            for (int i = 0; i < axes; i++) _axisIndices[i] = i;
+            // The standard axes, then each variable at the axis it keeps
+            // (TelemetryVariable.Slot), so the list can have gaps where a
+            // deleted variable's axis waits.
+            var indices = new System.Collections.Generic.List<int>();
+            for (int i = 0; i < GameTelemetryRuntime.StandardAxisCount; i++) indices.Add(i);
+            foreach (var variable in _variables)
+                if (variable.Slot >= 0 && variable.Slot < GameTelemetryRuntime.MaxVariableAxes)
+                    indices.Add(GameTelemetryRuntime.StandardAxisCount + variable.Slot);
+            indices.Sort();
+            _axisIndices = indices.ToArray();
             // The identity never changes, so saved mappings survive a change
             // of game, port or format.
             Name = "Game Telemetry";
@@ -166,7 +179,9 @@ namespace PadForge.Common.Input.Telemetry
 
         public uint SdlInstanceId { get; }
         public string Name { get; }
-        public int NumAxes => _axisIndices.Length;
+        /// <summary>The axis space, up to the highest axis in use.
+        /// <see cref="SupportedAxisIndices"/> names the ones that exist.</summary>
+        public int NumAxes => _axisIndices[^1] + 1;
         public int NumButtons => ButtonCount;
         public int RawButtonCount => ButtonCount;
         public int NumHats => 0;
@@ -197,10 +212,15 @@ namespace PadForge.Common.Input.Telemetry
         public bool StopRumble() => false;
 
         /// <summary>The axis names for a row with the given variables, then
-        /// the buttons'. Shared with the tests.</summary>
+        /// the buttons'. A variable's axis is the standard ones plus its
+        /// slot. Shared with the tests.</summary>
         internal static string AxisName(int index, TelemetryVariable[] variables)
-            => index < s_axisNames.Length ? s_axisNames[index]
-             : variables[index - s_axisNames.Length].Name;
+        {
+            if (index < s_axisNames.Length) return s_axisNames[index];
+            foreach (var variable in variables)
+                if (variable.Slot == index - s_axisNames.Length) return variable.Name;
+            return string.Empty;
+        }
 
         internal static string ButtonName(int index) => index switch
         {
@@ -213,18 +233,22 @@ namespace PadForge.Common.Input.Telemetry
         /// <summary>Every axis and button by name.</summary>
         public DeviceObjectItem[] GetDeviceObjects()
         {
-            var items = new DeviceObjectItem[NumAxes + ButtonCount];
-            for (int i = 0; i < NumAxes; i++)
-                items[i] = new DeviceObjectItem
+            int axisCount = _axisIndices.Length;
+            var items = new DeviceObjectItem[axisCount + ButtonCount];
+            for (int a = 0; a < axisCount; a++)
+            {
+                int i = _axisIndices[a];
+                items[a] = new DeviceObjectItem
                 {
                     Name = AxisName(i, _variables),
                     ObjectType = DeviceObjectTypeFlags.AbsoluteAxis,
-                    ObjectTypeGuid = i < s_axisGuids.Length ? s_axisGuids[i] : ObjectGuid.Slider,
+                    ObjectTypeGuid = i < s_axisGuids.Length ? s_axisGuids[i] : ObjectGuid.ZAxis,
                     InputIndex = i,
                     Offset = i * 4,
                 };
+            }
             for (int b = 0; b < ButtonCount; b++)
-                items[NumAxes + b] = new DeviceObjectItem
+                items[axisCount + b] = new DeviceObjectItem
                 {
                     Name = ButtonName(b),
                     ObjectType = DeviceObjectTypeFlags.PushButton,
@@ -265,67 +289,95 @@ namespace PadForge.Common.Input.Telemetry
 
         /// <summary>Opens the socket unless only the shared memory is read.
         /// The row opens even when the port is taken, so the status line can
-        /// say so.</summary>
+        /// say so, and <see cref="RetryBind"/> tries the port again.</summary>
         public bool Open()
         {
             if (_disposed) return false;
-            if (_reader.ReadsUdp && OffLimitsForTest && IsSharedPort(_port))
-            {
-                _listen = TelemetryListenState.PortInUse;
-            }
-            else if (_reader.ReadsUdp)
-            {
-                try
-                {
-                    // The test host binds loopback alone (NetworkListenerGate).
-                    NetworkListenerGate.Enter(BindAddress);
-                    // While a wheel wants RPM lights, the hub listens on
-                    // 20777, 5300 and 4444. It closes its socket on this
-                    // port and reads the game from this row until the row
-                    // closes (GameTelemetryRowSource).
-                    TelemetryHub.YieldPort(_port);
-                    _yieldedPort = true;
-                    var s = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-                    _socket = s;
-                    // Suppress ICMP port-unreachable surfacing as a SocketException
-                    // on the next receive (the DSU server's rule).
-                    try { s.IOControl(SIO_UDP_CONNRESET, new byte[4], null); } catch { }
-                    // Exclusive, so a second listener on the same port shows as
-                    // a conflict rather than taking half the packets.
-                    s.ExclusiveAddressUse = true;
-                    s.Bind(new IPEndPoint(BindAddress, _port));
-                    // The copy goes out from loopback, so the forward socket
-                    // listens on nothing the network can reach.
-                    var forward = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-                    try { forward.IOControl(SIO_UDP_CONNRESET, new byte[4], null); } catch { }
-                    forward.Bind(new IPEndPoint(IPAddress.Loopback, 0));
-                    _forward = forward;
-                    _running = true;
-                    _listen = TelemetryListenState.Listening;
-                    _thread = new Thread(ReceiveLoop)
-                    {
-                        Name = "PadForge.GameTelemetryUdp",
-                        IsBackground = true,
-                    };
-                    _thread.Start();
-                    SdlDiagLog.WriteLine($"Game telemetry: listening on UDP port {_port}");
-                    if (!IPAddress.IsLoopback(BindAddress)) _configureFirewall(_port);
-                }
-                catch (Exception ex)
-                {
-                    _listen = TelemetryListenState.PortInUse;
-                    try { _socket?.Dispose(); } catch { }
-                    try { _forward?.Dispose(); } catch { }
-                    _socket = null;
-                    _forward = null;
-                    ReclaimHubPort();
-                    SdlDiagLog.WriteLine($"Game telemetry: UDP port {_port} bind failed: {ex.Message}");
-                }
-            }
+            if (_reader.ReadsUdp) BindUdp();
             if (_reader.ReadsSharedMemory) _kunos = _kunosFactory();
             _attached = true;
             _statusVersion++;
             return true;
+        }
+
+        /// <summary>Tries the port again while another program holds it, so
+        /// the row starts listening once that program lets go, with no toggle
+        /// and no restart. The device sweep calls it on the poll thread every
+        /// 2 s. True when the row listens now.</summary>
+        internal bool RetryBind()
+        {
+            if (_disposed || !_reader.ReadsUdp || _listen != TelemetryListenState.PortInUse) return false;
+            BindUdp();
+            if (_listen != TelemetryListenState.Listening) return false;
+            lock (_stateLock) _statusVersion++;
+            return true;
+        }
+
+        /// <summary>How many times the row has tried its port, for the tests.</summary>
+        internal int BindAttempts { get; private set; }
+
+        /// <summary>Binds the socket and starts the receive thread, or leaves
+        /// the row reporting the port in use. A failure is logged once per
+        /// run of failures, since the sweep retries every 2 s.</summary>
+        private void BindUdp()
+        {
+            BindAttempts++;
+            if (OffLimitsForTest && IsSharedPort(_port))
+            {
+                _listen = TelemetryListenState.PortInUse;
+                return;
+            }
+            try
+            {
+                // The test host binds loopback alone (NetworkListenerGate).
+                NetworkListenerGate.Enter(BindAddress);
+                // While a wheel wants RPM lights, the hub listens on
+                // 20777, 5300 and 4444. It closes its socket on this
+                // port and reads the game from this row until the row
+                // closes (GameTelemetryRowSource).
+                TelemetryHub.YieldPort(_port);
+                _yieldedPort = true;
+                var s = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                _socket = s;
+                // Suppress ICMP port-unreachable surfacing as a SocketException
+                // on the next receive (the DSU server's rule).
+                try { s.IOControl(SIO_UDP_CONNRESET, new byte[4], null); } catch { }
+                // Exclusive, so a second listener on the same port shows as
+                // a conflict rather than taking half the packets.
+                s.ExclusiveAddressUse = true;
+                s.Bind(new IPEndPoint(BindAddress, _port));
+                // The copy goes out from loopback, so the forward socket
+                // listens on nothing the network can reach.
+                var forward = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                try { forward.IOControl(SIO_UDP_CONNRESET, new byte[4], null); } catch { }
+                forward.Bind(new IPEndPoint(IPAddress.Loopback, 0));
+                _forward = forward;
+                _running = true;
+                _listen = TelemetryListenState.Listening;
+                _bindFailureLogged = false;
+                _thread = new Thread(ReceiveLoop)
+                {
+                    Name = "PadForge.GameTelemetryUdp",
+                    IsBackground = true,
+                };
+                _thread.Start();
+                SdlDiagLog.WriteLine($"Game telemetry: listening on UDP port {_port}");
+                if (!IPAddress.IsLoopback(BindAddress)) _configureFirewall(_port);
+            }
+            catch (Exception ex)
+            {
+                _listen = TelemetryListenState.PortInUse;
+                try { _socket?.Dispose(); } catch { }
+                try { _forward?.Dispose(); } catch { }
+                _socket = null;
+                _forward = null;
+                ReclaimHubPort();
+                if (!_bindFailureLogged)
+                {
+                    _bindFailureLogged = true;
+                    SdlDiagLog.WriteLine($"Game telemetry: UDP port {_port} bind failed: {ex.Message}");
+                }
+            }
         }
 
         private void ReceiveLoop()
@@ -441,7 +493,7 @@ namespace PadForge.Common.Input.Telemetry
                         _statusVersion++;
                     }
                 }
-                GameTelemetryRuntime.Publish(frame, live, now);
+                GameTelemetryRuntime.Publish(frame, _variables, live, now);
                 var dst = _statePool.Next();
                 _state.CopyInto(dst);
                 return dst;
@@ -460,14 +512,14 @@ namespace PadForge.Common.Input.Telemetry
             axes[ClutchAxis] = Unipolar(f.Clutch);
             axes[HandbrakeAxis] = Unipolar(f.Handbrake);
             axes[SteeringAxis] = Centered(f.Steering);
-            for (int i = GameTelemetryRuntime.StandardAxisCount; i < _axisIndices.Length; i++)
+            for (int v = 0; v < _variables.Length; v++)
             {
-                int v = i - GameTelemetryRuntime.StandardAxisCount;
                 var variable = _variables[v];
+                if (variable.Slot < 0 || variable.Slot >= GameTelemetryRuntime.MaxVariableAxes) continue;
                 float value = v < f.Variables.Length ? f.Variables[v] : 0f;
                 double span = variable.Max - variable.Min;
                 double share = span != 0 ? (value - variable.Min) / span : value >= variable.Max ? 1 : 0;
-                axes[i] = Unipolar((float)share);
+                axes[GameTelemetryRuntime.StandardAxisCount + variable.Slot] = Unipolar((float)share);
             }
 
             var buttons = _state.Buttons;
@@ -482,7 +534,7 @@ namespace PadForge.Common.Input.Telemetry
         private void Rest()
         {
             var axes = _state.Axis;
-            for (int i = 0; i < _axisIndices.Length; i++) axes[i] = 0;
+            for (int i = 0; i < NumAxes; i++) axes[i] = 0;
             axes[SteeringAxis] = HeadPose.AxisCenter;
             var buttons = _state.Buttons;
             for (int b = 0; b < ButtonCount; b++) buttons[b] = false;

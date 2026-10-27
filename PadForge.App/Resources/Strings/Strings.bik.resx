@@ -1083,6 +1083,7 @@
   <data name="KeyboardScreens_Mode_Lightbar" xml:space="preserve"><value>Kolor kan lightbar</value></data>
   <data name="KeyboardScreens_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>direkta sa {0}</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>an screen kan G19 yaon sa driver kan ibang programa ({0}), na dai ginagalaw kan PadForge</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>naghahalat nin selpon na may Arx Control</value></data>
   <data name="KeyboardScreens_Status_ArxOnPhone" xml:space="preserve"><value>sa selpon</value></data>
   <data name="KeyboardScreens_Status_Strike7Showing" xml:space="preserve"><value>sa screen kan V.E.N.O.M.</value></data>
@@ -1105,12 +1106,13 @@
   <data name="Macro_Pan_Direction" xml:space="preserve"><value>Direksyon</value></data>
   <data name="Common_Pixels" xml:space="preserve"><value>px</value></data>
   <data name="DeviceType_NovintFalcon" xml:space="preserve"><value>Novint Falcon</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>Ini-set kan {0} an mga ilaw kan device na ini.</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Wala/Tuo</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Itaas/Ibaba</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Laog/Luwas</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Button {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Dai nag-load an dhd64.dll na pinili mo, kaya ginagamit kan PadForge an kopya sa itaas.</value></data>
   <data name="Falcon_Status_Open" xml:space="preserve"><value>bukas</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Magpili nin dhd64.dll…</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Mga library (*.dll)|*.dll</value></data>

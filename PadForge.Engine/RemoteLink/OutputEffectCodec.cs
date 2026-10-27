@@ -20,7 +20,10 @@ namespace PadForge.Engine.RemoteLink
     /// <item>Vibration carries the full <see cref="Common.Vibration"/> (motors + impulse
     ///   triggers + directional + condition FFB) for every non-Sony, non-vendor-wheel
     ///   device. Owner replays via ForceFeedbackState.SetDeviceForces on the real
-    ///   SDL handle (rumble / trigger rumble / DirectInput haptic, per its caps).</item>
+    ///   SDL handle (rumble / trigger rumble / DirectInput haptic, per its caps).
+    ///   A shared Novint Falcon's frame carries its slot's settings in a
+    ///   <see cref="FalconTail"/>, and the owner hands both to the Falcon's
+    ///   haptic thread (#521).</item>
     /// <item>Wheel carries semantic steering FFB (force/condition/periodic/range/autocenter/
     ///   RPM LEDs) for Logitech / Fanatec / Thrustmaster wheels. Owner re-encodes with
     ///   its own per-vendor raw-HID writer (vendor PID quantization + report sizing +
@@ -87,7 +90,30 @@ namespace PadForge.Engine.RemoteLink
 
         // ── Full Vibration ──────────────────────────────────────────────────
 
-        public static byte[] EncodeVibration(Vibration v)
+        /// <summary>
+        /// A Novint Falcon's settings from the consumer's slot (#521), a tail on
+        /// the Vibration frame of a shared Falcon. The owner's haptic thread
+        /// renders the force, and the feel, the buttons and the strengths are
+        /// set on the consumer's pad page, so they ride with the force. Not
+        /// assigned means the consumer's slots let the Falcon go. The strengths
+        /// are percent, the force cap is tenths of a newton. An owner from
+        /// before the tail stops reading at the condition axes and never sees
+        /// it.
+        /// </summary>
+        public readonly record struct FalconTail(bool Assigned, byte Feel, byte Spring, byte KickButton, byte Kick,
+            byte Shake, byte BraceButton, byte PreloadButton, byte Gravity, ushort ForceCapTenths, byte Overall)
+        {
+            /// <summary>The tail's first byte.</summary>
+            public const byte Tag = 0xFA;
+            /// <summary>Its length, the tag included.</summary>
+            public const int Length = 13;
+            /// <summary>The consumer's slots let the Falcon go.</summary>
+            public static readonly FalconTail Unassigned = default;
+        }
+
+        public static byte[] EncodeVibration(Vibration v) => EncodeVibration(v, null);
+
+        public static byte[] EncodeVibration(Vibration v, FalconTail? falcon)
         {
             var w = new Writer(64);
             w.U8((byte)Kind.Vibration);
@@ -115,6 +141,21 @@ namespace PadForge.Engine.RemoteLink
                 w.U32(a.DeadBand);
                 w.U32(a.PositiveSaturation);
                 w.U32(a.NegativeSaturation);
+            }
+            if (falcon is { } f)
+            {
+                w.U8(FalconTail.Tag);
+                w.U8(f.Assigned ? (byte)1 : (byte)0);
+                w.U8(f.Feel);
+                w.U8(f.Spring);
+                w.U8(f.KickButton);
+                w.U8(f.Kick);
+                w.U8(f.Shake);
+                w.U8(f.BraceButton);
+                w.U8(f.PreloadButton);
+                w.U8(f.Gravity);
+                w.U16(f.ForceCapTenths);
+                w.U8(f.Overall);
             }
             return w.ToArray();
         }
@@ -215,12 +256,16 @@ namespace PadForge.Engine.RemoteLink
             public readonly float HapticToneAmp; // HapticTone
             public readonly int PlayerIndex;     // PlayerIndex (1-based, 0 = unmapped)
             public readonly int GuideLedPercent; // GuideLed (0-100 percent)
+            /// <summary>Vibration: a shared Falcon's settings, null from a
+            /// consumer that sent none.</summary>
+            public readonly FalconTail? Falcon;
             public OutputEffect(Kind kind, byte[] sonyBody, Vibration vibration, WheelFrame wheel,
-                float hapticToneHz = 0f, float hapticToneAmp = 0f, int playerIndex = 0, int guideLedPercent = 0)
+                float hapticToneHz = 0f, float hapticToneAmp = 0f, int playerIndex = 0, int guideLedPercent = 0,
+                FalconTail? falcon = null)
             {
                 Kind = kind; SonyBody = sonyBody; Vibration = vibration; Wheel = wheel;
                 HapticToneHz = hapticToneHz; HapticToneAmp = hapticToneAmp; PlayerIndex = playerIndex;
-                GuideLedPercent = guideLedPercent;
+                GuideLedPercent = guideLedPercent; Falcon = falcon;
             }
         }
 
@@ -274,7 +319,17 @@ namespace PadForge.Engine.RemoteLink
                             v.ConditionAxes = arr;
                             v.ConditionAxisCount = axes;
                         }
-                        effect = new OutputEffect(kind, null, v, default);
+                        // A Falcon's settings (#521) ride after the axes. Bytes
+                        // there without the tag and the tail's full length are
+                        // not one.
+                        FalconTail? falcon = null;
+                        if (r.Remaining >= FalconTail.Length && r.Peek() == FalconTail.Tag)
+                        {
+                            r.U8();
+                            falcon = new FalconTail(r.U8() != 0, r.U8(), r.U8(), r.U8(), r.U8(), r.U8(),
+                                r.U8(), r.U8(), r.U8(), r.U16(), r.U8());
+                        }
+                        effect = new OutputEffect(kind, null, v, default, falcon: falcon);
                         return true;
                     }
 
@@ -360,6 +415,8 @@ namespace PadForge.Engine.RemoteLink
             private readonly ReadOnlySpan<byte> _s;
             private int _p;
             public Reader(ReadOnlySpan<byte> s, int start) { _s = s; _p = start; }
+            public int Remaining => _s.Length - _p;
+            public byte Peek() => _s[_p];
             public byte U8() { byte v = _s[_p]; _p += 1; return v; }
             public ushort U16() { ushort v = BinaryPrimitives.ReadUInt16LittleEndian(_s.Slice(_p, 2)); _p += 2; return v; }
             public short I16() => unchecked((short)U16());

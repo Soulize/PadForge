@@ -280,21 +280,97 @@ namespace PadForge.Tests
             Assert.Equal(12500f, f.MaxRpm);
         }
 
-        [Fact]
-        public void F1_AYearByteThatDoesNotMatch_IsNotF1()
+        /// <summary>F1 24 and F1 25 also send the two formats before their
+        /// own (f1-24-udp README "Will my old app still work"), and the year
+        /// byte then names the game, or reads 0, never the format's year.</summary>
+        [Theory]
+        [InlineData(2023, 24)]
+        [InlineData(2023, 25)]
+        [InlineData(2023, 0)]
+        [InlineData(2024, 25)]
+        [InlineData(2024, 0)]
+        public void F1_AnOlderFormat_DecodesWhateverTheGameYearByteSays(int year, int gameYear)
         {
-            var p = F1Telemetry(2024, 0);
-            p[2] = 23;
+            var state = new TelemetryDecoders.F1State();
+            var status = F1Status(year, 0, 12000);
+            status[2] = (byte)gameYear;
+            var telemetry = F1Telemetry(year, 0);
+            telemetry[2] = (byte)gameYear;
             var f = new TelemetryFrame();
             f.Reset(0);
-            Assert.Equal(TelemetryDecode.No, TelemetryDecoders.TryF1(p, new TelemetryDecoders.F1State(), f));
+            Assert.Equal(TelemetryDecode.Claimed, TelemetryDecoders.TryF1(status, state, f));
+            f.Reset(0);
+            Assert.Equal(TelemetryDecode.Frame, TelemetryDecoders.TryF1(telemetry, state, f));
+            Assert.Equal(TelemetrySource.F1, f.Source);
+            Assert.Equal(gameYear != 0 ? 2000 + gameYear : year, f.F1Year);
+            Assert.Equal(11000f, f.Rpm);
+            Assert.Equal(12000f, f.MaxRpm);
         }
 
-        [Fact]
-        public void F1_24MotionEx_IsClaimed_AndNeverReadAsEaSportsWrc()
+        /// <summary>The status names the game by the year byte formats 2023
+        /// and later carry, and by the format when the byte reads 0 or the
+        /// format has none (F1 22).</summary>
+        [Theory]
+        [InlineData(2024, 25, "F1 25")]
+        [InlineData(2024, 0, "F1 24")]
+        [InlineData(2023, 24, "F1 24")]
+        [InlineData(2025, 25, "F1 25")]
+        [InlineData(2022, -1, "F1 22")]
+        public void F1_TheStatusNamesTheGame_NotTheFormat(int year, int gameYear, string name)
         {
-            // F1 24's Motion Ex is 237 bytes, EA SPORTS WRC's length.
+            var telemetry = F1Telemetry(year, 0);
+            if (gameYear >= 0) telemetry[2] = (byte)gameYear;
+            var f = new TelemetryFrame();
+            f.Reset(0);
+            Assert.Equal(TelemetryDecode.Frame, TelemetryDecoders.TryF1(telemetry, new TelemetryDecoders.F1State(), f));
+            Assert.Equal(name, InputService.SourceName(
+                new TelemetryStatus(TelemetryListenState.Listening, 20777, f.Source, f.F1Year, "", "", 0)));
+        }
+
+        /// <summary>Every packet size of formats 2023 to 2025, by packet id:
+        /// vAzhure F12023.cs, F12024.cs and F12025.cs (Marshal.SizeOf of each
+        /// Packet...Data struct), and the f1-24-udp README's "Size:" lines
+        /// for 2024.</summary>
+        public static IEnumerable<object[]> F1PacketSizes()
+        {
+            int[] f1_23 = { 1349, 644, 1131, 45, 1306, 1107, 1352, 1239, 1020, 1218, 953, 1460, 231, 217 };
+            int[] f1_24 = { 1349, 753, 1285, 45, 1350, 1133, 1352, 1239, 1020, 1306, 953, 1460, 231, 237, 101 };
+            int[] f1_25 = { 1349, 753, 1285, 45, 1284, 1133, 1352, 1239, 1042, 954, 1041, 1460, 231, 273, 101, 1131 };
+            for (int id = 0; id < f1_23.Length; id++) yield return new object[] { 2023, id, f1_23[id] };
+            for (int id = 0; id < f1_24.Length; id++) yield return new object[] { 2024, id, f1_24[id] };
+            for (int id = 0; id < f1_25.Length; id++) yield return new object[] { 2025, id, f1_25[id] };
+        }
+
+        [Theory]
+        [MemberData(nameof(F1PacketSizes))]
+        public void F1_EveryPacketOfItsFormat_IsClaimed(int year, int id, int length)
+        {
+            var f = new TelemetryFrame();
+            f.Reset(0);
+            Assert.NotEqual(TelemetryDecode.No, TelemetryDecoders.TryF1(F1(year, id, length, 0), new TelemetryDecoders.F1State(), f));
+        }
+
+        [Theory]
+        [InlineData(2023, 1351)]
+        [InlineData(2024, 559)]
+        [InlineData(2025, 237)]
+        public void F1_ALengthNotInItsFormat_IsNotF1(int year, int length)
+        {
+            var f = new TelemetryFrame();
+            f.Reset(0);
+            Assert.Equal(TelemetryDecode.No, TelemetryDecoders.TryF1(F1(year, 6, length, 0), new TelemetryDecoders.F1State(), f));
+        }
+
+        [Theory]
+        [InlineData(24)]
+        [InlineData(25)]
+        [InlineData(0)]
+        public void F1_24MotionEx_IsClaimed_AndNeverReadAsEaSportsWrc(int gameYear)
+        {
+            // Format 2024's Motion Ex is 237 bytes, EA SPORTS WRC's length,
+            // and F1 25 sends it with its own year byte or 0.
             var motionEx = F1(2024, 13, 237, 0);
+            motionEx[2] = (byte)gameYear;
             var reader = new TelemetryReader(GameTelemetryFormat.Auto, null, null, 0);
             Assert.False(reader.Read(motionEx, 1000));
             Assert.Equal(TelemetrySource.None, reader.Frame.Source);
@@ -307,6 +383,22 @@ namespace PadForge.Tests
             var f = new TelemetryFrame();
             f.Reset(0);
             Assert.Equal(TelemetryDecode.No, TelemetryDecoders.TryF1(p, new TelemetryDecoders.F1State(), f));
+        }
+
+        // ── The status line ──
+
+        /// <summary>Automobilista 2 sends Project CARS 2's packets, and
+        /// American Truck Simulator the ETS2 plugin's, with nothing that
+        /// tells the two games apart, so the status names both, as the
+        /// picker does.</summary>
+        [Fact]
+        public void TheStatus_NamesBothGamesOfAFormatTwoGamesSend()
+        {
+            var s = PadForge.Resources.Strings.Strings.Instance;
+            Assert.Equal(s.Telemetry_Game_ProjectCars2, InputService.SourceName(
+                new TelemetryStatus(TelemetryListenState.Listening, 5606, TelemetrySource.ProjectCars2, 0, "", "", 0)));
+            Assert.Equal(s.Telemetry_Game_TruckSimulator, InputService.SourceName(
+                new TelemetryStatus(TelemetryListenState.Listening, 49001, TelemetrySource.TruckSimulator, 0, "", "", 0)));
         }
 
         // ── Codemasters ──
@@ -701,6 +793,21 @@ namespace PadForge.Tests
             Assert.False(compiled.TryRead(Encoding.UTF8.GetBytes("{\"fuel\":0.25}"), f, pinned: false));
         }
 
+        /// <summary>An offset so large that adding the field's size overflows
+        /// reads nothing, as any offset past the packet's end does.</summary>
+        [Fact]
+        public void AFieldOffsetNearIntMax_ReadsNothing()
+        {
+            var format = BinaryFormat();
+            format.Fields.Add(new CustomTelemetryField { Target = CustomTelemetryTarget.Throttle, Offset = int.MaxValue - 1, Type = CustomTelemetryType.F32 });
+            var compiled = new CompiledTelemetryFormat(format, GameTelemetryRuntime.BuildVariables(new[] { format }));
+            var f = new TelemetryFrame();
+            f.Reset(3);
+            Assert.True(compiled.TryRead(RigPacket(false), f, pinned: true));
+            Assert.Equal(5000f, f.Rpm);
+            Assert.Equal(0f, f.Throttle);
+        }
+
         [Fact]
         public void AutoDetect_TriesACustomFormatFirst()
         {
@@ -918,7 +1025,7 @@ namespace PadForge.Tests
         [Fact]
         public void TheRow_NamesEveryAxisAndButton()
         {
-            var variables = new[] { new TelemetryVariable("Boost", 0, 2) };
+            var variables = new[] { new TelemetryVariable("Boost", 0, 2, 0) };
             var clock = new Clock();
             using var row = Row(GameTelemetryFormat.Auto, clock, variables);
             var objects = row.GetDeviceObjects();
@@ -935,12 +1042,149 @@ namespace PadForge.Tests
             Assert.Equal("telemetry://game", row.DevicePath);
         }
 
+        /// <summary>The row writes every axis, Steering and the variables
+        /// included, into the state's Axis array, so the picker must offer
+        /// each as "Axis N". A Slider GUID made it "Slider N", which reads
+        /// the Sliders array the row never fills (the #193 rule in
+        /// SdlDeviceWrapper.GetDeviceObjects).</summary>
+        [Fact]
+        public void ThePicker_OffersEveryAxisAsAnAxis_TheArrayTheRowWrites()
+        {
+            var variables = new[] { new TelemetryVariable("Boost", 0, 2, 0) };
+            var clock = new Clock();
+            using var row = Row(GameTelemetryFormat.Auto, clock, variables);
+            var ud = new PadForge.Engine.Data.UserDevice { CapType = InputDeviceType.GameTelemetry, DeviceObjects = row.GetDeviceObjects() };
+            var choices = PadForge.Common.MappingDisplayResolver.BuildInputChoices(ud);
+            Assert.DoesNotContain(choices, c => c.Descriptor.StartsWith("Slider", StringComparison.Ordinal));
+            Assert.Contains(choices, c => c.Descriptor == "Axis 6" && c.DisplayName == "Steering");
+            Assert.Contains(choices, c => c.Descriptor == "Axis 7" && c.DisplayName == "Boost");
+        }
+
+        // ── Each variable keeps its axis ──
+
+        private static CustomTelemetryFormat VariablesFormat(string name, params string[] variables)
+        {
+            var format = new CustomTelemetryFormat { Name = name, Length = 4 * Math.Max(1, variables.Length) };
+            for (int i = 0; i < variables.Length; i++)
+                format.Fields.Add(new CustomTelemetryField { Target = CustomTelemetryTarget.Variable, Name = variables[i], Offset = 4 * i, Max = 100 });
+            return format;
+        }
+
+        private static int SlotOf(string name) => GameTelemetryRuntime.Variables.Single(v => v.Name == name).Slot;
+
+        /// <summary>A saved mapping names an axis by number, so a variable
+        /// keeps the axis it was first given while its name is in use, the
+        /// voice phrase and NFC tag registries' rule for their buttons.
+        /// Deleting or reordering a variable moves no other variable's axis,
+        /// and a name that leaves frees its axis for the next new one.</summary>
+        [Fact]
+        public void AVariable_KeepsItsAxis_WhenAnotherIsDeletedOrMoved()
+        {
+            GameTelemetryRuntime.Formats = new[] { VariablesFormat("Rig", "Boost", "Temp", "Far") };
+            Assert.Equal(new[] { 0, 1, 2 }, new[] { SlotOf("Boost"), SlotOf("Temp"), SlotOf("Far") });
+
+            GameTelemetryRuntime.Formats = new[] { VariablesFormat("Rig", "Far", "Temp") };   // Boost deleted, the rest swapped
+            Assert.Equal(1, SlotOf("Temp"));
+            Assert.Equal(2, SlotOf("Far"));
+
+            var clock = new Clock();
+            using var row = Row(GameTelemetryFormat.Custom, clock, GameTelemetryRuntime.Variables, GameTelemetryRuntime.CompiledFormats[0]);
+            Assert.Equal(new[] { 0, 1, 2, 3, 4, 5, 6, 8, 9 }, row.SupportedAxisIndices);
+            Assert.Equal(10, row.NumAxes);
+            var objects = row.GetDeviceObjects().Where(o => !o.IsButton).ToArray();
+            Assert.Equal("Temp", objects.Single(o => o.InputIndex == 8).Name);
+            Assert.Equal("Far", objects.Single(o => o.InputIndex == 9).Name);
+            var packet = new byte[8];
+            F32(packet, 0, 25f);    // Far
+            F32(packet, 4, 75f);    // Temp
+            row.InjectUdp(packet, "127.0.0.1");
+            var state = row.GetCurrentState();
+            Assert.Equal(GameTelemetryDevice.Unipolar(0.75f), state.Axis[8]);
+            Assert.Equal(GameTelemetryDevice.Unipolar(0.25f), state.Axis[9]);
+            Assert.Equal(0, state.Axis[7]);
+
+            // The freed axis goes to the next new name.
+            GameTelemetryRuntime.Formats = new[] { VariablesFormat("Rig", "Far", "Temp", "Oil") };
+            Assert.Equal(0, SlotOf("Oil"));
+            Assert.Equal(1, SlotOf("Temp"));
+        }
+
+        /// <summary>The axes ride the formats into the settings file, so a
+        /// restart keeps them. A file from before has none, and its variables
+        /// take the axes in first-use order, where they were.</summary>
+        [Fact]
+        public void TheAxes_SurviveARestart_AndAnOlderFileKeepsItsOrder()
+        {
+            var vm = new DashboardViewModel();
+            vm.GameTelemetryFormats = new List<CustomTelemetryFormat> { VariablesFormat("Rig", "Boost", "Temp", "Far") };
+            vm.GameTelemetryFormats = new List<CustomTelemetryFormat> { VariablesFormat("Rig", "Far", "Temp") };
+            var saved = vm.GameTelemetryFormats;
+            Assert.Equal(1, saved[0].Fields.Single(f => f.Name == "Temp").Axis);
+            Assert.Equal(2, saved[0].Fields.Single(f => f.Name == "Far").Axis);
+
+            var serializer = new XmlSerializer(typeof(AppSettingsData));
+            using var writer = new StringWriter();
+            serializer.Serialize(writer, new AppSettingsData { GameTelemetryFormats = saved });
+            Assert.Contains("Axis=\"1\"", writer.ToString());
+            var back = (AppSettingsData)serializer.Deserialize(new StringReader(writer.ToString()));
+
+            GameTelemetryRuntime.ResetForTest();            // a new process
+            new DashboardViewModel().GameTelemetryFormats = back.GameTelemetryFormats;
+            Assert.Equal(1, SlotOf("Temp"));
+            Assert.Equal(2, SlotOf("Far"));
+
+            // An older file: no Axis anywhere.
+            GameTelemetryRuntime.ResetForTest();
+            var older = VariablesFormat("Rig", "Far", "Temp");
+            Assert.All(older.Fields, f => Assert.Equal(-1, f.Axis));
+            GameTelemetryRuntime.Formats = new[] { older };
+            Assert.Equal(0, SlotOf("Far"));
+            Assert.Equal(1, SlotOf("Temp"));
+        }
+
+        /// <summary>The row has 24 axes, the input state's, 17 after the
+        /// standard seven. A variable past them gets none and still reads as
+        /// an expression channel, and it takes the first axis a deleted
+        /// variable frees.</summary>
+        [Fact]
+        public void AVariablePastTheLastAxis_GetsNone_UntilOneIsFreed()
+        {
+            int max = GameTelemetryRuntime.MaxVariableAxes;
+            Assert.Equal(PadForge.Engine.CustomInputState.MaxAxis - GameTelemetryRuntime.StandardAxisCount, max);
+            var names = Enumerable.Range(0, max + 1).Select(i => "V" + i).ToArray();
+            GameTelemetryRuntime.Formats = new[] { VariablesFormat("Many", names) };
+            Assert.Equal(-1, SlotOf("V" + max));
+            Assert.Equal(max - 1, SlotOf("V" + (max - 1)));
+            var clock = new Clock();
+            using (var row = Row(GameTelemetryFormat.Custom, clock, GameTelemetryRuntime.Variables, GameTelemetryRuntime.CompiledFormats[0]))
+                Assert.Equal(PadForge.Engine.CustomInputState.MaxAxis, row.NumAxes);
+
+            GameTelemetryRuntime.Formats = new[] { VariablesFormat("Many", names.Where(n => n != "V3").ToArray()) };
+            Assert.Equal(3, SlotOf("V" + max));
+        }
+
+        /// <summary>The dialog edits copies, so it carries each field's axis
+        /// through, and a renamed variable keeps the axis its old name had
+        /// once that name is gone.</summary>
+        [Fact]
+        public void TheDialog_CarriesTheAxis_AndARenameKeepsIt()
+        {
+            var vm = new DashboardViewModel();
+            vm.GameTelemetryFormats = new List<CustomTelemetryFormat> { VariablesFormat("Rig", "Boost", "Temp", "Far") };
+            var edit = TelemetryFormatEdit.From(vm.GameTelemetryFormats[0]);
+            edit.Fields[2].Name = "Oil";                     // Far renamed, axis 2
+            edit.Fields.RemoveAt(0);                         // Boost deleted, axis 0 free
+            vm.GameTelemetryFormats = new List<CustomTelemetryFormat> { edit.ToModel() };
+            Assert.Equal(1, SlotOf("Temp"));
+            Assert.Equal(2, SlotOf("Oil"));
+        }
+
         [Fact]
         public void TheRowsIdentity_NeverChanges()
         {
             var clock = new Clock();
             using var a = Row(GameTelemetryFormat.Auto, clock);
-            using var b = Row(GameTelemetryFormat.F1, clock, new[] { new TelemetryVariable("X", 0, 1) });
+            using var b = Row(GameTelemetryFormat.F1, clock, new[] { new TelemetryVariable("X", 0, 1, 0) });
             Assert.Equal(a.InstanceGuid, b.InstanceGuid);
             Assert.Equal(a.ProductGuid, b.ProductGuid);
         }
@@ -1095,6 +1339,28 @@ namespace PadForge.Tests
             Assert.Equal(0f, GameTelemetryRuntime.Read(TelemetryChannel.Variable, "Missing"));
         }
 
+        /// <summary>Saving the formats swaps the variable list at once, and
+        /// the row keeps publishing frames laid out by the list it opened
+        /// with until the sweep reopens it. A name reads its own value
+        /// through that window, never the value at its new position.</summary>
+        [Fact]
+        public void AVariable_ReadsItsOwnValue_BeforeTheRowReopensOnNewFormats()
+        {
+            GameTelemetryRuntime.Formats = new[] { BinaryFormat() };   // Boost, Temp, Far
+            var clock = new Clock();
+            using var row = Row(GameTelemetryFormat.Custom, clock, GameTelemetryRuntime.Variables, GameTelemetryRuntime.CompiledFormats[0]);
+            row.InjectUdp(RigPacket(false), "127.0.0.1");
+            row.GetCurrentState();
+            Assert.Equal(90.5f, GameTelemetryRuntime.Read(TelemetryChannel.Variable, "Temp"), 3);
+
+            var edited = BinaryFormat();
+            edited.Fields.RemoveAll(field => field.Name == "Boost");
+            GameTelemetryRuntime.Formats = new[] { edited };              // Temp, Far
+            Assert.Equal("Temp", GameTelemetryRuntime.Variables[0].Name);
+            row.GetCurrentState();
+            Assert.Equal(90.5f, GameTelemetryRuntime.Read(TelemetryChannel.Variable, "Temp"), 3);
+        }
+
         [Theory]
         [InlineData("tel:SpeedKmh", TelemetryChannel.SpeedKmh, "")]
         [InlineData("tel:Gear", TelemetryChannel.Gear, "")]
@@ -1186,7 +1452,6 @@ namespace PadForge.Tests
             var row = new DeviceRowViewModel { DeviceTypeKey = "GameTelemetry", DevicePath = "telemetry://game" };
             Assert.True(row.IsInternalVirtual);
             Assert.False(row.ShowSubmitMapping);
-            Assert.True(row.IsGameTelemetryDevice);
             Assert.Equal(PadForge.Resources.Strings.Strings.Instance.DeviceType_GameTelemetry, row.DeviceType);
             Assert.Equal("\uEC4A", PadForge.Common.DeviceTypeGlyph.For(InputDeviceType.GameTelemetry));
         }
@@ -1225,6 +1490,75 @@ namespace PadForge.Tests
             Assert.True(row.Open());
             Assert.Equal(TelemetryListenState.PortInUse, row.Status.State);
             Assert.False(TelemetryHub.IsPortYielded(port));
+        }
+
+        /// <summary>A port another program held when the row opened is tried
+        /// again, so the row listens once that program lets go, with no
+        /// toggle and no restart.</summary>
+        [Fact]
+        public void ARowWhosePortWasInUse_ListensOnceItIsFree()
+        {
+            var holder = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            holder.Bind(new IPEndPoint(IPAddress.Loopback, 0));
+            int port = ((IPEndPoint)holder.LocalEndPoint).Port;
+            var clock = new Clock { Now = Environment.TickCount64 };
+            using var row = Row(GameTelemetryFormat.Auto, clock, port: port);
+            Assert.True(row.Open());
+            Assert.Equal(TelemetryListenState.PortInUse, row.Status.State);
+
+            Assert.False(row.RetryBind());
+            Assert.Equal(TelemetryListenState.PortInUse, row.Status.State);
+            Assert.Equal(0, row.BoundPort);
+            Assert.False(TelemetryHub.IsPortYielded(port));
+
+            holder.Dispose();
+            int version = row.StatusVersion;
+            Assert.True(row.RetryBind());
+            Assert.Equal(TelemetryListenState.Listening, row.Status.State);
+            Assert.Equal(port, row.BoundPort);
+            Assert.NotEqual(version, row.StatusVersion);
+
+            var packet = Forza(324);
+            using var game = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
+            game.Send(packet, packet.Length, new IPEndPoint(IPAddress.Loopback, port));
+            long until = Environment.TickCount64 + 3000;
+            while (row.Status.Source == TelemetrySource.None && Environment.TickCount64 < until)
+                System.Threading.Thread.Sleep(5);
+            Assert.Equal(TelemetrySource.ForzaHorizon, row.Status.Source);
+            Assert.False(row.RetryBind());   // listening: nothing to retry
+        }
+
+        /// <summary>The device sweep (every 2 s) is what retries the port,
+        /// on the row it already has. The test host's gate refuses the
+        /// every-address bind the app's own row makes, so the port stays in
+        /// use here and each sweep is one more attempt.</summary>
+        [Fact]
+        public void TheSweep_RetriesAPortInUse_OnTheSameRow()
+        {
+            var saved = SettingsManager.UserDevices;
+            var im = new InputManager();
+            try
+            {
+                SettingsManager.UserDevices = new DeviceCollection();
+                GameTelemetryRuntime.Port = FreeLoopbackPort();
+                GameTelemetryRuntime.Enabled = true;
+                var sweep = typeof(InputManager).GetMethod("UpdateGameTelemetryDevice",
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                sweep.Invoke(im, null);
+                var row = im.GameTelemetry;
+                Assert.NotNull(row);
+                Assert.Equal(TelemetryListenState.PortInUse, row.Status.State);
+                int attempts = row.BindAttempts;
+                sweep.Invoke(im, null);
+                sweep.Invoke(im, null);
+                Assert.Same(row, im.GameTelemetry);
+                Assert.Equal(attempts + 2, row.BindAttempts);
+            }
+            finally
+            {
+                im.ShutdownGameTelemetryInputs();
+                SettingsManager.UserDevices = saved;
+            }
         }
 
         [Fact]
@@ -1348,6 +1682,45 @@ namespace PadForge.Tests
             Assert.Equal(7000f, snap.MaxRpm);
         }
 
+        /// <summary>The RPM lights' own F1 listener (the hub's, while the Game
+        /// Telemetry row is off) reads the four formats the row reads, each
+        /// by its own layout, and only a packet of its id's size: F1 22's
+        /// 24-byte header and 47-byte Car Status entries, the 29-byte header
+        /// and 55-byte entries after (vAzhure F12022.cs to F12025.cs).</summary>
+        [Theory]
+        [InlineData(2022)]
+        [InlineData(2023)]
+        [InlineData(2024)]
+        [InlineData(2025)]
+        public void TheLightsF1Listener_ReadsEveryFormatTheRowReads(int year)
+        {
+            int header = year == 2022 ? 24 : 29;
+            int entry = year == 2022 ? 47 : 55;
+            var status = F1Status(year, 3, 12500);
+            U16(status, header + 3 * entry + 19, 4000);
+            Assert.Equal(CodemastersUdpTelemetrySource.F1Read.MaxAndIdle,
+                CodemastersUdpTelemetrySource.ReadF1(status, out int format, out _, out float max, out float idle));
+            Assert.Equal(year, format);
+            Assert.Equal(12500f, max);
+            Assert.Equal(4000f, idle);
+            Assert.Equal(CodemastersUdpTelemetrySource.F1Read.Rpm,
+                CodemastersUdpTelemetrySource.ReadF1(F1Telemetry(year, 3), out format, out float rpm, out _, out _));
+            Assert.Equal(11000f, rpm);
+        }
+
+        [Fact]
+        public void TheLightsF1Listener_ReadsNoOtherFormat_AndNoPacketOfAnotherSize()
+        {
+            var old = F1Telemetry(2023, 0);
+            U16(old, 0, 2021);
+            Assert.Equal(CodemastersUdpTelemetrySource.F1Read.None, CodemastersUdpTelemetrySource.ReadF1(old, out _, out _, out _, out _));
+            // Car Telemetry's id at Car Status's size.
+            var foreign = F1(2024, 6, 1239, 0);
+            Assert.Equal(CodemastersUdpTelemetrySource.F1Read.None, CodemastersUdpTelemetrySource.ReadF1(foreign, out _, out _, out _, out _));
+            var shortStatus = F1(2025, 7, 237, 0);
+            Assert.Equal(CodemastersUdpTelemetrySource.F1Read.None, CodemastersUdpTelemetrySource.ReadF1(shortStatus, out _, out _, out _, out _));
+        }
+
         [Fact]
         public void TheHub_ReadsTheRowFirst_AndOpensNoSourceOnAPortTheRowHolds()
         {
@@ -1408,6 +1781,96 @@ namespace PadForge.Tests
             vm.SelectedGameTelemetryOption = vm.GameTelemetryOptions.First(o => o.Format == GameTelemetryFormat.Forza);
             Assert.Equal(30000, vm.GameTelemetryPort);
             Assert.Equal(GameTelemetryFormat.Forza, GameTelemetryRuntime.Format);
+        }
+
+        /// <summary>Leaving Project CARS 2 or the ETS2 plugin, whose ports are
+        /// fixed, puts the port back to the default the other games send to,
+        /// unless the player typed another port since.</summary>
+        [Fact]
+        public void LeavingAFixedPortSender_PutsTheDefaultPortBack()
+        {
+            var vm = new DashboardViewModel();
+            GameTelemetryOption Pick(GameTelemetryFormat format) => vm.GameTelemetryOptions.First(o => o.Format == format);
+
+            vm.SelectedGameTelemetryOption = Pick(GameTelemetryFormat.ProjectCars2);
+            Assert.Equal(GameTelemetryRuntime.ProjectCars2Port, vm.GameTelemetryPort);
+            vm.SelectedGameTelemetryOption = Pick(GameTelemetryFormat.F1);
+            Assert.Equal(GameTelemetryRuntime.DefaultPort, vm.GameTelemetryPort);
+            Assert.Equal(GameTelemetryRuntime.DefaultPort, GameTelemetryRuntime.Port);
+
+            vm.SelectedGameTelemetryOption = Pick(GameTelemetryFormat.TruckSimulator);
+            vm.ResetGameTelemetryGameCommand.Execute(null);
+            Assert.Equal(GameTelemetryFormat.Auto, vm.GameTelemetryFormat);
+            Assert.Equal(GameTelemetryRuntime.DefaultPort, vm.GameTelemetryPort);
+
+            // One fixed-port sender to the other takes the new one's port.
+            vm.SelectedGameTelemetryOption = Pick(GameTelemetryFormat.TruckSimulator);
+            vm.SelectedGameTelemetryOption = Pick(GameTelemetryFormat.ProjectCars2);
+            Assert.Equal(GameTelemetryRuntime.ProjectCars2Port, vm.GameTelemetryPort);
+
+            // A port typed after the pick is the player's, and stays.
+            vm.GameTelemetryPort = 30000;
+            vm.SelectedGameTelemetryOption = Pick(GameTelemetryFormat.Forza);
+            Assert.Equal(30000, vm.GameTelemetryPort);
+
+            // A saved profile's port is applied as saved.
+            vm.SelectedGameTelemetryOption = Pick(GameTelemetryFormat.ProjectCars2);
+            vm.ApplyGameTelemetrySettings(GameTelemetryFormat.Forza, "", GameTelemetryRuntime.ProjectCars2Port, 0, 300);
+            Assert.Equal(GameTelemetryRuntime.ProjectCars2Port, vm.GameTelemetryPort);
+        }
+
+        /// <summary>Assetto Corsa is read from shared memory alone, so the
+        /// row opens no socket and copies nothing on, and the port and the
+        /// forward port are off while it is picked.</summary>
+        [Fact]
+        public void ThePorts_AreOffWhileAssettoCorsaIsPicked()
+        {
+            var vm = new DashboardViewModel();
+            var changed = new List<string>();
+            vm.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+            Assert.True(vm.GameTelemetryReadsUdp);
+            vm.SelectedGameTelemetryOption = vm.GameTelemetryOptions.First(o => o.Format == GameTelemetryFormat.AssettoCorsa);
+            Assert.False(vm.GameTelemetryReadsUdp);
+            Assert.Contains(nameof(DashboardViewModel.GameTelemetryReadsUdp), changed);
+            Assert.False(new TelemetryReader(GameTelemetryFormat.AssettoCorsa, null, null, 0).ReadsUdp);
+            vm.SelectedGameTelemetryOption = vm.GameTelemetryOptions.First(o => o.Format == GameTelemetryFormat.Auto);
+            Assert.True(vm.GameTelemetryReadsUdp);
+
+            // Both rows, each box with its reset button.
+            string page = File.ReadAllText(Path.Combine(RepoRoot(), "PadForge.App", "Views", "DashboardPage.xaml"));
+            foreach (string row in new[] { "Grid.Row=\"1\"", "Grid.Row=\"2\"" })
+            {
+                string panel = "<StackPanel " + row + " Grid.Column=\"1\" Orientation=\"Horizontal\" Margin=\"0,0,0,8\" IsEnabled=\"{Binding GameTelemetryReadsUdp}\">";
+                int at = page.IndexOf(panel, StringComparison.Ordinal);
+                Assert.True(at >= 0, "no " + panel);
+                string body = page.Substring(at, page.IndexOf("</StackPanel>", at, StringComparison.Ordinal) - at);
+                Assert.Contains(row == "Grid.Row=\"1\"" ? "{Binding GameTelemetryPort," : "{Binding GameTelemetryForwardPort,", body);
+            }
+        }
+
+        /// <summary>The picker, the profiles and the reader name a format by
+        /// its name, case aside, so a hand-edited file with two formats of
+        /// one name loads the first alone, as a name that cannot be read is
+        /// dropped.</summary>
+        [Fact]
+        public void ASecondFormatOfTheSameName_IsDropped_FirstWins()
+        {
+            var first = BinaryFormat();               // "Rig", Boost, Temp, Far
+            var second = new CustomTelemetryFormat
+            {
+                Name = "RIG",
+                Length = 12,
+                Fields = { new CustomTelemetryField { Target = CustomTelemetryTarget.Variable, Name = "Oil", Offset = 0 } },
+            };
+            GameTelemetryRuntime.Formats = new[] { first, second };
+            var compiled = Assert.Single(GameTelemetryRuntime.CompiledFormats);
+            Assert.Equal("Rig", compiled.Name);
+            Assert.Equal(new[] { "Boost", "Temp", "Far" }, GameTelemetryRuntime.Variables.Select(v => v.Name));
+
+            var vm = new DashboardViewModel();
+            vm.GameTelemetryFormats = new List<CustomTelemetryFormat> { first, second };
+            var custom = Assert.Single(vm.GameTelemetryOptions, o => o.Format == GameTelemetryFormat.Custom);
+            Assert.Equal("Rig", custom.CustomName);
         }
 
         [Fact]

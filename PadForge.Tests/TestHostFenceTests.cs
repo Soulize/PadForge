@@ -329,7 +329,7 @@ namespace PadForge.Tests
             new object[] { Input + "WinScard.cs", "public static string ReadUid(string reader)", "if (DirectDeviceAccess.RefusesAll) return null;" },
             new object[] { Input + "XboxGipGuideLedWriter.cs", "private bool OpenInterface()", "if (DirectDeviceAccess.Refuses(" },
             new object[] { Input + "XboxImpulseHidWriter.cs", "private static SafeFileHandle CreateFileSafe(", "if (DirectDeviceAccess.Refuses(path)) return new SafeFileHandle(new IntPtr(-1), true);" },
-            new object[] { G19Screen, "private bool Open(string path)", "if (DirectDeviceAccess.Refuses(path)) return false;" },
+            new object[] { G19Screen, "public static IG19Link TryOpen(string path)", "if (DirectDeviceAccess.Refuses(path)) return null;" },
             new object[] { DeviceAccess, "internal static bool Refuses(string path)", "OffLimitsForTest && IsDevicePath(path);" },
             new object[] { DeviceAccess, "internal static bool RefusesAll", "OffLimitsForTest;" },
 
@@ -477,7 +477,7 @@ namespace PadForge.Tests
             new object[] { Strike7, "public static Strike7Library TryLoad(string path, out string reason)", VendorRefuses + ")", "NativeLibrary.TryLoad(" },
             new object[] { ForceDimension, "public static ForceDimensionLibrary TryLoad(string picked, out string reason)", VendorRefuses + ")", "NativeLibrary.TryLoad(" },
             // A Falcon is opened by Force Dimension's library, by index (#521).
-            new object[] { Input + "InputManager.Falcon.cs", "private void FalconSweep()", "if (DirectDeviceAccess.RefusesAll) break;", "link.OpenIndex(index)" },
+            new object[] { Input + "InputManager.Falcon.cs", "private void FalconSweep()", "if (DirectDeviceAccess.RefusesAll && !FalconRuntime.ScriptedForTest) break;", "link.OpenIndex(index)" },
 
             // What is sent beyond this PC.
             new object[] { Stun, "public static async Task<IPEndPoint> QueryAsync(", RefusesHost + " return null;", "Dns.GetHostAddressesAsync(" },
@@ -497,7 +497,7 @@ namespace PadForge.Tests
             new object[] { GameModFiles, "internal static void Write(int port)", "if (OffLimitsForTest) return;", "WriteTo(" },
             // The ports games send their telemetry to, and the memory
             // Assetto Corsa writes (#531).
-            new object[] { Telemetry, "public bool Open()", "if (_reader.ReadsUdp && OffLimitsForTest && IsSharedPort(_port))", "new Socket(" },
+            new object[] { Telemetry, "private void BindUdp()", "if (OffLimitsForTest && IsSharedPort(_port))", "new Socket(" },
             new object[] { Kunos, "private bool TryOpen()", "if (OffLimitsForTest && (_physicsName == PhysicsName || _staticName == StaticName || _graphicsName == GraphicsName))", "MemoryMappedFile.OpenExisting(" },
         };
 

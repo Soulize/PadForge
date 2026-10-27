@@ -24,7 +24,7 @@ public sealed class MicrophoneDecoderLifetimeTests(ITestOutputHelper output)
         public readonly AudioPassthroughService.PersonaFeed Feed;
         readonly HMMicrophoneInput microphone;
         readonly object engine;
-        readonly byte[] ring = new byte[AudioPassthroughService.HmMicRingBytes];
+        readonly byte[] ring = new byte[AudioPassthroughService.MicRingBytes(48000, 2)];
         readonly NamedPipeServerStream server;
         readonly Thread reader;
         readonly Task connection;

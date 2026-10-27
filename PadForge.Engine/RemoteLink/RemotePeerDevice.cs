@@ -170,6 +170,14 @@ namespace PadForge.Engine.RemoteLink
         /// tail, where the sensors are offered under (Any Device) alone.</summary>
         public int CapSenseChannelMask { get; set; }
 
+        /// <summary>True when the owner's pad carries voice phrases (the
+        /// owner's UserDevice.HasVoicePhrases). A Bluetooth DualShock 4 does
+        /// by its path, which a peer:// copy never has, so the copy needs the
+        /// owner's answer to offer the phrases its owner recognizes. Null for
+        /// a pad without phrases and from a peer that predates the v13 tail,
+        /// where the copy keeps the answer its own identity gives.</summary>
+        public bool? HasVoicePhrases { get; set; }
+
         internal RemotePeerDeviceInfo CloneForSlot(byte slot)
         {
             var copy = (RemotePeerDeviceInfo)MemberwiseClone();
@@ -353,6 +361,10 @@ namespace PadForge.Engine.RemoteLink
         /// Steam Controller with no sensor in its own picker group and none
         /// for the Valve automap to bind.</summary>
         public int CapSenseChannelMask => Info.CapSenseChannelMask;
+        /// <summary>The owner's answer, carried by the device list's v13 tail.
+        /// Without it a shared Bluetooth DualShock 4 offered no voice phrases,
+        /// its peer:// path failing the Bluetooth test its owner's row passes.</summary>
+        public bool? OwnerHasVoicePhrases => Info.HasVoicePhrases;
         public bool? TouchpadPressureSupported => Info.TouchpadPressureSupported;
         public bool? TouchpadClickSupported => Info.TouchpadClickSupported;
         public HapticEffectStrategy HapticStrategy => HapticEffectStrategy.None;

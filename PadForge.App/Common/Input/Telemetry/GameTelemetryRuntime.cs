@@ -129,16 +129,20 @@ namespace PadForge.Common.Input.Telemetry
             }
             set
             {
+                // A format whose name cannot be read, or that repeats an
+                // earlier one's name (case aside), is dropped: the picker,
+                // the profiles and the reader name a format by it.
                 var formats = new List<CustomTelemetryFormat>();
+                var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 if (value != null)
                     foreach (var format in value)
-                        if (format != null && CustomTelemetryFormat.IsValidName(format.Name))
+                        if (format != null && CustomTelemetryFormat.IsValidName(format.Name) && names.Add(format.Name))
                             formats.Add(format.Clone());
-                var variables = BuildVariables(formats);
-                var compiled = new CompiledTelemetryFormat[formats.Count];
-                for (int i = 0; i < compiled.Length; i++) compiled[i] = new CompiledTelemetryFormat(formats[i], variables);
                 lock (_formatsLock)
                 {
+                    var variables = AssignAxes(formats, BuildVariables(formats));
+                    var compiled = new CompiledTelemetryFormat[formats.Count];
+                    for (int i = 0; i < compiled.Length; i++) compiled[i] = new CompiledTelemetryFormat(formats[i], variables);
                     _formats = formats.ToArray();
                     _variables = variables;
                     _compiled = compiled;
@@ -148,22 +152,120 @@ namespace PadForge.Common.Input.Telemetry
         }
 
         /// <summary>Every custom variable across the formats, by first use
-        /// and without repeats, with the span its first definition gives.</summary>
+        /// and without repeats, with the span its first definition gives and
+        /// the axis it keeps.</summary>
         public static TelemetryVariable[] Variables => _variables;
+
+        // The axis each variable name keeps, under _formatsLock. A name keeps
+        // its axis while any format uses it (the voice phrase and NFC tag
+        // registries' rule for their buttons), so a saved mapping on that
+        // axis keeps reading that variable.
+        private static Dictionary<string, int> _axes = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Gives each variable the axis it keeps. A name in use keeps its
+        /// axis. A new name takes the axis its fields carry
+        /// (<see cref="CustomTelemetryField.Axis"/>: the settings file after a
+        /// restart, or a rename in the dialog that brought the old name's axis
+        /// along) when no name in use holds it, and otherwise the lowest free
+        /// one, in first-use order, so a file from before the axes were saved
+        /// keeps its old order. A name past the last free axis gets none and
+        /// reads as an expression channel alone, the registries' "full". A
+        /// name no format uses any more gives its axis up. Caller holds
+        /// _formatsLock.
+        /// </summary>
+        private static TelemetryVariable[] AssignAxes(IReadOnlyList<CustomTelemetryFormat> formats, TelemetryVariable[] variables)
+        {
+            var next = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            var taken = new bool[MaxVariableAxes];
+            foreach (var variable in variables)
+                if (_axes.TryGetValue(variable.Name, out int axis) && axis >= 0 && axis < taken.Length && !taken[axis])
+                {
+                    next[variable.Name] = axis;
+                    taken[axis] = true;
+                }
+            foreach (var variable in variables)
+            {
+                if (next.ContainsKey(variable.Name)) continue;
+                int carried = CarriedAxis(formats, variable.Name);
+                if (carried >= 0 && carried < taken.Length && !taken[carried])
+                {
+                    next[variable.Name] = carried;
+                    taken[carried] = true;
+                }
+            }
+            foreach (var variable in variables)
+            {
+                if (next.ContainsKey(variable.Name)) continue;
+                int free = Array.IndexOf(taken, false);
+                if (free < 0) break;
+                next[variable.Name] = free;
+                taken[free] = true;
+            }
+            _axes = next;
+            var result = new TelemetryVariable[variables.Length];
+            for (int i = 0; i < result.Length; i++)
+                result[i] = variables[i] with { Slot = next.TryGetValue(variables[i].Name, out int axis) ? axis : -1 };
+            return result;
+        }
+
+        /// <summary>The first axis a field of that name carries, or -1.</summary>
+        private static int CarriedAxis(IReadOnlyList<CustomTelemetryFormat> formats, string name)
+        {
+            foreach (var format in formats)
+                foreach (var field in format.Fields)
+                    if (field != null && field.Target == CustomTelemetryTarget.Variable && field.Axis >= 0
+                        && string.Equals(field.Name?.Trim(), name, StringComparison.OrdinalIgnoreCase))
+                        return field.Axis;
+            return -1;
+        }
+
+        /// <summary>Writes the axis each variable keeps onto every field that
+        /// names it, -1 where it has none, so the settings file carries the
+        /// axes across a restart.</summary>
+        internal static void WriteAxes(IEnumerable<CustomTelemetryFormat> formats)
+        {
+            if (formats == null) return;
+            var variables = _variables;
+            foreach (var format in formats)
+            {
+                if (format == null) continue;
+                foreach (var field in format.Fields)
+                {
+                    if (field == null || field.Target != CustomTelemetryTarget.Variable) continue;
+                    string name = field.Name?.Trim();
+                    int axis = -1;
+                    foreach (var variable in variables)
+                        if (string.Equals(variable.Name, name, StringComparison.OrdinalIgnoreCase)) { axis = variable.Slot; break; }
+                    field.Axis = axis;
+                }
+            }
+        }
 
         public static CompiledTelemetryFormat[] CompiledFormats => _compiled;
 
-        /// <summary>The compiled format the Custom choice names, or null.</summary>
-        public static CompiledTelemetryFormat PinnedFormat
+        /// <summary>The compiled formats and the variable list their fields
+        /// index, read together under the lock the setter swaps them under,
+        /// so a save between two reads cannot hand the row one list's
+        /// readers and the other list's axes.</summary>
+        internal static void ReadFormats(out CompiledTelemetryFormat[] compiled, out TelemetryVariable[] variables)
         {
-            get
+            lock (_formatsLock)
             {
-                string name = CustomFormatName;
-                foreach (var format in _compiled)
-                    if (string.Equals(format.Name, name, StringComparison.OrdinalIgnoreCase))
-                        return format;
-                return null;
+                compiled = _compiled;
+                variables = _variables;
             }
+        }
+
+        /// <summary>The format in <paramref name="compiled"/> the Custom
+        /// choice names, or null.</summary>
+        internal static CompiledTelemetryFormat FindPinned(CompiledTelemetryFormat[] compiled)
+        {
+            string name = CustomFormatName;
+            foreach (var format in compiled)
+                if (string.Equals(format.Name, name, StringComparison.OrdinalIgnoreCase))
+                    return format;
+            return null;
         }
 
         public static int Version => _version;
@@ -179,7 +281,9 @@ namespace PadForge.Common.Input.Telemetry
                     if (field == null || field.Target != CustomTelemetryTarget.Variable) continue;
                     string name = field.Name?.Trim() ?? string.Empty;
                     if (!CustomTelemetryFormat.IsValidName(name) || !seen.Add(name)) continue;
-                    list.Add(new TelemetryVariable(name, field.Min, field.Max));
+                    // In first-use order. The runtime's Formats setter then
+                    // gives each name the axis it keeps (AssignAxes).
+                    list.Add(new TelemetryVariable(name, field.Min, field.Max, list.Count < MaxVariableAxes ? list.Count : -1));
                 }
             }
             return list.ToArray();
@@ -191,6 +295,11 @@ namespace PadForge.Common.Input.Telemetry
 
         private static readonly TelemetryFrame _values = new();
         private static bool _live;
+
+        // The variable list the published frame is laid out by: the row's,
+        // from when it opened. Saving the formats swaps _variables at once,
+        // and the row publishes by its old list until the sweep reopens it.
+        private static TelemetryVariable[] _valueVariables = Array.Empty<TelemetryVariable>();
 
         /// <summary>An engine value published longer ago than this is not
         /// read. The row publishes on every poll, so a gap this long means
@@ -206,12 +315,15 @@ namespace PadForge.Common.Input.Telemetry
 
         /// <summary>Written by the row on every read (Step 2, the poll
         /// thread) and read by the macro evaluator later in the same pass, so
-        /// the values take no lock: both run on the poll thread.</summary>
-        internal static void Publish(TelemetryFrame frame, bool live, long nowMs)
+        /// the values take no lock: both run on the poll thread.
+        /// <paramref name="variables"/> is the list the row opened with,
+        /// which lays out the frame's variables.</summary>
+        internal static void Publish(TelemetryFrame frame, TelemetryVariable[] variables, bool live, long nowMs)
         {
             _live = live;
+            _valueVariables = variables ?? Array.Empty<TelemetryVariable>();
             if (live) frame.CopyTo(_values);
-            else _values.Reset(_variables.Length);
+            else _values.Reset(_valueVariables.Length);
             lock (_engineLock)
             {
                 // A game in a menu or paused lights nothing, the rule the
@@ -228,7 +340,7 @@ namespace PadForge.Common.Input.Telemetry
         internal static void ClearValues()
         {
             _live = false;
-            _values.Reset(_variables.Length);
+            _values.Reset(_valueVariables.Length);
             lock (_engineLock) _engineLive = false;
         }
 
@@ -272,7 +384,7 @@ namespace PadForge.Common.Input.Telemetry
                 case TelemetryChannel.SteeringPercent: return f.Steering * 100f;
                 case TelemetryChannel.Driving: return !f.DrivingReported || f.Driving ? 1f : 0f;
                 case TelemetryChannel.Variable:
-                    var variables = _variables;
+                    var variables = _valueVariables;
                     for (int i = 0; i < variables.Length && i < f.Variables.Length; i++)
                         if (string.Equals(variables[i].Name, variable, StringComparison.OrdinalIgnoreCase))
                             return f.Variables[i];
@@ -292,6 +404,7 @@ namespace PadForge.Common.Input.Telemetry
             _forwardPort = 0;
             _fullSpeedKmh = DefaultFullSpeedKmh;
             Formats = Array.Empty<CustomTelemetryFormat>();
+            _valueVariables = Array.Empty<TelemetryVariable>();
             ClearValues();
         }
     }

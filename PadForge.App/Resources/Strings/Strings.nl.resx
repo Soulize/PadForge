@@ -283,6 +283,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Werkt met mods die voor DSX zijn gemaakt, zoals die voor GTA V, Red Dead Redemption 2, Skyrim en Forza. Zolang de server luistert, schrijft PadForge zijn poort op de plek waar die mods ernaar zoeken.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Luistert op :{0}. {1} verzendt naar virtuele controller {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Luistert op :{0}. {1} verzendt, maar op geen enkele virtuele controller zit een PlayStation-controller.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Luistert op :{0}. {1} verzendt naar controllerindex {2}, en geen enkele virtuele controller met een PlayStation-controller heeft die index.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Poort {0} wordt gebruikt door een ander programma, zoals DSX. Sluit het af of kies een andere poort.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Een gamemod</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Werkt met OpenTrack en met elke tracker die zijn UDP-uitvoer verstuurt of naar het gedeelde geheugen van FreeTrack 2.0 schrijft, en met een OpenXR-runtime op deze machine die een sessie op de achtergrond kan uitvoeren.</value></data>
@@ -4098,7 +4099,7 @@ Wil je dat PadForge ze nu verwijdert? Hiervoor zijn verhoogde rechten nodig en h
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Wachten op gegevens in het gedeelde geheugen van FreeTrack.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>Het gedeelde geheugen van FreeTrack is niet beschikbaar.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Trilling op basis van stuurhoek</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Voegt doorlopende trilling toe naarmate de gekozen virtuele stickas verder van het midden beweegt. Gebruikt de toegewezen uitvoer van alle bronnen. Bij Splitsen per richting stuurt negatieve beweging de linkermotor aan en positieve beweging de rechtermotor. Linkermotor of Rechtermotor zet beide richtingen op die ene motor. Voor Xbox- en PlayStation-uitvoer met trilapparaten. Native forcefeedback van stuurwielen is uitgesloten.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Voegt doorlopende trilling toe naarmate de gekozen virtuele stickas verder van het midden beweegt. Gebruikt de toegewezen uitvoer van alle bronnen. Bij Splitsen per richting stuurt negatieve beweging de linkermotor aan en positieve beweging de rechtermotor. Linkermotor of Rechtermotor zet beide richtingen op die ene motor. Voor Xbox- en PlayStation-uitvoer met trilapparaten. Stuurwielen, andere apparaten met constante force feedback en Fanatec-pedalen worden overgeslagen.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Stuurhoektrilling inschakelen</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Virtuele as</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Linkerstick X</value></data>
@@ -4301,6 +4302,7 @@ Wil je dat PadForge ze nu verwijdert? Hiervoor zijn verhoogde rechten nodig en h
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>rechtstreeks op de {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>WinUSB wordt aan het scherm van de G19 gebonden</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>het scherm van de G19 gebruikt een ander stuurprogramma ({0}), start dus Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>het scherm van de G19 gebruikt het stuurprogramma van een ander programma ({0}), dat PadForge met rust laat</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>heeft Logitech Gaming Software 8.52 of nieuwer nodig</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>start Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>wacht op een telefoon met Arx Control</value></data>
@@ -4372,6 +4374,7 @@ Wil je dat PadForge ze nu verwijdert? Hiervoor zijn verhoogde rechten nodig en h
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Handgreep</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} stelt de triggers van deze controller in.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} stelt de lampjes van deze controller in.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} stelt de lampjes van dit apparaat in.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} stelt de triggers en lampjes van deze controller in.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} speelt triggertrillingen af op de Impulse-triggers van deze controller.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Modeffecten wissen</value></data>
@@ -4379,10 +4382,10 @@ Wil je dat PadForge ze nu verwijdert? Hiervoor zijn verhoogde rechten nodig en h
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Links/rechts</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Omhoog/omlaag</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Naar binnen/naar buiten</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Knop {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, geladen vanaf {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>De gekozen dhd64.dll is niet geladen, dus PadForge gebruikt het exemplaar hierboven.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>De bibliotheek van Force Dimension werkt alleen in de x64-versie van PadForge.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>dhd64.dll gevonden, laden mislukt.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Deze dhd64.dll is niet de Force Dimension-bibliotheek die PadForge verwacht.</value></data>
@@ -4392,11 +4395,12 @@ Wil je dat PadForge ze nu verwijdert? Hiervoor zijn verhoogde rechten nodig en h
   <data name="Falcon_Status_Open" xml:space="preserve"><value>geopend</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Een Falcon is geopend in een ander programma, zoals FalconJoyForce of de eigen hulpprogramma's van Force Dimension. Sluit hem daar.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>De Falcon gebruikt een ander stuurprogramma ({0}), waardoor de bibliotheek van Force Dimension hem niet kan openen. Werk in Apparaatbeheer het stuurprogramma van de Falcon bij vanuit de map drivers\usb in de SDK-map van Force Dimension.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>De Falcon gebruikt het stuurprogramma van Force Dimension, maar de bibliotheek van Force Dimension kon hem niet openen: {0}. Controleer de voeding en de USB-kabel.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Er is een Falcon aangesloten zonder stuurprogramma. Met Falcon-stuurprogramma installeren krijgt hij dat van Force Dimension.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Er is een Falcon aangesloten zonder stuurprogramma, en de SDK-map bevat geen stuurprogrammapakket om hem te geven. Installeer de SDK van Force Dimension opnieuw.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Geen Falcon gevonden. Sluit de voeding en de USB-kabel aan.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>dhd64.dll kiezen…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Laadt dit exemplaar van de bibliotheek van Force Dimension vóór alle andere. De exemplaren die de SDK installeert, worden ook zonder dit gevonden.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Laadt dit exemplaar van de bibliotheek van Force Dimension in plaats van alle andere. Een Falcon die op een ander exemplaar open staat, wordt gesloten en opnieuw geopend op dit exemplaar. De exemplaren die de SDK installeert, worden ook zonder dit gevonden.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Bibliotheken (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Falcon-stuurprogramma installeren</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Installeert het stuurprogramma van Force Dimension, uit de SDK-map, op een Falcon die er geen heeft. Windows vraagt mogelijk eerst of u Force Dimension vertrouwt.</value></data>
@@ -4413,7 +4417,7 @@ Wil je dat PadForge ze nu verwijdert? Hiervoor zijn verhoogde rechten nodig en h
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Speelt games met een Novint Falcon via de SDK van Force Dimension, die u bij Force Dimension installeert. De handgreep is een stick, de vier knoppen op de greep zijn knoppen, en PadForge zet de trilling en effecten van de game als kracht op de handgreep. Het tabblad Force Feedback van elke slot bepaalt hoe de Falcon aanvoelt.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Novint Falcon aansturen</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Opent elke Falcon via dhd64.dll van Force Dimension. Een geopende Falcon is van PadForge alleen, dus FalconJoyForce en de hulpprogramma's van Force Dimension kunnen hem niet openen zolang dit aan staat. Uit sluit PadForge elke Falcon.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon-bibliotheek ingesteld op {0}. Een exemplaar dat al in gebruik is, blijft actief tot PadForge opnieuw start.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon-bibliotheek ingesteld op {0}. PadForge laadt het binnen enkele seconden, en een Falcon die op een ander exemplaar open staat, wordt opnieuw geopend op dit exemplaar.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Het Falcon-stuurprogramma van Force Dimension wordt geïnstalleerd…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Het Falcon-stuurprogrammapakket van Force Dimension of de bijbehorende catalogus ontbreekt: {0}. Installeer de SDK van Force Dimension opnieuw.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Er is geen Falcon aangesloten.</value></data>

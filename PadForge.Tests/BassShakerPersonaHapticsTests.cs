@@ -223,7 +223,7 @@ namespace PadForge.Tests
 
             string vd = File.ReadAllText(Path.Combine(RepoRoot(), "PadForge.App", "Common", "Input", "InputManager.Step5.VirtualDevices.cs"));
             int laneAt = vd.IndexOf("private void UpdateRumbleAudioLane()", StringComparison.Ordinal);
-            int merge = vd.IndexOf("long hapticLevel = PersonaHapticLevel(slot, now);", laneAt, StringComparison.Ordinal);
+            int merge = vd.IndexOf("pack = WithPersonaHaptics(slot, pack, now);", laneAt, StringComparison.Ordinal);
             int masks = vd.IndexOf("pack &= ~(0xFFFFL << (idx * 16));", laneAt, StringComparison.Ordinal);
             int publish = vd.IndexOf("RumbleAudioService.PublishIfCurrent(slot, gen, pack);", laneAt, StringComparison.Ordinal);
             Assert.True(laneAt > 0 && merge > laneAt && masks > merge && publish > masks,

@@ -319,6 +319,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Fungerar med moddar gjorda för DSX, till exempel för GTA V, Red Dead Redemption 2, Skyrim och Forza. Medan servern lyssnar skriver PadForge sin port dit moddarna letar efter den.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Lyssnar på :{0}. {1} skickar till virtuell handkontroll {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Lyssnar på :{0}. {1} skickar, men ingen virtuell handkontroll har en PlayStation-handkontroll.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Lyssnar på :{0}. {1} skickar till handkontrollsindex {2}, och ingen virtuell handkontroll med en PlayStation-handkontroll har det indexet.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Port {0} används av ett annat program, till exempel DSX. Stäng det eller välj en annan port.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>En spelmodd</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Fungerar med OpenTrack och alla spårare som skickar sin UDP-utdata eller skriver till delat minne enligt FreeTrack 2.0, och med en OpenXR-körmiljö på den här datorn som kan köra en session i bakgrunden.</value></data>
@@ -4127,7 +4128,7 @@ Vill du att PadForge avinstallerar dem nu? Detta kräver förhöjd behörighet o
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Väntar på data från det delade FreeTrack-minnet.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>Det delade FreeTrack-minnet är inte tillgängligt.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Vibration efter styrvinkel</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Lägger till kontinuerlig vibration när den valda virtuella spakaxeln rör sig bort från mitten. Använder den mappade utdatan från alla tilldelade källor. Med Dela efter riktning driver negativ rörelse vänster motor och positiv rörelse höger. Vänster motor eller Höger motor lägger båda riktningarna på just den motorn. För Xbox- och PlayStation-utdata med vibrationsenheter. Rattens egen kraftåterkoppling omfattas inte.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Lägger till kontinuerlig vibration när den valda virtuella spakaxeln rör sig bort från mitten. Använder den mappade utdatan från alla tilldelade källor. Med Dela efter riktning driver negativ rörelse vänster motor och positiv rörelse höger. Vänster motor eller Höger motor lägger båda riktningarna på just den motorn. För Xbox- och PlayStation-utdata med vibrationsenheter. Den hoppar över ratter, andra enheter med konstant kraftåterkoppling och Fanatec-pedaler.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Aktivera vibration efter styrvinkel</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Virtuell axel</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Vänster spak X</value></data>
@@ -4330,6 +4331,7 @@ Vill du att PadForge avinstallerar dem nu? Detta kräver förhöjd behörighet o
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>direkt på {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>binder WinUSB till skärmen på G19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>skärmen på G19 använder en annan drivrutin ({0}), så starta Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>skärmen på G19 använder ett annat programs drivrutin ({0}), som PadForge låter vara</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>kräver Logitech Gaming Software 8.52 eller senare</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>starta Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>väntar på en telefon med Arx Control</value></data>
@@ -4401,6 +4403,7 @@ Vill du att PadForge avinstallerar dem nu? Detta kräver förhöjd behörighet o
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Handtag</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} styr den här handkontrollens avtryckare.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} styr den här handkontrollens lampor.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} styr den här enhetens lampor.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} styr den här handkontrollens avtryckare och lampor.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} spelar upp avtryckarvibrationer på den här handkontrollens impulsavtryckare.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Rensa moddeffekter</value></data>
@@ -4408,10 +4411,10 @@ Vill du att PadForge avinstallerar dem nu? Detta kräver förhöjd behörighet o
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Vänster/höger</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Upp/ned</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>In/ut</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Knapp {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, inläst från {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Den dhd64.dll du valde kunde inte läsas in, så PadForge använder kopian ovan.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Force Dimensions bibliotek körs bara i x64-versionen av PadForge.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>Hittade dhd64.dll men kunde inte läsa in den.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Den dhd64.dll är inte det Force Dimension-bibliotek som PadForge förväntar sig.</value></data>
@@ -4421,11 +4424,12 @@ Vill du att PadForge avinstallerar dem nu? Detta kräver förhöjd behörighet o
   <data name="Falcon_Status_Open" xml:space="preserve"><value>öppen</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>En Falcon är öppen i ett annat program, till exempel FalconJoyForce eller Force Dimensions egna verktyg. Stäng den där.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon använder en annan drivrutin ({0}), så Force Dimensions bibliotek kan inte öppna den. Uppdatera Falcons drivrutin i Enhetshanteraren från mappen drivers\usb i Force Dimensions SDK-mapp.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon använder Force Dimensions drivrutin, och Force Dimensions bibliotek kunde inte öppna den: {0}. Kontrollera dess ström och USB-kabel.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>En Falcon är ansluten utan drivrutin. Med Installera Falcon-drivrutin får den Force Dimensions drivrutin.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>En Falcon är ansluten utan drivrutin, och SDK-mappen har inget drivrutinspaket att ge den. Installera om Force Dimensions SDK.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Ingen Falcon hittades. Koppla in dess ström och USB-kabel.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Välj dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Läser in den här kopian av Force Dimensions bibliotek före alla andra. Kopiorna som SDK installerar hittas utan detta.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Läser in den här kopian av Force Dimensions bibliotek i stället för alla andra. En Falcon som är öppen på en annan kopia stängs och öppnas igen på den här. Kopiorna som SDK installerar hittas utan detta.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Bibliotek (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Installera Falcon-drivrutin</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Installerar Force Dimensions drivrutin från SDK-mappen på en Falcon som saknar drivrutin. Windows kan först fråga om du litar på Force Dimension.</value></data>
@@ -4442,7 +4446,7 @@ Vill du att PadForge avinstallerar dem nu? Detta kräver förhöjd behörighet o
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Spela spel med en Novint Falcon via Force Dimensions SDK, som du installerar från Force Dimension. Handtaget är en spak, greppets fyra knappar är knappar, och PadForge lägger spelets vibration och effekter på handtaget som kraft. Fliken Kraftåterkoppling för varje plats ställer in hur Falcon känns.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Styr Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Öppnar varje Falcon via Force Dimensions dhd64.dll. En öppen Falcon tillhör enbart PadForge, så FalconJoyForce och Force Dimensions verktyg kan inte öppna den medan detta är på. När det är av stänger PadForge alla Falcon.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon-biblioteket är satt till {0}. En kopia som redan används ligger kvar tills PadForge startas igen.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon-biblioteket är satt till {0}. PadForge läser in det inom några sekunder, och en Falcon som är öppen på en annan kopia öppnas igen på den här.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Installerar Force Dimensions Falcon-drivrutin…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Force Dimensions Falcon-drivrutinspaket, eller dess katalog, saknas: {0}. Installera om Force Dimensions SDK.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Ingen Falcon är ansluten.</value></data>

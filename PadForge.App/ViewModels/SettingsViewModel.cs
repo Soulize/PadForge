@@ -1432,17 +1432,19 @@ namespace PadForge.ViewModels
 
         private string _keyboardScreensStatus = string.Empty;
 
-        /// <summary>A line per kind of screen naming what draws it, pushed by
-        /// InputService. Empty while the feature is off, which collapses the
-        /// lines.</summary>
+        /// <summary>The feature's lines, pushed by InputService: Arx Control's
+        /// library while no Arx screen is present, the S.T.R.I.K.E. 7's while
+        /// no S.T.R.I.K.E. 7 is, and no screen found. Each screen's own line
+        /// is on its row. Empty while the feature is off or the engine is
+        /// stopped, which collapses the lines.</summary>
         public string KeyboardScreensStatus
         {
             get => _keyboardScreensStatus;
             set => SetProperty(ref _keyboardScreensStatus, value);
         }
 
-        /// <summary>Each kind of keyboard screen's choices (#519). Changed on
-        /// the UI thread only.</summary>
+        /// <summary>Each keyboard screen's choices (#519), kept by the
+        /// screen's row. Changed on the UI thread only.</summary>
         public List<PadForge.Services.KeyboardScreenData> KeyboardScreens { get; set; } = new();
 
         /// <summary>The Default profile's keyboard screen picture (#519), a
@@ -1499,8 +1501,9 @@ namespace PadForge.ViewModels
 
         private string _falconStatus = string.Empty;
 
-        /// <summary>The library's line, then a line per Falcon or why none
-        /// opened, pushed by InputService. Empty while the switch is off.</summary>
+        /// <summary>The library's line, then why no Falcon opened while none
+        /// is open, pushed by InputService. Each open Falcon's line is on its
+        /// Devices panel. Empty while the switch is off.</summary>
         public string FalconStatus
         {
             get => _falconStatus;

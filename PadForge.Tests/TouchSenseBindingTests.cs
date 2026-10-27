@@ -353,8 +353,9 @@ namespace PadForge.Tests
             // binds its own node.
             Assert.Contains("node.Vid != G19UsbScreen.Vid || node.Pid != G19UsbScreen.Pid || node.Interface != 0", g19);
             Assert.Contains("string.Equals(n.InstanceId, _instanceId, StringComparison.OrdinalIgnoreCase)", g19);
-            Assert.Contains("if (!mayBind || now < _nextBind) return;", g19);
-            Assert.Contains("VendorUsbDriverInstaller.Bind(plan, node.InstanceId, nodes, _log, CancellationToken.None);", g19);
+            Assert.Contains("if (!mayBind || now < _nextBind || _bindFailures >= MaxBindFailures) return;", g19);
+            Assert.Contains("Bind = (plan, instanceId, nodes, log, ct) => VendorUsbDriverInstaller.Bind(plan, instanceId, nodes, log, ct),", g19);
+            Assert.Contains("if (_io.Bind(plan, node.InstanceId, nodes, _log, _stopping)) _bindFailures = 0;", g19);
             Assert.DoesNotContain("OptIn", g19);
             Assert.DoesNotContain(TouchSenseProtocol.Mice, m => m.VendorId == KeyboardScreenDevices.LogitechVid
                 && m.ProductId == KeyboardScreenDevices.G19);

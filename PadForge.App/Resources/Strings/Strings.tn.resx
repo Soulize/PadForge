@@ -941,10 +941,10 @@
   <data name="Common_Pixels" xml:space="preserve"><value>px</value></data>
   <data name="DeviceType_NovintFalcon" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Setshwaro</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} e baya masedi a sedirisiwa se.</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Molema/Moja</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Godimo/Tlase</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Mo teng/Kwa ntle</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Konopo {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Open" xml:space="preserve"><value>e bulegile</value></data>

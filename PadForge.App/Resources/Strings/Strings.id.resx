@@ -319,6 +319,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Berfungsi dengan mod yang dibuat untuk DSX, seperti untuk GTA V, Red Dead Redemption 2, Skyrim, dan Forza. Selama server mendengarkan, PadForge menuliskan port-nya di tempat mod tersebut mencarinya.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Mendengarkan di :{0}. {1} mengirim ke kontroler virtual {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Mendengarkan di :{0}. {1} mengirim, tetapi tidak ada kontroler virtual yang memiliki kontroler PlayStation.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Mendengarkan di :{0}. {1} mengirim ke indeks kontroler {2}, dan tidak ada kontroler virtual dengan kontroler PlayStation yang memiliki indeks itu.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Port {0} dipakai program lain, seperti DSX. Tutup program itu atau pilih port lain.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Sebuah mod game</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Berfungsi dengan OpenTrack dan pelacak apa pun yang mengirim output UDP-nya atau menulis memori bersama FreeTrack 2.0, serta dengan runtime OpenXR di komputer ini yang dapat menjalankan sesi di latar belakang.</value></data>
@@ -4127,7 +4128,7 @@ Apakah Anda ingin PadForge menghapus instalannya sekarang? Tindakan ini memerluk
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Menunggu data memori bersama FreeTrack.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>Memori bersama FreeTrack tidak tersedia.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Getaran sudut kemudi</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Menambahkan getaran terus-menerus saat sumbu stik virtual yang dipilih bergerak menjauhi tengah. Memakai output terpetakan dari semua sumber yang ditetapkan. Dengan Dipisah menurut arah, gerakan negatif menggerakkan motor kiri dan gerakan positif motor kanan. Motor kiri atau Motor kanan menempatkan kedua arah pada satu motor itu. Untuk output Xbox dan PlayStation dengan perangkat bergetar. Force feedback asli setir tidak termasuk.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Menambahkan getaran terus-menerus saat sumbu stik virtual yang dipilih bergerak menjauhi tengah. Memakai output terpetakan dari semua sumber yang ditetapkan. Dengan Dipisah menurut arah, gerakan negatif menggerakkan motor kiri dan gerakan positif motor kanan. Motor kiri atau Motor kanan menempatkan kedua arah pada satu motor itu. Untuk output Xbox dan PlayStation dengan perangkat bergetar. Efek ini melewati setir, perangkat lain dengan constant force feedback, dan pedal Fanatec.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Aktifkan getaran sudut kemudi</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Sumbu virtual</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Stik kiri X</value></data>
@@ -4330,6 +4331,7 @@ Apakah Anda ingin PadForge menghapus instalannya sekarang? Tindakan ini memerluk
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>langsung di {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>mengikat WinUSB ke layar G19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>layar G19 memakai driver lain ({0}), jadi jalankan Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>layar G19 memakai driver program lain ({0}), yang dibiarkan oleh PadForge</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>memerlukan Logitech Gaming Software 8.52 atau yang lebih baru</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>jalankan Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>menunggu ponsel dengan Arx Control</value></data>
@@ -4401,6 +4403,7 @@ Apakah Anda ingin PadForge menghapus instalannya sekarang? Tindakan ini memerluk
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Gagang</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} sedang mengatur pelatuk kontroler ini.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} sedang mengatur lampu kontroler ini.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} sedang mengatur lampu perangkat ini.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} sedang mengatur pelatuk dan lampu kontroler ini.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} memainkan getaran pelatuk pada pelatuk impuls kontroler ini.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Hapus efek mod</value></data>
@@ -4408,10 +4411,10 @@ Apakah Anda ingin PadForge menghapus instalannya sekarang? Tindakan ini memerluk
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Kiri/Kanan</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Atas/Bawah</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Masuk/Keluar</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Tombol {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>SDK Force Dimension {0}, dimuat dari {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>dhd64.dll yang Anda pilih gagal dimuat, jadi PadForge memakai salinan di atas.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Pustaka Force Dimension hanya berjalan pada PadForge versi x64.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>dhd64.dll ditemukan tetapi tidak dapat dimuat.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>dhd64.dll tersebut bukan pustaka Force Dimension yang diharapkan PadForge.</value></data>
@@ -4421,11 +4424,12 @@ Apakah Anda ingin PadForge menghapus instalannya sekarang? Tindakan ini memerluk
   <data name="Falcon_Status_Open" xml:space="preserve"><value>terbuka</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Falcon sedang dibuka di program lain, seperti FalconJoyForce atau alat bawaan Force Dimension. Tutup di sana.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon menggunakan driver lain ({0}), sehingga pustaka Force Dimension tidak dapat membukanya. Di Pengelola Perangkat, perbarui driver Falcon dari folder drivers\usb di folder SDK Force Dimension.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon memakai driver Force Dimension, dan pustaka Force Dimension tidak dapat membukanya: {0}. Periksa daya dan kabel USB-nya.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Falcon terhubung tanpa driver. Instal Driver Falcon akan memberinya driver Force Dimension.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Falcon terhubung tanpa driver, dan folder SDK tidak memiliki paket driver untuk diberikan. Instal ulang SDK Force Dimension.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Falcon tidak ditemukan. Hubungkan daya dan kabel USB-nya.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Pilih dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Memuat salinan pustaka Force Dimension ini sebelum salinan lainnya. Salinan yang dipasang SDK tetap ditemukan tanpa ini.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Memuat salinan pustaka Force Dimension ini menggantikan salinan lainnya. Falcon yang terbuka pada salinan lain akan menutup lalu terbuka lagi pada salinan ini. Salinan yang dipasang SDK tetap ditemukan tanpa ini.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Pustaka (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Instal Driver Falcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Menginstal driver Force Dimension, dari folder SDK, pada Falcon yang belum memilikinya. Windows mungkin lebih dulu menanyakan apakah Anda memercayai Force Dimension.</value></data>
@@ -4442,7 +4446,7 @@ Apakah Anda ingin PadForge menghapus instalannya sekarang? Tindakan ini memerluk
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Memainkan game dengan Novint Falcon melalui SDK Force Dimension, yang Anda instal dari Force Dimension. Gagang berfungsi sebagai stik, keempat tombol pada genggaman berfungsi sebagai tombol, dan PadForge meneruskan getaran serta efek dari game ke gagang sebagai gaya. Tab Force Feedback tiap slot mengatur bagaimana Falcon terasa.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Kendalikan Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Membuka setiap Falcon melalui dhd64.dll milik Force Dimension. Falcon yang terbuka hanya menjadi milik PadForge, sehingga FalconJoyForce dan alat Force Dimension tidak dapat membukanya selama ini aktif. Jika nonaktif, PadForge menutup semua Falcon.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Pustaka Falcon diatur ke {0}. Salinan yang sedang digunakan tetap dipakai sampai PadForge dimulai lagi.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Pustaka Falcon diatur ke {0}. PadForge memuatnya dalam beberapa detik, dan Falcon yang terbuka pada salinan lain akan terbuka lagi pada salinan ini.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Menginstal driver Falcon dari Force Dimension…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Paket driver Falcon dari Force Dimension, atau katalognya, tidak ada: {0}. Instal ulang SDK Force Dimension.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Tidak ada Falcon yang terhubung.</value></data>

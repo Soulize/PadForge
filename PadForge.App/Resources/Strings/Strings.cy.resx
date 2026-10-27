@@ -304,6 +304,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Yn gweithio gyda modiau a wnaed ar gyfer DSX, fel y rhai ar gyfer GTA V, Red Dead Redemption 2, Skyrim a Forza. Tra bo'r gweinydd yn gwrando, mae PadForge yn ysgrifennu ei borth lle mae'r modiau hynny'n edrych amdano.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Yn gwrando ar :{0}. Mae {1} yn anfon at reolydd rhithwir {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Yn gwrando ar :{0}. Mae {1} yn anfon, ond nid oes gan yr un rheolydd rhithwir reolydd PlayStation arno.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Yn gwrando ar :{0}. Mae {1} yn anfon at fynegai rheolydd {2}, ac nid oes gan unrhyw reolydd rhithwir gyda rheolydd PlayStation arno y mynegai hwnnw.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Mae porth {0} yn cael ei ddefnyddio gan raglen arall, fel DSX. Caewch hi neu dewiswch borth arall.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Mod gêm</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Yn gweithio gydag OpenTrack ac unrhyw draciwr sy'n anfon ei allbwn UDP neu'n ysgrifennu cof a rennir FreeTrack 2.0, a chydag amser rhedeg OpenXR ar y peiriant hwn a all redeg sesiwn yn y cefndir.</value></data>
@@ -4092,7 +4093,7 @@ Hoffech chi i PadForge eu dadosod nawr? Mae hyn angen caniatâd gweinyddwr ac ef
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Yn aros am ddata cof a rennir FreeTrack.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>Nid yw cof a rennir FreeTrack ar gael.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Dirgryniad Ongl Llywio</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Yn ychwanegu dirgryniad parhaus wrth i'r echelin ffon rithwir ddewisedig symud i ffwrdd o'r canol. Yn defnyddio'r allbwn mapiedig o'r holl ffynonellau a neilltuwyd. Gyda Hollti yn ôl Cyfeiriad, mae symudiad negyddol yn gyrru'r modur chwith a symudiad positif y dde. Mae Modur Chwith neu Modur Dde yn rhoi'r ddau gyfeiriad ar yr un modur hwnnw. Ar gyfer allbwn Xbox a PlayStation gyda dyfeisiau dirgryniad. Eithrir adborth grym olwyn brodorol.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Yn ychwanegu dirgryniad parhaus wrth i'r echelin ffon rithwir ddewisedig symud i ffwrdd o'r canol. Yn defnyddio'r allbwn mapiedig o'r holl ffynonellau a neilltuwyd. Gyda Hollti yn ôl Cyfeiriad, mae symudiad negyddol yn gyrru'r modur chwith a symudiad positif y dde. Mae Modur Chwith neu Modur Dde yn rhoi'r ddau gyfeiriad ar yr un modur hwnnw. Ar gyfer allbwn Xbox a PlayStation gyda dyfeisiau dirgryniad. Mae'n hepgor olwynion lywio, dyfeisiau eraill ag adborth grym cyson, a phedalau Fanatec.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Galluogi Dirgryniad Ongl Llywio</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Echelin Rithwir</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Ffon Chwith X</value></data>
@@ -4282,6 +4283,7 @@ Hoffech chi i PadForge eu dadosod nawr? Mae hyn angen caniatâd gweinyddwr ac ef
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>yn uniongyrchol ar y {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>yn rhwymo WinUSB i sgrin y G19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>mae sgrin y G19 ar yrrwr arall ({0}), felly dechreuwch Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>mae sgrin y G19 ar yrrwr rhaglen arall ({0}), y mae PadForge yn ei adael yn llonydd</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>mae angen Logitech Gaming Software 8.52 neu ddiweddarach</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>dechreuwch Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>yn aros am ffôn gydag Arx Control</value></data>
@@ -4353,6 +4355,7 @@ Hoffech chi i PadForge eu dadosod nawr? Mae hyn angen caniatâd gweinyddwr ac ef
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Carn</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>Mae {0} yn gosod sbardunau'r rheolydd hwn.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>Mae {0} yn gosod goleuadau'r rheolydd hwn.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>Mae {0} yn gosod goleuadau'r ddyfais hon.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>Mae {0} yn gosod sbardunau a goleuadau'r rheolydd hwn.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>Mae {0} yn chwarae dirgryniadau sbardun ar sbardunau impwls y rheolydd hwn.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Clirio Effeithiau Mod</value></data>
@@ -4360,10 +4363,10 @@ Hoffech chi i PadForge eu dadosod nawr? Mae hyn angen caniatâd gweinyddwr ac ef
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Chwith/Dde</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>I Fyny/I Lawr</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>I Mewn/Allan</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Botwm {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, wedi'i lwytho o {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Ni lwythodd y dhd64.dll a ddewisoch, felly mae PadForge yn defnyddio'r copi uchod.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Mae llyfrgell Force Dimension yn rhedeg yn fersiwn x64 PadForge yn unig.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>Canfuwyd dhd64.dll ond nid oedd modd ei lwytho.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Nid yw'r dhd64.dll hwnnw'n llyfrgell Force Dimension y mae PadForge yn ei disgwyl.</value></data>
@@ -4373,11 +4376,12 @@ Hoffech chi i PadForge eu dadosod nawr? Mae hyn angen caniatâd gweinyddwr ac ef
   <data name="Falcon_Status_Open" xml:space="preserve"><value>ar agor</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Mae Falcon ar agor mewn rhaglen arall, fel FalconJoyForce neu offer Force Dimension ei hun. Caewch ef yno.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Mae'r Falcon ar yrrwr arall ({0}), felly ni all llyfrgell Force Dimension ei agor. Yn Rheolwr Dyfeisiau, diweddarwch yrrwr y Falcon o'r ffolder drivers\usb yn ffolder SDK Force Dimension.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Mae'r Falcon ar yrrwr Force Dimension, ac ni allai llyfrgell Force Dimension ei agor: {0}. Gwiriwch ei bŵer a'i gebl USB.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Mae Falcon wedi'i blygio i mewn heb yrrwr. Mae Gosod Gyrrwr Falcon yn rhoi gyrrwr Force Dimension iddo.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Mae Falcon wedi'i blygio i mewn heb yrrwr, ac nid oes pecyn gyrrwr yn ffolder yr SDK i'w roi iddo. Gosodwch SDK Force Dimension eto.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Dim Falcon wedi'i ganfod. Plygiwch ei bŵer a'i gebl USB i mewn.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Dewis dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Yn llwytho'r copi hwn o lyfrgell Force Dimension cyn unrhyw un arall. Mae'r copïau y mae'r SDK yn eu gosod i'w cael hebddo.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Yn llwytho'r copi hwn o lyfrgell Force Dimension yn lle unrhyw un arall. Mae Falcon sydd ar agor ar gopi arall yn cau ac yn agor eto ar yr un hwn. Mae'r copïau y mae'r SDK yn eu gosod i'w cael hebddo.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Llyfrgelloedd (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Gosod Gyrrwr Falcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Yn gosod gyrrwr Force Dimension, o ffolder yr SDK, ar Falcon sydd heb un. Efallai y bydd Windows yn gofyn yn gyntaf a ydych yn ymddiried yn Force Dimension.</value></data>
@@ -4394,7 +4398,7 @@ Hoffech chi i PadForge eu dadosod nawr? Mae hyn angen caniatâd gweinyddwr ac ef
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Chwarae gemau gyda Novint Falcon trwy SDK Force Dimension, y byddwch yn ei osod o Force Dimension. Mae'r carn yn ffon, mae pedwar botwm y gafael yn fotymau, ac mae PadForge yn rhoi dirgryniad ac effeithiau'r gêm ar y carn fel grym. Mae tab Adborth Grym pob slot yn gosod sut mae'r Falcon yn teimlo.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Rheoli Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Yn agor pob Falcon trwy dhd64.dll Force Dimension. Mae Falcon agored yn eiddo i PadForge yn unig, felly ni all FalconJoyForce nac offer Force Dimension ei agor tra bydd hwn ymlaen. Pan fydd i ffwrdd, mae PadForge yn cau pob Falcon.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Mae llyfrgell Falcon wedi'i gosod i {0}. Mae copi sydd eisoes yn cael ei ddefnyddio yn aros nes i PadForge ddechrau eto.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Mae llyfrgell Falcon wedi'i gosod i {0}. Mae PadForge yn ei llwytho o fewn ychydig eiliadau, ac mae Falcon sydd ar agor ar gopi arall yn agor eto ar yr un hwn.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Yn gosod gyrrwr Falcon Force Dimension…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Mae pecyn gyrrwr Falcon Force Dimension, neu ei gatalog, ar goll: {0}. Gosodwch SDK Force Dimension eto.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Nid oes Falcon wedi'i blygio i mewn.</value></data>

@@ -133,6 +133,9 @@ namespace PadForge.Services
         // trigger providers, one each.
         private Vibration _personaHapticScratchSony;
         private Vibration _personaHapticTriggerScratchSony;
+        // The persona haptics alone, for a DualSense inside a game's rumble
+        // release grace.
+        private PersonaHapticRumble.DeviceScratch _personaReleaseScratchSony;
         // #102 trigger-routing main-motor source for the Sony AT Vibration path.
         private Vibration _routeMainScratchSony;
         private Vibration _routeCfScratchSony;
@@ -933,6 +936,9 @@ namespace PadForge.Services
             // Voice phrases on mic-bearing pads (issue #317): the engine
             // stamps pulses into the pad's state through this hook.
             PadForge.Engine.SdlDeviceWrapper.ExternalVoiceAugment = PadForge.Common.Input.VoicePulse.Apply;
+            // A Bluetooth DualShock 4 carries phrases only while its
+            // microphone lane is on (#528).
+            PadForge.Engine.Data.UserDevice.Ds4BtMicEnabled = () => PadForge.Common.Input.AudioPassthroughService.EnableDs4BtMic;
             // An XInput pad's identity weighs a node under the usbip-win2
             // host controller by the persona scope Step 1 and the hiding
             // side ask.
@@ -1160,6 +1166,17 @@ namespace PadForge.Services
 
                 return ((byte)(maxR >> 8), (byte)(maxL >> 8));
             };
+
+            // The persona haptics alone (discussion #522), through each row's
+            // gains, for a DualSense whose game released its rumble: inside
+            // that grace the converted haptics are the one PadForge source the
+            // pad gets (UserEffectsDispatcher, the release branch beside the
+            // pass-through zeroing). Called inside the dispatcher's device
+            // lock like the provider above, which is what lets it keep one
+            // scratch of its own.
+            UserEffectsDispatcher.SlotPersonaRumbleForDeviceProvider = (padIndex, deviceGuid) =>
+                PersonaHapticRumble.ForDevice(_inputManager, padIndex, deviceGuid, Environment.TickCount64,
+                    _personaReleaseScratchSony ??= new PersonaHapticRumble.DeviceScratch());
 
             // Slot's raw rumble for change-detection inside the audio
             // dispatch tick — see SlotRawRumbleProvider docs.
@@ -2192,8 +2209,15 @@ namespace PadForge.Services
             // FinalVibrationStates (that projection carries test rumble,
             // macro rumble, per-device gain/swap, and AudioBassDetector's
             // audio rumble, which would close the shaker feedback loop).
+            // The persona haptics join on the two body voices, as they do
+            // for the shaker lane: a game that plays the DualSense's haptics
+            // as audio sends no rumble (discussion #522).
             PadForge.Engine.Common.Mapping.SourceCoercion.SlotRumbleProvider = slotIndex =>
-                _inputManager?.GetInboundRumblePack(slotIndex) ?? 0L;
+            {
+                var im = _inputManager;
+                if (im == null) return 0L;
+                return im.WithPersonaHaptics(slotIndex, im.GetInboundRumblePack(slotIndex), Environment.TickCount64);
+            };
 
             // The rumble-to-audio renderer reconciles endpoints on its own
             // worker. Cheap when no slot has a config (one array walk per
@@ -2646,6 +2670,7 @@ namespace PadForge.Services
                 });
                 UserEffectsDispatcher.SlotButtonsProvider = null;
                 UserEffectsDispatcher.SlotRumbleForDeviceProvider = null;
+                UserEffectsDispatcher.SlotPersonaRumbleForDeviceProvider = null;
                 UserEffectsDispatcher.SlotRawRumbleProvider = null;
                 UserEffectsDispatcher.SlotImpulseTriggerForDeviceProvider = null;
                 UserEffectsDispatcher.SteeringAtResistanceProvider = null;
@@ -3717,6 +3742,8 @@ namespace PadForge.Services
             UpdateFalconStatus();
             // Game mods (#529): same cadence, one read when nothing moved.
             UpdateGameModLines();
+            RetryDsuServerOnPortInUse();
+            RetryWebServerOnPortInUse();
 
             // Snapshot devices under lock to avoid cross-thread collection-modified
             // exceptions when the engine's UpdateDevices runs concurrently.
@@ -11031,19 +11058,62 @@ namespace PadForge.Services
 
             if (_dsuServer.Start(port))
             {
+                _dsuFailed = false;
+                _dsuPortInUse = false;
                 _inputManager.DsuServer = _dsuServer;
             }
             else
             {
+                // A port another program holds is tried again on the
+                // dashboard tick (RetryDsuServerOnPortInUse).
+                _dsuFailed = true;
+                _dsuPortInUse = _dsuServer.PortInUse;
+                _dsuFailedPort = port;
+                _dsuFailedMs = Environment.TickCount64;
                 _dsuServer.Dispose();
                 _dsuServer = null;
             }
         }
 
+        /// <summary>Whether the motion server's last start failed, whether
+        /// its port was bound by another program, which port and when. A
+        /// language change rebuilds the card's line from them. Written where
+        /// the server starts and stops.</summary>
+        private bool _dsuFailed;
+        private bool _dsuPortInUse;
+        private int _dsuFailedPort;
+        private long _dsuFailedMs;
+
+        /// <summary>The motion server's port another program held: the bind
+        /// is tried again every few seconds while the switch is on and the
+        /// engine runs, so closing that program brings the server up. The
+        /// game mod server's rule (<see cref="PortInUseRetryMs"/>). A start
+        /// that fails again records the new time.</summary>
+        private void RetryDsuServerOnPortInUse()
+        {
+            if (!_dsuPortInUse || _dsuServer != null) return;
+            if (Environment.TickCount64 - _dsuFailedMs < PortInUseRetryMs) return;
+            StartDsuServerIfEnabled();
+        }
+
         private void StopDsuServer()
         {
+            _dsuFailed = false;
+            _dsuPortInUse = false;
             if (_dsuServer == null)
+            {
+                // A start that failed left its reason on the card, and no
+                // server runs to report the stop. Queued like that reason,
+                // so a start that follows at once (a port change) still
+                // shows its own line.
+                _dispatcher.BeginInvoke(() =>
+                {
+                    if (_dsuServer != null) return;
+                    _mainVm.Dashboard.DsuServerStatus = Strings.Instance.Common_Stopped;
+                    _mainVm.Dashboard.IsDsuServerRunning = false;
+                });
                 return;
+            }
 
             if (_inputManager != null)
                 _inputManager.DsuServer = null;
@@ -11211,7 +11281,7 @@ namespace PadForge.Services
             if (_webServer != null)
                 return; // Already running.
 
-            _webServer = new WebControllerServer();
+            _webServer = WebServerFactory?.Invoke() ?? new WebControllerServer();
             _webServer.StatusChanged += OnWebServerStatusChanged;
             _webServer.DeviceConnected += device =>
             {
@@ -11258,7 +11328,24 @@ namespace PadForge.Services
                     // port (which stops and restarts), while this was starting.
                     bool wanted = _mainVm.Dashboard.EnableWebController
                                   && ReferenceEquals(_webServer, launching);
-                    if (ok && wanted) return;
+                    if (ok && wanted)
+                    {
+                        _webOutageLogged = false;
+                        _webPlainRetryMs = Environment.TickCount64;
+                        return;
+                    }
+                    // A port another program holds is probed again on the
+                    // dashboard tick while the switch stays on
+                    // (RetryWebServerOnPortInUse). One line for the outage.
+                    if (!ok && wanted && launching.PortInUse)
+                    {
+                        if (!_webOutageLogged)
+                            PadForge.Engine.SdlDiagLog.WriteLine($"Web controller: port {port} is in use");
+                        _webOutageLogged = true;
+                        _webPortInUse = true;
+                        _webFailedPort = port;
+                        _webFailedMs = Environment.TickCount64;
+                    }
                     launching.StatusChanged -= OnWebServerStatusChanged;
                     try { launching.Dispose(); } catch { }
                     if (ReferenceEquals(_webServer, launching))
@@ -11332,10 +11419,68 @@ namespace PadForge.Services
             }
         }
 
+        /// <summary>Whether the web controller's last start found its port
+        /// held by another program, which port, and when it was last tried.
+        /// Set by the launch's continuation on the UI thread, read by the
+        /// tick there, and cleared where the server stops.</summary>
+        private bool _webPortInUse;
+        private int _webFailedPort;
+        private long _webFailedMs;
+        private bool _webOutageLogged;
+        private long _webPlainRetryMs;
+
+        /// <summary>Test seams: the server a start makes, and the probe a
+        /// retry asks first. Null in the app.</summary>
+        internal Func<WebControllerServer> WebServerFactory { get; set; }
+        internal Func<int, bool> WebPortProbe { get; set; }
+
+        /// <summary>A port another program held, tried again every few
+        /// seconds on the dashboard tick while the switch is on and the
+        /// engine runs (<see cref="PortInUseRetryMs"/>). The main address is
+        /// probed first (<see cref="WebControllerServer.ProbePort"/>), and
+        /// only a free port gets the full start, since that start runs netsh
+        /// before it binds. The plain address of a running server is added
+        /// again (<see cref="WebControllerServer.RetryPlainAddress"/>), which
+        /// spawns nothing. A launch that fails again records the new time,
+        /// and its identity and generation guards hold as for any
+        /// start.</summary>
+        private void RetryWebServerOnPortInUse()
+        {
+            long now = Environment.TickCount64;
+            var server = _webServer;
+            if (server != null)
+            {
+                if (now - _webPlainRetryMs < PortInUseRetryMs || !server.PlainPortInUse) return;
+                _webPlainRetryMs = now;
+                server.RetryPlainAddress();
+                return;
+            }
+            if (!_webPortInUse || now - _webFailedMs < PortInUseRetryMs) return;
+            _webFailedMs = now;
+            var probe = WebPortProbe ?? (p => WebControllerServer.ProbePort(p, () => new HttpWebControllerListener()));
+            if (!probe(_webFailedPort)) return;
+            _webPortInUse = false;
+            StartWebServerIfEnabled();
+        }
+
         private void StopWebServer()
         {
+            _webPortInUse = false;
+            _webOutageLogged = false;
             if (_webServer == null)
+            {
+                // A start that failed left its reason on the card, and no
+                // server runs to report the stop. Queued like that reason,
+                // so a start that follows at once (a port change) still
+                // shows its own line.
+                _dispatcher.BeginInvoke(() =>
+                {
+                    if (_webServer != null) return;
+                    _mainVm.Dashboard.WebControllerStatus = Strings.Instance.Common_Stopped;
+                    _mainVm.Dashboard.IsWebControllerRunning = false;
+                });
                 return;
+            }
 
             _webServer.StatusChanged -= OnWebServerStatusChanged;
             _webServer.Dispose();
@@ -12400,8 +12545,11 @@ namespace PadForge.Services
                                 // rumble, and its level reaches the device
                                 // through the apply below. Its saved record
                                 // holds while it sleeps, so the consumer's
-                                // capability does not flap with it.
-                                HasRumble = dev.HasRumble || ud.HasPeripheralHaptics,
+                                // capability does not flap with it. A Novint
+                                // Falcon (#521) takes the slot's force through
+                                // its haptic thread, which the apply below feeds.
+                                HasRumble = dev.HasRumble || ud.HasPeripheralHaptics
+                                    || dev is PadForge.Common.Input.Falcon.FalconDevice,
                                 HasRumbleTriggers = dev.HasRumbleTriggers,
                                 HasHaptic = dev.HasHaptic,
                                 HasGyro = dev.HasGyro,
@@ -12427,6 +12575,9 @@ namespace PadForge.Services
                                 NumTouchpads = dev.NumTouchpads,
                                 TouchpadFingerCounts = dev.TouchpadFingerCounts,
                                 CapSenseChannelMask = dev.CapSenseChannelMask,
+                                // A Bluetooth DualShock 4's phrases rest on a
+                                // path the peer's copy does not have.
+                                HasVoicePhrases = ud.HasVoicePhrases ? true : null,
                                 TouchpadPressureSupported = dev.TouchpadPressureSupported,
                                 TouchpadClickSupported = dev.TouchpadClickSupported,
                                 InputDeviceType = devType,
@@ -12732,6 +12883,10 @@ namespace PadForge.Services
             // the device just after the crash sweep has no other writer left
             // to end it.
             if (_inputManager?.OutputsQuiesced == true && !IsRelayedStop(effect)) return;
+            // A Falcon takes only a frame that carries the peer slot's
+            // settings (#521). A peer from before them sends none, and the
+            // Falcon stays as this PC's slots leave it, unclaimed.
+            if (!TakesRemoteFalconFrame(source, effect)) return;
             // Sole-writer guard (#138): this frame means a remote game is driving the
             // shared device. Refresh the output lease so the owner's LOCAL output pipeline
             // yields. The apply below is the sole hardware writer (no two-writer stutter).
@@ -12844,6 +12999,15 @@ namespace PadForge.Services
                                     ud, vib.LeftMotorSpeed, vib.RightMotorSpeed,
                                     vib.LeftTriggerMotorSpeed, vib.RightTriggerMotorSpeed);
                             }
+                        }
+                        else if (source is PadForge.Common.Input.Falcon.FalconDevice falcon)
+                        {
+                            // Novint Falcon sole-writer path (#521, mirrors
+                            // InputManager.Step2's isFalcon hand-off): the haptic
+                            // thread renders the relayed force with the peer
+                            // slot's settings. The consumer folded trigger
+                            // rumble before it shipped the frame.
+                            ApplyRemoteFalcon(falcon, effect);
                         }
                         else
                         {
@@ -13406,16 +13570,19 @@ namespace PadForge.Services
                 _ => Strings.Instance.Common_Stopped,
             };
 
-            // DSU server
+            // DSU server. A failed start keeps its reason.
             if (_dsuServer == null)
-                dash.DsuServerStatus = Strings.Instance.Common_Stopped;
+                dash.DsuServerStatus = _dsuFailed
+                    ? (_dsuPortInUse ? string.Format(Strings.Instance.Server_PortInUse_Format, _dsuFailedPort) : Strings.Instance.Server_FailedToStart)
+                    : Strings.Instance.Common_Stopped;
             else
                 dash.DsuServerStatus = string.Format(Strings.Instance.Server_ListeningOn_Format, _mainVm.Dashboard.DsuMotionServerPort);
 
             // Game mod server and the pad page lines (#529): the next tick
-            // rebuilds them in the new language.
+            // rebuilds them in the new language. A failed start keeps its
+            // reason.
             if (_gameModServer == null)
-                dash.GameModServerStatus = Strings.Instance.Common_Stopped;
+                dash.GameModServerStatus = GameModStoppedStatus();
             else
                 dash.GameModServerStatus = _gameModServer.FormatStatus();
             _gameModLinesVersion = -1;
@@ -13430,9 +13597,12 @@ namespace PadForge.Services
             ResetGameTelemetryStatusCache();
             UpdateGameTelemetryStatus();
 
-            // Web controller server
+            // Web controller server. A port another program holds keeps its
+            // reason.
             if (_webServer == null)
-                dash.WebControllerStatus = Strings.Instance.Common_Stopped;
+                dash.WebControllerStatus = _webPortInUse
+                    ? string.Format(Strings.Instance.Server_PortInUse_Format, _webFailedPort)
+                    : Strings.Instance.Common_Stopped;
             else
             {
                 int clients = dash.WebControllerClientCount;
@@ -18493,9 +18663,7 @@ namespace PadForge.Services
                             if (entry.RawButton >= 0)
                             {
                                 var obj = objects?.FirstOrDefault(o => o.IsButton && o.InputIndex == entry.RawButton);
-                                inputs.Add(obj != null && !string.IsNullOrEmpty(obj.Name)
-                                    ? obj.Name
-                                    : string.Format(Strings.Instance.Macro_Button_Format, entry.RawButton));
+                                inputs.Add(MacroItem.ButtonLabel(obj, entry.RawButton));
                             }
                             else if (!string.IsNullOrEmpty(entry.Pov))
                             {

@@ -319,6 +319,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Λειτουργεί με mod που έγιναν για το DSX, όπως αυτά για GTA V, Red Dead Redemption 2, Skyrim και Forza. Όσο ο διακομιστής ακούει, το PadForge γράφει τη θύρα του εκεί όπου την αναζητούν αυτά τα mod.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Ακρόαση στο :{0}. {1} στέλνει στο εικονικό χειριστήριο {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Ακρόαση στο :{0}. {1} στέλνει, αλλά κανένα εικονικό χειριστήριο δεν έχει χειριστήριο PlayStation.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Ακρόαση στο :{0}. {1} στέλνει στον δείκτη χειριστηρίου {2}, και κανένα εικονικό χειριστήριο με χειριστήριο PlayStation δεν έχει αυτόν τον δείκτη.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Η θύρα {0} χρησιμοποιείται από άλλο πρόγραμμα, όπως το DSX. Κλείστε το ή επιλέξτε άλλη θύρα.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Ένα mod παιχνιδιού</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>Λειτουργεί με το OpenTrack και με κάθε ανιχνευτή που στέλνει την έξοδό του μέσω UDP ή γράφει στην κοινόχρηστη μνήμη FreeTrack 2.0, καθώς και με ένα περιβάλλον εκτέλεσης OpenXR σε αυτόν τον υπολογιστή που μπορεί να εκτελεί μια συνεδρία στο παρασκήνιο.</value></data>
@@ -4127,7 +4128,7 @@
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Αναμονή για δεδομένα από την κοινόχρηστη μνήμη FreeTrack.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>Η κοινόχρηστη μνήμη FreeTrack δεν είναι διαθέσιμη.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Δόνηση γωνίας τιμονιού</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Προσθέτει συνεχή δόνηση καθώς ο επιλεγμένος εικονικός άξονας μοχλού απομακρύνεται από το κέντρο. Χρησιμοποιεί την αντιστοιχισμένη έξοδο από όλες τις ανατεθειμένες πηγές. Με την επιλογή Διαχωρισμός ανά κατεύθυνση, η αρνητική κίνηση οδηγεί τον αριστερό κινητήρα και η θετική τον δεξιό. Η επιλογή Αριστερός κινητήρας ή Δεξιός κινητήρας βάζει και τις δύο κατευθύνσεις σε αυτόν τον κινητήρα. Για έξοδο Xbox και PlayStation με συσκευές δόνησης. Η εγγενής ανάδραση δύναμης των τιμονιερών εξαιρείται.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Προσθέτει συνεχή δόνηση καθώς ο επιλεγμένος εικονικός άξονας μοχλού απομακρύνεται από το κέντρο. Χρησιμοποιεί την αντιστοιχισμένη έξοδο από όλες τις ανατεθειμένες πηγές. Με την επιλογή Διαχωρισμός ανά κατεύθυνση, η αρνητική κίνηση οδηγεί τον αριστερό κινητήρα και η θετική τον δεξιό. Η επιλογή Αριστερός κινητήρας ή Δεξιός κινητήρας βάζει και τις δύο κατευθύνσεις σε αυτόν τον κινητήρα. Για έξοδο Xbox και PlayStation με συσκευές δόνησης. Παραλείπει τιμονιέρες, άλλες συσκευές με σταθερή ανάδραση δύναμης και πεντάλ Fanatec.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Ενεργοποίηση δόνησης γωνίας τιμονιού</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Εικονικός άξονας</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Αριστερός μοχλός X</value></data>
@@ -4330,6 +4331,7 @@
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>απευθείας στο {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>σύνδεση του WinUSB στην οθόνη του G19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>η οθόνη του G19 χρησιμοποιεί άλλο πρόγραμμα οδήγησης ({0}), οπότε ξεκινήστε το Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>η οθόνη του G19 χρησιμοποιεί το πρόγραμμα οδήγησης ενός άλλου προγράμματος ({0}), το οποίο το PadForge αφήνει ως έχει</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>απαιτεί Logitech Gaming Software 8.52 ή νεότερο</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>ξεκινήστε το Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>αναμονή για τηλέφωνο με Arx Control</value></data>
@@ -4401,6 +4403,7 @@
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Λαβή</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} ορίζει τις σκανδάλες αυτού του χειριστηρίου.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} ορίζει τα φώτα αυτού του χειριστηρίου.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} ορίζει τα φώτα αυτής της συσκευής.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} ορίζει τις σκανδάλες και τα φώτα αυτού του χειριστηρίου.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} αναπαράγει δονήσεις σκανδαλών στις σκανδάλες ώθησης αυτού του χειριστηρίου.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Εκκαθάριση εφέ mod</value></data>
@@ -4408,10 +4411,10 @@
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Αριστερά/Δεξιά</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Πάνω/Κάτω</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Μέσα/Έξω</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Κουμπί {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, φορτώθηκε από {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Το dhd64.dll που επιλέξατε δεν φορτώθηκε, γι' αυτό το PadForge χρησιμοποιεί το αντίγραφο παραπάνω.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Η βιβλιοθήκη της Force Dimension λειτουργεί μόνο στην έκδοση x64 του PadForge.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>Το dhd64.dll βρέθηκε, αλλά δεν ήταν δυνατή η φόρτωσή του.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Αυτό το dhd64.dll δεν είναι η βιβλιοθήκη της Force Dimension που περιμένει το PadForge.</value></data>
@@ -4421,11 +4424,12 @@
   <data name="Falcon_Status_Open" xml:space="preserve"><value>ανοιχτό</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Ένα Falcon είναι ανοιχτό σε άλλο πρόγραμμα, όπως το FalconJoyForce ή τα εργαλεία της Force Dimension. Κλείστε το εκεί.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Το Falcon χρησιμοποιεί άλλο πρόγραμμα οδήγησης ({0}), γι' αυτό η βιβλιοθήκη της Force Dimension δεν μπορεί να το ανοίξει. Στη Διαχείριση συσκευών, ενημερώστε το πρόγραμμα οδήγησης του Falcon από τον φάκελο drivers\usb μέσα στον φάκελο του SDK της Force Dimension.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Το Falcon χρησιμοποιεί το πρόγραμμα οδήγησης της Force Dimension και η βιβλιοθήκη της Force Dimension δεν μπόρεσε να το ανοίξει: {0}. Ελέγξτε την τροφοδοσία και το καλώδιο USB του.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Ένα Falcon είναι συνδεδεμένο χωρίς πρόγραμμα οδήγησης. Η εγκατάσταση προγράμματος οδήγησης Falcon του δίνει αυτό της Force Dimension.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Ένα Falcon είναι συνδεδεμένο χωρίς πρόγραμμα οδήγησης, και ο φάκελος του SDK δεν έχει πακέτο προγράμματος οδήγησης για να του δοθεί. Εγκαταστήστε ξανά το SDK της Force Dimension.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Δεν βρέθηκε Falcon. Συνδέστε το τροφοδοτικό και το καλώδιο USB του.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Επιλογή dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Φορτώνει αυτό το αντίγραφο της βιβλιοθήκης της Force Dimension πριν από οποιοδήποτε άλλο. Τα αντίγραφα που εγκαθιστά το SDK βρίσκονται και χωρίς αυτό.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Φορτώνει αυτό το αντίγραφο της βιβλιοθήκης της Force Dimension αντί για οποιοδήποτε άλλο. Ένα Falcon που είναι ανοιχτό σε άλλο αντίγραφο κλείνει και ανοίγει ξανά σε αυτό. Τα αντίγραφα που εγκαθιστά το SDK βρίσκονται και χωρίς αυτό.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Βιβλιοθήκες (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Εγκατάσταση προγράμματος οδήγησης Falcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Εγκαθιστά το πρόγραμμα οδήγησης της Force Dimension, από τον φάκελο του SDK, σε ένα Falcon που δεν έχει κανένα. Τα Windows ίσως ρωτήσουν πρώτα αν εμπιστεύεστε τη Force Dimension.</value></data>
@@ -4442,7 +4446,7 @@
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Παίζει παιχνίδια με ένα Novint Falcon μέσω του SDK της Force Dimension, το οποίο εγκαθιστάτε από τη Force Dimension. Η λαβή είναι μοχλός, τα τέσσερα κουμπιά της λαβής είναι κουμπιά και το PadForge εφαρμόζει στη λαβή ως δύναμη τη δόνηση και τα εφέ του παιχνιδιού. Η καρτέλα Ανάδραση δύναμης κάθε υποδοχής ορίζει πώς αισθάνεται το Falcon.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Οδήγηση Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Ανοίγει κάθε Falcon μέσω του dhd64.dll της Force Dimension. Ένα ανοιχτό Falcon ανήκει αποκλειστικά στο PadForge, επομένως το FalconJoyForce και τα εργαλεία της Force Dimension δεν μπορούν να το ανοίξουν όσο η επιλογή είναι ενεργή. Όταν είναι ανενεργή, το PadForge κλείνει κάθε Falcon.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Η βιβλιοθήκη του Falcon ορίστηκε σε {0}. Ένα αντίγραφο που ήδη χρησιμοποιείται παραμένει μέχρι να ξεκινήσει ξανά το PadForge.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Η βιβλιοθήκη του Falcon ορίστηκε σε {0}. Το PadForge τη φορτώνει μέσα σε λίγα δευτερόλεπτα και ένα Falcon που είναι ανοιχτό σε άλλο αντίγραφο ανοίγει ξανά σε αυτό.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Εγκατάσταση του προγράμματος οδήγησης Falcon της Force Dimension…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Το πακέτο προγράμματος οδήγησης Falcon της Force Dimension ή ο κατάλογός του λείπει: {0}. Εγκαταστήστε ξανά το SDK της Force Dimension.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Δεν είναι συνδεδεμένο κανένα Falcon.</value></data>

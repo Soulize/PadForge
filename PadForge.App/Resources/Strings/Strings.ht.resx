@@ -295,6 +295,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>Mache ak mod ki fèt pou DSX, tankou sa yo pou GTA V, Red Dead Redemption 2, Skyrim ak Forza. Pandan sèvè a ap koute, PadForge ekri pò li a kote mod sa yo chèche l.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>Ap koute sou :{0}. {1} ap voye bay kontwolè vityèl {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>Ap koute sou :{0}. {1} ap voye, men pa gen okenn kontwolè vityèl ki gen yon kontwolè PlayStation sou li.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Ap koute sou :{0}. {1} ap voye bay kontwolè nimewo {2}, men okenn kontwolè vityèl ki gen yon kontwolè PlayStation sou li pa gen nimewo sa a.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Yon lòt pwogram, tankou DSX, ap itilize pò {0}. Fèmen l oswa chwazi yon lòt pò.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Yon mod jwèt</value></data>
   <data name="Settings_GKeysStatus_Running_Format" xml:space="preserve"><value>Ap mache, {0} evènman touch</value></data>
@@ -3459,7 +3460,7 @@ Gen yon kopi vèsyon anvan an nan dosye sa a: {1}</value></data>
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>Ap tann done nan memwa pataje FreeTrack.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>Memwa pataje FreeTrack pa disponib.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Vibrasyon selon ang direksyon</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Ajoute yon vibrasyon kontinyèl pandan aks stick vityèl ou chwazi a ap deplase lwen sant lan. Li sèvi ak sòti ki asiye nan tout sous ki atribiye yo. Avèk «Separe selon direksyon», mouvman negatif fè motè gòch la mache, mouvman pozitif fè motè dwat la mache. «Motè gòch» oswa «Motè dwat» mete toude direksyon yo sou motè sa a sèlman. Pou sòti Xbox ak PlayStation ak aparèy ki ka vibre. Retou fòs natif volan yo pa enkli.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Ajoute yon vibrasyon kontinyèl pandan aks stick vityèl ou chwazi a ap deplase lwen sant lan. Li sèvi ak sòti ki asiye nan tout sous ki atribiye yo. Avèk «Separe selon direksyon», mouvman negatif fè motè gòch la mache, mouvman pozitif fè motè dwat la mache. «Motè gòch» oswa «Motè dwat» mete toude direksyon yo sou motè sa a sèlman. Pou sòti Xbox ak PlayStation ak aparèy ki ka vibre. Li pa aji sou volan yo, sou lòt aparèy ki gen retou fòs konstan, ni sou pedal Fanatec yo.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Aktive vibrasyon selon ang direksyon</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Aks vityèl</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Stick gòch X</value></data>
@@ -3662,6 +3663,7 @@ Gen yon kopi vèsyon anvan an nan dosye sa a: {1}</value></data>
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>dirèkteman sou {0} la</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>ap mare WinUSB ak ekran G19 la</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>ekran G19 la sou yon lòt pilòt ({0}), kidonk lanse Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>ekran G19 la sou pilòt yon lòt pwogram ({0}), epi PadForge pa manyen l</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>bezwen Logitech Gaming Software 8.52 oswa pi resan</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>lanse Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>ap tann yon telefòn ki gen Arx Control</value></data>
@@ -3733,6 +3735,7 @@ Gen yon kopi vèsyon anvan an nan dosye sa a: {1}</value></data>
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Manch</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} ap regle gachèt kontwolè sa a.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} ap regle limyè kontwolè sa a.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} ap regle limyè aparèy sa a.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} ap regle gachèt ak limyè kontwolè sa a.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} ap jwe vibrasyon gachèt sou gachèt Impulse kontwolè sa a.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Efase efè mod yo</value></data>
@@ -3740,10 +3743,10 @@ Gen yon kopi vèsyon anvan an nan dosye sa a: {1}</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Gòch/Dwat</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Anwo/Anba</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Anndan/Deyò</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Bouton {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, chaje soti nan {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>dhd64.dll ou chwazi a pa t chaje, kidonk PadForge sèvi ak kopi ki anwo a.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Bibliyotèk Force Dimension lan mache sèlman nan vèsyon x64 PadForge la.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>PadForge jwenn dhd64.dll, men li pa ka chaje l.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>dhd64.dll sa a se pa bibliyotèk Force Dimension PadForge ap tann nan.</value></data>
@@ -3752,11 +3755,12 @@ Gen yon kopi vèsyon anvan an nan dosye sa a: {1}</value></data>
   <data name="Falcon_Status_Rate_Format" xml:space="preserve"><value>ap mache a {0:0.0} kHz</value></data>
   <data name="Falcon_Status_Open" xml:space="preserve"><value>louvri</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Yon Falcon louvri nan yon lòt pwogram, tankou FalconJoyForce oswa zouti Force Dimension yo. Fèmen l la.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon an sou pilòt Force Dimension, epi bibliyotèk Force Dimension pa t ka louvri l: {0}. Verifye kouran li ak kab USB li.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Yon Falcon branche san pilòt. «Enstale pilòt Falcon» ba li pilòt Force Dimension lan.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Yon Falcon branche san pilòt, epi dosye SDK a pa gen okenn pakè pilòt pou ba li. Reenstale SDK Force Dimension lan.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Pa jwenn okenn Falcon. Branche kouran li ak kab USB li.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Chwazi dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Chaje kopi bibliyotèk Force Dimension sa a anvan tout lòt. PadForge jwenn kopi SDK a enstale yo san li.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Chaje kopi bibliyotèk Force Dimension sa a nan plas tout lòt. Yon Falcon ki louvri sou yon lòt kopi ap fèmen epi l ap louvri ankò sou kopi sa a. PadForge jwenn kopi SDK a enstale yo san li.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Bibliyotèk (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Enstale pilòt Falcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Enstale pilòt Force Dimension lan, ki nan dosye SDK a, sou yon Falcon ki pa genyen youn. Windows ka mande w anvan si pou w fè Force Dimension konfyans.</value></data>
@@ -3773,7 +3777,7 @@ Gen yon kopi vèsyon anvan an nan dosye sa a: {1}</value></data>
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Jwe jwèt ak yon Novint Falcon atravè SDK Force Dimension lan, ke ou enstale soti nan Force Dimension. Manch lan se yon stick, kat bouton manch lan se bouton, epi PadForge transfòme vibrasyon ak efè jwèt la an fòs sou manch lan. Onglè Retou fòs chak plas detèmine kijan Falcon nan reyaji.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Kontwole Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Louvri chak Falcon atravè dhd64.dll Force Dimension lan. Yon Falcon ki louvri se pou PadForge sèlman, kidonk FalconJoyForce ak zouti Force Dimension yo pa ka louvri l pandan opsyon sa a aktive. Lè l dezaktive, PadForge fèmen tout Falcon yo.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Bibliyotèk Falcon an kounye a se {0}. Yon kopi ki deja ap itilize rete jiskaske PadForge rekòmanse.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Bibliyotèk Falcon an kounye a se {0}. PadForge ap chaje l nan kèk segonn, epi yon Falcon ki louvri sou yon lòt kopi ap louvri ankò sou kopi sa a.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Ap enstale pilòt Falcon Force Dimension lan…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Pakè pilòt Falcon Force Dimension lan, oswa katalòg li, manke: {0}. Reenstale SDK Force Dimension lan.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Pa gen okenn Falcon ki branche.</value></data>

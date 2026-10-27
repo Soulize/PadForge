@@ -304,6 +304,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>GTA V, Red Dead Redemption 2, Skyrim, Forza зэрэг тоглоомд зориулсан, DSX-д зориулж хийсэн модуудтай ажиллана. Сервер сонсож байх үед PadForge өөрийн портыг тэдгээр модын хайдаг газарт бичнэ.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>:{0} дээр сонсож байна. {1} {2}-р виртуал контроллер руу илгээж байна.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>:{0} дээр сонсож байна. {1} илгээж байгаа ч аль ч виртуал контроллер дээр PlayStation контроллер алга.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>:{0} дээр сонсож байна. {1} {2}-р контроллер руу илгээж байгаа боловч PlayStation контроллертой виртуал контроллеруудын аль нь ч ийм дугааргүй байна.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>{0} портыг DSX зэрэг өөр програм ашиглаж байна. Тэр програмыг хаах эсвэл өөр порт сонгоно уу.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Тоглоомын мод</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>OpenTrack болон UDP гаралтаа илгээдэг эсвэл FreeTrack 2.0 хуваалцсан санах ойд бичдэг аливаа хянагчтай, мөн энэ компьютер дээрх арын горимд сесс ажиллуулж чадах OpenXR ажиллах орчинтой ажиллана.</value></data>
@@ -4088,7 +4089,7 @@ PadForge одоо тэдгээрийг устгах уу? Үүнд админи�
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>FreeTrack хуваалцсан санах ойн өгөгдлийг хүлээж байна.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>FreeTrack хуваалцсан санах ой боломжгүй байна.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>Жолооны өнцгийн чичиргээ</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Сонгосон виртуал стикийн тэнхлэг төвөөс холдох тусам тасралтгүй чичиргээ нэмнэ. Хуваарилсан бүх эх үүсвэрийн оноолтын гаралтыг ашиглана. «Чиглэлээр хуваах» сонголтод сөрөг хөдөлгөөн зүүн моторыг, эерэг хөдөлгөөн баруун моторыг ажиллуулна. «Зүүн мотор» эсвэл «Баруун мотор» сонголт хоёр чиглэлийг хоёуланг нь тухайн нэг моторт өгнө. Чичиргээтэй төхөөрөмжтэй Xbox ба PlayStation гаралтад зориулагдсан. Жолооны уугуул хүчний эргэх холбоо хамаарахгүй.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Сонгосон виртуал стикийн тэнхлэг төвөөс холдох тусам тасралтгүй чичиргээ нэмнэ. Хуваарилсан бүх эх үүсвэрийн оноолтын гаралтыг ашиглана. «Чиглэлээр хуваах» сонголтод сөрөг хөдөлгөөн зүүн моторыг, эерэг хөдөлгөөн баруун моторыг ажиллуулна. «Зүүн мотор» эсвэл «Баруун мотор» сонголт хоёр чиглэлийг хоёуланг нь тухайн нэг моторт өгнө. Чичиргээтэй төхөөрөмжтэй Xbox ба PlayStation гаралтад зориулагдсан. Жолоо, тогтмол хүчний эргэх холбоотой бусад төхөөрөмж болон Fanatec дөрөөг алгасна.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>Жолооны өнцгийн чичиргээг идэвхжүүлэх</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Виртуал тэнхлэг</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Зүүн стик X</value></data>
@@ -4290,6 +4291,7 @@ PadForge одоо тэдгээрийг устгах уу? Үүнд админи�
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>{0} дээр шууд</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>G19-ийн дэлгэцэд WinUSB-г холбож байна</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>G19-ийн дэлгэц өөр драйвер ({0}) дээр байгаа тул Logitech Gaming Software-ийг эхлүүлнэ үү</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>G19-ийн дэлгэц өөр програмын драйвер ({0}) дээр байгаа бөгөөд PadForge түүнийг хөндөхгүй</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>Logitech Gaming Software 8.52 буюу түүнээс хойшхи хувилбар шаардлагатай</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>Logitech Gaming Software-ийг эхлүүлнэ үү</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>Arx Control-той утсыг хүлээж байна</value></data>
@@ -4361,6 +4363,7 @@ PadForge одоо тэдгээрийг устгах уу? Үүнд админи�
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Бариул</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} энэ контроллерийн гохыг тохируулж байна.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} энэ контроллерийн гэрлийг тохируулж байна.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} энэ төхөөрөмжийн гэрлийг тохируулж байна.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} энэ контроллерийн гох болон гэрлийг тохируулж байна.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} энэ контроллерийн импульсийн гохонд гохны чичиргээ тоглуулж байна.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Модын эффектийг арилгах</value></data>
@@ -4368,10 +4371,10 @@ PadForge одоо тэдгээрийг устгах уу? Үүнд админи�
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Зүүн/Баруун</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Дээш/Доош</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Дотогш/Гадагш</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Товч {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, ачаалсан байршил: {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Таны сонгосон dhd64.dll ачаалагдсангүй, тиймээс PadForge дээрх хувийг ашиглаж байна.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Force Dimension-ы сан зөвхөн PadForge-ийн x64 хувилбар дээр ажиллана.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>dhd64.dll олдсон боловч ачаалж чадсангүй.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Энэ dhd64.dll нь PadForge-ийн хүлээж буй Force Dimension сан биш байна.</value></data>
@@ -4381,11 +4384,12 @@ PadForge одоо тэдгээрийг устгах уу? Үүнд админи�
   <data name="Falcon_Status_Open" xml:space="preserve"><value>нээлттэй</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Falcon өөр программд, жишээ нь FalconJoyForce эсвэл Force Dimension-ы өөрийн хэрэгслүүдэд нээлттэй байна. Тэндээс хаана уу.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon өөр драйвер ({0}) дээр байгаа тул Force Dimension-ы сан үүнийг нээж чадахгүй. Төхөөрөмжийн менежерээс Falcon-ы драйверыг Force Dimension-ы SDK хавтасны drivers\usb хавтаснаас шинэчилнэ үү.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon нь Force Dimension-ы драйвер дээр байгаа боловч Force Dimension-ы сан үүнийг нээж чадсангүй: {0}. Тэжээл болон USB кабелийг нь шалгана уу.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Falcon драйвергүйгээр залгагдсан байна. «Falcon драйвер суулгах» нь түүнд Force Dimension-ы драйверыг суулгана.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Falcon драйвергүйгээр залгагдсан бөгөөд SDK хавтсанд түүнд суулгах драйверын багц алга. Force Dimension-ы SDK-г дахин суулгана уу.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Falcon олдсонгүй. Тэжээлийн кабель болон USB кабелийг нь залгана уу.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>dhd64.dll сонгох…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Force Dimension-ы сангийн энэ хувийг бусдаас өмнө ачаална. SDK-ийн суулгасан хувиудыг үүнгүйгээр олдог.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Force Dimension-ы сангийн энэ хувийг бусад хувийн оронд ачаална. Өөр хувь дээр нээлттэй Falcon хаагдаж, энэ хувь дээр дахин нээгдэнэ. SDK-ийн суулгасан хувиудыг үүнгүйгээр олдог.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Сангууд (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Falcon драйвер суулгах</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>Драйвергүй Falcon дээр Force Dimension-ы драйверыг SDK хавтаснаас суулгана. Windows эхлээд Force Dimension-д итгэх эсэхийг асууж магадгүй.</value></data>
@@ -4402,7 +4406,7 @@ PadForge одоо тэдгээрийг устгах уу? Үүнд админи�
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Force Dimension-ы SDK-аар дамжуулан Novint Falcon-оор тоглоом тоглоно. SDK-г Force Dimension-ы сайтаас суулгана. Бариул нь стик, бариулын дөрвөн товч нь товч болж, PadForge тоглоомын чичиргээ болон эффектийг бариул дээр хүч болгон дамжуулна. Слот бүрийн «Хүчний эргэх холбоо» таб Falcon-ы мэдрэмжийг тохируулна.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Novint Falcon-ыг удирдах</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Falcon бүрийг Force Dimension-ы dhd64.dll ашиглан нээнэ. Нээлттэй Falcon зөвхөн PadForge-д хамаарах тул энэ асаалттай үед FalconJoyForce болон Force Dimension-ы хэрэгслүүд үүнийг нээж чадахгүй. Унтраавал PadForge бүх Falcon-ыг хаана.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon-ы санг {0} болгож тохирууллаа. Аль хэдийн ашиглагдаж буй хувь PadForge дахин эхлэх хүртэл хэвээр үлдэнэ.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon-ы санг {0} болгож тохирууллаа. PadForge үүнийг хэдэн секундын дотор ачаалах бөгөөд өөр хувь дээр нээлттэй Falcon энэ хувь дээр дахин нээгдэнэ.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Force Dimension-ы Falcon драйверыг суулгаж байна…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Force Dimension-ы Falcon драйверын багц эсвэл түүний каталог алга: {0}. Force Dimension-ы SDK-г дахин суулгана уу.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Falcon залгагдаагүй байна.</value></data>

@@ -1046,11 +1046,11 @@
   <data name="DeviceType_NovintFalcon" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} omboheko hína ko control gatillo kuéra.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} omboheko hína ko control tesape kuéra.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} omboheko hína ko mba'e'oka tesape kuéra.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} omboheko hína ko control gatillo ha tesape kuéra.</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Asu/Akatúa</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Yvate/Yvýpe</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Hyepýpe/Okápe</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Votõ {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Open" xml:space="preserve"><value>ijuruja</value></data>

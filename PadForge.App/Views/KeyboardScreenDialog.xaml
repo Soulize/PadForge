@@ -13,7 +13,7 @@
         ResizeMode="NoResize"
         ShowInTaskbar="False">
 
-    <!-- What one kind of keyboard screen shows (issue #519): the mode, a
+    <!-- What one keyboard screen shows (issue #519): the mode, a
          preview drawn the way the screen draws it, and the picture choices
          the mode takes, the Dreamcast Screen dialog's shape. -->
     <Grid common:InitialFocus.First="True" Margin="20,18,20,18">

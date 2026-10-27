@@ -1533,6 +1533,39 @@ namespace PadForge.Tests
             finally { PeripheralOutputs.StatusChanged -= OnStatus; }
         }
 
+        /// <summary>The HID++ worker builds a new snapshot on every scan and
+        /// liveness check, most of them the same as the last. A status change
+        /// raised for a new object alone refreshed every pad page and rewrote
+        /// PadForge.xml every 30 s on a PC with a Logitech receiver (audit of
+        /// 2026-10-27), so only a snapshot a tab would read differently
+        /// raises one, as the direct backends' snapshot already did.</summary>
+        [Fact]
+        public void AnHidppSnapshotLikeTheLastRaisesNoStatus()
+        {
+            var unit = PeripheralLinkingTests.Unit(1, 3, Vendor) with { Name = "MX Master 4", BatteryPercent = 80 };
+            HidppSnapshot Snapshot(int battery, params Guid[] pending) => new(
+                new[] { unit with { Zones = new[] { new HidppZone(0, 1) }, BatteryPercent = battery } },
+                new HashSet<Guid>(pending));
+
+            PeripheralOutputs.Hidpp = Snapshot(80, Vendor);
+            int raised = 0;
+            void OnStatus() => raised++;
+            PeripheralOutputs.StatusChanged += OnStatus;
+            try
+            {
+                // A rescan that found the same unit builds new objects, zones included.
+                PeripheralOutputs.Hidpp = Snapshot(80, Vendor);
+                Assert.Equal(0, raised);
+                // A battery reading that moved is news.
+                PeripheralOutputs.Hidpp = Snapshot(40, Vendor);
+                Assert.Equal(1, raised);
+                // So is a container that is no longer waiting on a slot.
+                PeripheralOutputs.Hidpp = Snapshot(40);
+                Assert.Equal(2, raised);
+            }
+            finally { PeripheralOutputs.StatusChanged -= OnStatus; }
+        }
+
         [Fact]
         public void TheForceFeedbackLineNamesTheDeviceItsRowReaches()
         {
@@ -2999,7 +3032,7 @@ namespace PadForge.Tests
             // Remote Link: the owner advertises the rumble and applies it,
             // and keeps the rows with no input of their own to itself, a
             // vendor row and a unit row alike.
-            Assert.Contains("HasRumble = dev.HasRumble || ud.HasPeripheralHaptics,", service);
+            Assert.Contains("HasRumble = dev.HasRumble || ud.HasPeripheralHaptics", service);
             Assert.Contains("&& PadForge.Common.Input.Peripherals.PeripheralOutputs.TakesHaptics(ud))", service);
             Assert.Contains("if (dev is PadForge.Common.Input.Peripherals.IOutputOnlyRow) return false;", service);
             // The Devices page's rumble chip, which is Identify's button.

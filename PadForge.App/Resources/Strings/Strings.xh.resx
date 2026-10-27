@@ -107,6 +107,7 @@
   <data name="Dashboard_GameMods" xml:space="preserve"><value>Ii-mod zemidlalo</value></data>
   <data name="Dashboard_EnableGameMods" xml:space="preserve"><value>Yamkela ii-mod zemidlalo ze-DSX</value></data>
   <data name="Dashboard_GameModPort" xml:space="preserve"><value>Izibuko le-mod yomdlalo</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Imamele kwizibuko :{0}. {1} ithumela kwisilawuli esinenombolo {2}, kwaye akukho silawuli sibonakalayo esinesilawuli se-PlayStation esinaloo nombolo.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>Izibuko {0} lisetyenziswa yenye inkqubo, njenge-DSX. Yivale okanye ukhethe elinye izibuko.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>I-mod yomdlalo</value></data>
   <data name="RemoteLink_Connect" xml:space="preserve"><value>Qhagamshela</value></data>
@@ -1433,7 +1434,7 @@
   <data name="RemoteLink_AssignmentBusy" xml:space="preserve">
     <value>Kulindwe enye i-PC...</value>
   </data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Yongeza ukungcangcazela okuqhubekayo njengoko i-axis yentonga ebonakalayo ekhethiweyo isuka embindini. Isebenzisa isiphumo semephu esivela kuyo yonke imithombo eyabelweyo. Xa kukhethwe "Yahlula ngokwecala", intshukumo eya ngasekhohlo iqhuba imoto yasekhohlo, eya ngasekunene iqhuba eyasekunene. "Imoto yasekhohlo" okanye "Imoto yasekunene" ibeka omabini amacala kuloo moto inye. Isetyenziselwa isiphumo se-Xbox nese-PlayStation kunye nezixhobo ezingcangcazelayo. I-force feedback yevili yangqo ayibandakanywa.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Yongeza ukungcangcazela okuqhubekayo njengoko i-axis yentonga ebonakalayo ekhethiweyo isuka embindini. Isebenzisa isiphumo semephu esivela kuyo yonke imithombo eyabelweyo. Xa kukhethwe "Yahlula ngokwecala", intshukumo eya ngasekhohlo iqhuba imoto yasekhohlo, eya ngasekunene iqhuba eyasekunene. "Imoto yasekhohlo" okanye "Imoto yasekunene" ibeka omabini amacala kuloo moto inye. Isetyenziselwa isiphumo se-Xbox nese-PlayStation kunye nezixhobo ezingcangcazelayo. Itsiba amavili, ezinye izixhobo ezine-force feedback eqhubekayo, kunye neepedali ze-Fanatec.</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>I-axis ebonakalayo</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Intonga yasekhohlo X</value></data>
   <data name="Pad_SteeringAngleRumble_LY" xml:space="preserve"><value>Intonga yasekhohlo Y</value></data>
@@ -1503,6 +1504,7 @@
   <data name="KeyboardScreens_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="KeyboardScreens_Status_Off" xml:space="preserve"><value>cimile</value></data>
   <data name="KeyboardScreens_Status_Lgs" xml:space="preserve"><value>nge-Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>isikrini se-G19 sikwidrayiva yenye inkqubo ({0}), i-PadForge engayichukumisiyo</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>qalisa i-Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxOnPhone" xml:space="preserve"><value>kwifowuni</value></data>
   <data name="KeyboardScreens_Status_Strike7NotRunning" xml:space="preserve"><value>qalisa isoftware ye-S.T.R.I.K.E. 7</value></data>
@@ -1524,28 +1526,32 @@
   <data name="Devices_FalconHandle" xml:space="preserve"><value>Isibambo</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} imisela ii-trigger zesi silawuli.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} imisela izibane zesi silawuli.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} imisela izibane zesi sixhobo.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} imisela ii-trigger nezibane zesi silawuli.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>Susa iziphumo ze-mod</value></data>
   <data name="Devices_ClearModEffects_Tooltip" xml:space="preserve"><value>Iyekisa izinto ezimiselwe zii-mod zemidlalo kwesi silawuli. Iisetingi zaso zibuyela de i-mod ithumele kwakhona.</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Ekhohlo/Ekunene</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Phezulu/Ezantsi</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Ngaphakathi/Ngaphandle</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Iqhosha {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>I-dhd64.dll oyikhethileyo ayilayishwanga, ngoko i-PadForge isebenzisa ikopi engentla.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Ilayibrari ye-Force Dimension isebenza kuphela kuguqulelo lwe-x64 lwe-PadForge.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>Le dhd64.dll ayiyiyo ilayibrari ye-Force Dimension elindelwe yi-PadForge.</value></data>
   <data name="Falcon_Status_Rate_Format" xml:space="preserve"><value>isebenza nge-{0:0.0} kHz</value></data>
   <data name="Falcon_Status_Open" xml:space="preserve"><value>ivuliwe</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>I-Falcon ivulwe kwenye inkqubo, njenge-FalconJoyForce okanye izixhobo ze-Force Dimension. Yivale apho.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>I-Falcon ikwidrayiva ye-Force Dimension, kwaye ilayibrari ye-Force Dimension ayikwazanga ukuyivula: {0}. Jonga umbane wayo nentambo yayo ye-USB.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Akukho Falcon ifunyenweyo. Xhuma umbane wayo nentambo yayo ye-USB.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Khetha i-dhd64.dll…</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Ilayisha le kopi yelayibrari ye-Force Dimension endaweni yayo nayiphi na enye. I-Falcon evulwe kwenye ikopi iyavalwa ize ivulwe kwakhona kule. Iikopi ezifakwa yi-SDK ziyafunyanwa ngaphandle kwayo.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Iilayibrari (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Faka idrayiva ye-Falcon</value></data>
   <data name="Falcon_OpenDownload" xml:space="preserve"><value>Fumana i-SDK ye-Force Dimension</value></data>
   <data name="Falcon_Calibrate_Done_Format" xml:space="preserve"><value>Ilinganisiwe. {0}</value></data>
   <data name="Settings_Falcon_Title" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Lawula i-Novint Falcon</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Ilayibrari ye-Falcon isetelwe ku-{0}. I-PadForge iyayilayisha kwimizuzwana embalwa, kwaye i-Falcon evulwe kwenye ikopi iyavulwa kwakhona kule.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Kufakwa idrayiva ye-Falcon ye-Force Dimension…</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Akukho Falcon ixhunyiweyo.</value></data>
   <data name="Pad_Falcon_Header" xml:space="preserve"><value>Novint Falcon</value></data>

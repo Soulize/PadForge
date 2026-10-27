@@ -304,6 +304,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>ໃຊ້ໄດ້ກັບມອດທີ່ສ້າງສຳລັບ DSX ເຊັ່ນ ມອດສຳລັບ GTA V, Red Dead Redemption 2, Skyrim ແລະ Forza. ໃນຂະນະທີ່ເຊີບເວີກຳລັງຟັງຢູ່, PadForge ຈະຂຽນພອດຂອງມັນໄວ້ບ່ອນທີ່ມອດເຫຼົ່ານັ້ນຊອກຫາ.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>ກຳລັງຟັງຢູ່ທີ່ :{0}. {1} ກຳລັງສົ່ງໄປຫາຕົວຄວບຄຸມສະເໝືອນ {2}.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>ກຳລັງຟັງຢູ່ທີ່ :{0}. {1} ກຳລັງສົ່ງ, ແຕ່ບໍ່ມີຕົວຄວບຄຸມສະເໝືອນໃດທີ່ມີຕົວຄວບຄຸມ PlayStation ຢູ່.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>ກຳລັງຟັງຢູ່ທີ່ :{0}. {1} ກຳລັງສົ່ງໄປຫາຕົວຄວບຄຸມໝາຍເລກ {2} ແຕ່ບໍ່ມີຕົວຄວບຄຸມສະເໝືອນທີ່ເປັນຕົວຄວບຄຸມ PlayStation ໃດມີໝາຍເລກນັ້ນ.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>ພອດ {0} ຖືກໃຊ້ຢູ່ໂດຍໂປຣແກຣມອື່ນ ເຊັ່ນ DSX. ປິດໂປຣແກຣມນັ້ນ ຫຼື ເລືອກພອດອື່ນ.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>ມອດເກມໜຶ່ງ</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>ໃຊ້ໄດ້ກັບ OpenTrack ແລະ ຕົວຕິດຕາມໃດໆທີ່ສົ່ງເອົາພຸດ UDP ຫຼື ຂຽນໜ່ວຍຄວາມຈຳຮ່ວມຂອງ FreeTrack 2.0, ແລະ ກັບຣັນທາມ OpenXR ໃນເຄື່ອງນີ້ທີ່ສາມາດແລ່ນເຊດຊັນໃນພື້ນຫຼັງໄດ້.</value></data>
@@ -4088,7 +4089,7 @@
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>ກຳລັງລໍຖ້າຂໍ້ມູນໜ່ວຍຄວາມຈຳຮ່ວມຂອງ FreeTrack</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>ໜ່ວຍຄວາມຈຳຮ່ວມຂອງ FreeTrack ບໍ່ພ້ອມໃຊ້ງານ</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>ການສັ່ນຕາມມຸມພວງມາໄລ</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>ເພີ່ມການສັ່ນຕໍ່ເນື່ອງເມື່ອແກນສະຕິກສະເໝືອນທີ່ເລືອກເຄື່ອນອອກຈາກຈຸດກາງ ໃຊ້ຜົນອອກທີ່ແມັບແລ້ວຈາກທຸກແຫຼ່ງທີ່ກຳນົດໄວ້ ເມື່ອເລືອກ “ແຍກຕາມທິດທາງ” ການເຄື່ອນທີ່ທາງລົບຂັບມໍເຕີຊ້າຍ ທາງບວກຂັບມໍເຕີຂວາ “ມໍເຕີຊ້າຍ” ຫຼື “ມໍເຕີຂວາ” ຈະໃຫ້ທັງສອງທິດທາງໃຊ້ມໍເຕີນັ້ນພຽງໂຕດຽວ ສຳລັບຜົນອອກ Xbox ແລະ PlayStation ທີ່ມີອຸປະກອນສັ່ນ ບໍ່ລວມແຮງສະທ້ອນກັບຂອງພວງມາໄລແບບເນທີຟ</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>ເພີ່ມການສັ່ນຕໍ່ເນື່ອງເມື່ອແກນສະຕິກສະເໝືອນທີ່ເລືອກເຄື່ອນອອກຈາກຈຸດກາງ ໃຊ້ຜົນອອກທີ່ແມັບແລ້ວຈາກທຸກແຫຼ່ງທີ່ກຳນົດໄວ້ ເມື່ອເລືອກ “ແຍກຕາມທິດທາງ” ການເຄື່ອນທີ່ທາງລົບຂັບມໍເຕີຊ້າຍ ທາງບວກຂັບມໍເຕີຂວາ “ມໍເຕີຊ້າຍ” ຫຼື “ມໍເຕີຂວາ” ຈະໃຫ້ທັງສອງທິດທາງໃຊ້ມໍເຕີນັ້ນພຽງໂຕດຽວ ສຳລັບຜົນອອກ Xbox ແລະ PlayStation ທີ່ມີອຸປະກອນສັ່ນ ບໍ່ນຳໃຊ້ກັບພວງມາໄລ ອຸປະກອນອື່ນທີ່ມີແຮງສະທ້ອນກັບແບບຄົງທີ່ ແລະ ແປ້ນຢຽບ Fanatec</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>ເປີດໃຊ້ການສັ່ນຕາມມຸມພວງມາໄລ</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>ແກນສະເໝືອນ</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>ສະຕິກຊ້າຍ X</value></data>
@@ -4290,6 +4291,7 @@
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>ໂດຍກົງເທິງ {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>ກຳລັງຜູກ WinUSB ກັບໜ້າຈໍຂອງ G19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>ໜ້າຈໍຂອງ G19 ໃຊ້ໄດຣເວີອື່ນ ({0}), ສະນັ້ນໃຫ້ເປີດ Logitech Gaming Software</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>ໜ້າຈໍຂອງ G19 ໃຊ້ໄດຣເວີຂອງໂປຣແກຣມອື່ນ ({0}), ເຊິ່ງ PadForge ຈະບໍ່ແຕະຕ້ອງ</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>ຕ້ອງການ Logitech Gaming Software 8.52 ຫຼື ໃໝ່ກວ່າ</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>ເປີດ Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>ກຳລັງລໍຖ້າໂທລະສັບທີ່ມີ Arx Control</value></data>
@@ -4361,6 +4363,7 @@
   <data name="Devices_FalconHandle" xml:space="preserve"><value>ດ້າມຈັບ</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} ກຳລັງຕັ້ງທຣິກເກີຂອງຕົວຄວບຄຸມນີ້.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} ກຳລັງຕັ້ງໄຟຂອງຕົວຄວບຄຸມນີ້.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} ກຳລັງຕັ້ງໄຟຂອງອຸປະກອນນີ້.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} ກຳລັງຕັ້ງທຣິກເກີ ແລະ ໄຟຂອງຕົວຄວບຄຸມນີ້.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} ກຳລັງຫຼິ້ນການສັ່ນຂອງທຣິກເກີເທິງທຣິກເກີ Impulse ຂອງຕົວຄວບຄຸມນີ້.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>ລ້າງເອັບເຟັກມອດ</value></data>
@@ -4368,10 +4371,10 @@
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>ຊ້າຍ/ຂວາ</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>ຂຶ້ນ/ລົງ</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>ເຂົ້າ/ອອກ</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>ປຸ່ມ {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}, ໂຫຼດຈາກ {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>dhd64.dll ທີ່ທ່ານເລືອກໂຫຼດບໍ່ສຳເລັດ, ສະນັ້ນ PadForge ຈຶ່ງໃຊ້ສຳເນົາຂ້າງເທິງ.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>ໄລບຣາຣີຂອງ Force Dimension ເຮັດວຽກໄດ້ສະເພາະໃນ PadForge ລຸ້ນ x64 ເທົ່ານັ້ນ.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>ພົບ dhd64.dll ແຕ່ບໍ່ສາມາດໂຫຼດມັນໄດ້.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>dhd64.dll ນັ້ນບໍ່ແມ່ນໄລບຣາຣີ Force Dimension ທີ່ PadForge ຕ້ອງການ.</value></data>
@@ -4381,11 +4384,12 @@
   <data name="Falcon_Status_Open" xml:space="preserve"><value>ເປີດຢູ່</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>ມີ Falcon ເປີດຢູ່ໃນໂປຣແກຣມອື່ນ ເຊັ່ນ FalconJoyForce ຫຼື ເຄື່ອງມືຂອງ Force Dimension ເອງ. ປິດມັນຢູ່ໃນໂປຣແກຣມນັ້ນ.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon ກຳລັງໃຊ້ໄດຣເວີອື່ນ ({0}), ສະນັ້ນໄລບຣາຣີຂອງ Force Dimension ຈຶ່ງບໍ່ສາມາດເປີດມັນໄດ້. ໃນຕົວຈັດການອຸປະກອນ, ອັບເດດໄດຣເວີຂອງ Falcon ຈາກໂຟນເດີ drivers\usb ໃນໂຟນເດີ SDK ຂອງ Force Dimension.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon ກຳລັງໃຊ້ໄດຣເວີຂອງ Force Dimension, ແຕ່ໄລບຣາຣີຂອງ Force Dimension ບໍ່ສາມາດເປີດມັນໄດ້: {0}. ກວດສອບສາຍໄຟ ແລະ ສາຍ USB ຂອງມັນ.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>ມີ Falcon ສຽບຢູ່ໂດຍບໍ່ມີໄດຣເວີ. ປຸ່ມ "ຕິດຕັ້ງໄດຣເວີ Falcon" ຈະຕິດຕັ້ງໄດຣເວີຂອງ Force Dimension ໃຫ້ມັນ.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>ມີ Falcon ສຽບຢູ່ໂດຍບໍ່ມີໄດຣເວີ ແລະ ໂຟນເດີ SDK ບໍ່ມີແພັກເກັດໄດຣເວີທີ່ຈະຕິດຕັ້ງໃຫ້ມັນ. ຕິດຕັ້ງ SDK ຂອງ Force Dimension ຄືນໃໝ່.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>ບໍ່ພົບ Falcon. ສຽບສາຍໄຟ ແລະ ສາຍ USB ຂອງມັນ.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>ເລືອກ dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>ໂຫຼດສຳເນົາໄລບຣາຣີຂອງ Force Dimension ນີ້ກ່ອນສຳເນົາອື່ນ. ສຳເນົາທີ່ SDK ຕິດຕັ້ງຈະຖືກພົບເອງໂດຍບໍ່ຕ້ອງເລືອກ.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>ໂຫຼດສຳເນົາໄລບຣາຣີຂອງ Force Dimension ນີ້ແທນສຳເນົາອື່ນທັງໝົດ. Falcon ທີ່ເປີດຢູ່ກັບສຳເນົາອື່ນຈະປິດ ແລະ ເປີດຄືນໃໝ່ກັບສຳເນົານີ້. ສຳເນົາທີ່ SDK ຕິດຕັ້ງຈະຖືກພົບເອງໂດຍບໍ່ຕ້ອງເລືອກ.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|ໄລບຣາຣີ (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>ຕິດຕັ້ງໄດຣເວີ Falcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>ຕິດຕັ້ງໄດຣເວີຂອງ Force Dimension ຈາກໂຟນເດີ SDK ໃສ່ Falcon ທີ່ບໍ່ມີໄດຣເວີ. Windows ອາດຈະຖາມກ່ອນວ່າຈະເຊື່ອຖື Force Dimension ຫຼື ບໍ່.</value></data>
@@ -4402,7 +4406,7 @@
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>ຫຼິ້ນເກມດ້ວຍ Novint Falcon ຜ່ານ SDK ຂອງ Force Dimension ເຊິ່ງທ່ານຕິດຕັ້ງຈາກ Force Dimension. ດ້າມຈັບເປັນສະຕິກ, ປຸ່ມສີ່ປຸ່ມເທິງດ້າມຈັບເປັນປຸ່ມ ແລະ PadForge ປ່ຽນການສັ່ນ ແລະ ເອັບເຟັກຂອງເກມເປັນແຮງໃສ່ດ້າມຈັບ. ແຖບ ແຮງສະທ້ອນກັບ ຂອງແຕ່ລະຊ່ອງກຳນົດວ່າ Falcon ຈະໃຫ້ຄວາມຮູ້ສຶກແນວໃດ.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>ຄວບຄຸມ Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>ເປີດ Falcon ແຕ່ລະເຄື່ອງຜ່ານ dhd64.dll ຂອງ Force Dimension. Falcon ທີ່ເປີດຢູ່ເປັນຂອງ PadForge ຜູ້ດຽວ, ສະນັ້ນ FalconJoyForce ແລະ ເຄື່ອງມືຂອງ Force Dimension ບໍ່ສາມາດເປີດມັນໄດ້ໃນຂະນະທີ່ອັນນີ້ເປີດຢູ່. ເມື່ອປິດ, PadForge ຈະປິດ Falcon ທຸກເຄື່ອງ.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>ຕັ້ງໄລບຣາຣີ Falcon ເປັນ {0} ແລ້ວ. ສຳເນົາທີ່ກຳລັງໃຊ້ຢູ່ຈະຍັງຄົງຢູ່ຈົນກວ່າ PadForge ເລີ່ມໃໝ່.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>ຕັ້ງໄລບຣາຣີ Falcon ເປັນ {0} ແລ້ວ. PadForge ຈະໂຫຼດມັນພາຍໃນບໍ່ເທົ່າໃດວິນາທີ ແລະ Falcon ທີ່ເປີດຢູ່ກັບສຳເນົາອື່ນຈະເປີດຄືນໃໝ່ກັບສຳເນົານີ້.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>ກຳລັງຕິດຕັ້ງໄດຣເວີ Falcon ຂອງ Force Dimension…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>ແພັກເກັດໄດຣເວີ Falcon ຂອງ Force Dimension ຫຼື ແຄັດຕາລັອກຂອງມັນ ຫາຍໄປ: {0}. ຕິດຕັ້ງ SDK ຂອງ Force Dimension ຄືນໃໝ່.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>ບໍ່ມີ Falcon ສຽບຢູ່.</value></data>

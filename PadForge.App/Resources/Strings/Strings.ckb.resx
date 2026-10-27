@@ -304,6 +304,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>لەگەڵ ئەو مۆدانە کار دەکات کە بۆ DSX دروستکراون، وەک ئەوانەی بۆ GTA V، Red Dead Redemption 2، Skyrim و Forza. لە کاتێکدا ڕاژەکارەکە گوێ دەگرێت، PadForge پۆرتەکەی لەو شوێنە دەنووسێت کە ئەو مۆدانە بۆی دەگەڕێن.</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>گوێگرتن لەسەر :{0}. {1} بۆ کۆنترۆڵەری مەجازیی {2} دەنێرێت.</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>گوێگرتن لەسەر :{0}. {1} دەنێرێت، بەڵام هیچ کۆنترۆڵەرێکی مەجازی کۆنترۆڵەرێکی PlayStation ی لەسەر نییە.</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>گوێگرتن لەسەر :{0}. {1} بۆ ژمارەی کۆنترۆڵەری {2} دەنێرێت، و هیچ کۆنترۆڵەرێکی مەجازی کە کۆنترۆڵەرێکی PlayStation ی لەسەرە ئەو ژمارەیەی نییە.</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>پۆرتی {0} لەلایەن بەرنامەیەکی ترەوە بەکاردێت، وەک DSX. دایبخە یان پۆرتێکی تر هەڵبژێرە.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>مۆدێکی یاری</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>لەگەڵ OpenTrack و هەر شوێنپێهەڵگرێک کار دەکات کە دەرچوونی UDP دەنێرێت یان بیرگەی هاوبەشی FreeTrack 2.0 دەنووسێت، و لەگەڵ ڕەنتایمێکی OpenXR لەسەر ئەم کۆمپیوتەرە کە بتوانێت دانیشتنێک لە پاشبنەمادا بەڕێوە ببات.</value></data>
@@ -4093,7 +4094,7 @@
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>چاوەڕوانی داتای بیرگەی هاوبەشی FreeTrack.</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>بیرگەی هاوبەشی FreeTrack بەردەست نییە.</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>لەرزینی گۆشەی سوکان</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>لەرزینی بەردەوام زیاد دەکات کاتێک تەوەرە مەجازییە هەڵبژێردراوەکەی ستیک لە ناوەند دوور دەکەوێتەوە. دەرچووی بەستراو لە هەموو سەرچاوە دیاریکراوەکان بەکاردەهێنێت. لەگەڵ «دابەشکردن بەپێی ئاراستە»، جووڵەی نەرێنی مۆتۆری چەپ دەخاتە کار و جووڵەی ئەرێنی مۆتۆری ڕاست. «مۆتۆری چەپ» یان «مۆتۆری ڕاست» هەردوو ئاراستەکە دەخاتە سەر ئەو یەک مۆتۆرە. بۆ دەرچووی Xbox و PlayStation لەگەڵ ئامێرەکانی لەرزین. فیدباکی هێزی خۆماڵیی سوکان لێی دەرکراوە.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>لەرزینی بەردەوام زیاد دەکات کاتێک تەوەرە مەجازییە هەڵبژێردراوەکەی ستیک لە ناوەند دوور دەکەوێتەوە. دەرچووی بەستراو لە هەموو سەرچاوە دیاریکراوەکان بەکاردەهێنێت. لەگەڵ «دابەشکردن بەپێی ئاراستە»، جووڵەی نەرێنی مۆتۆری چەپ دەخاتە کار و جووڵەی ئەرێنی مۆتۆری ڕاست. «مۆتۆری چەپ» یان «مۆتۆری ڕاست» هەردوو ئاراستەکە دەخاتە سەر ئەو یەک مۆتۆرە. بۆ دەرچووی Xbox و PlayStation لەگەڵ ئامێرەکانی لەرزین. سوکانەکان، ئامێرەکانی تر کە فیدباکی هێزی بەردەوامیان هەیە، و پێدەڵەکانی Fanatec پشتگوێ دەخات.</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>چالاککردنی لەرزینی گۆشەی سوکان</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>تەوەری مەجازی</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>ستیکی چەپ X</value></data>
@@ -4296,6 +4297,7 @@
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>ڕاستەوخۆ لەسەر {0}</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>بەستنەوەی WinUSB بە شاشەی G19</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>شاشەی G19 لەسەر درایڤەرێکی ترە ({0})، بۆیە Logitech Gaming Software دەست پێ بکە</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>شاشەی G19 لەسەر درایڤەری بەرنامەیەکی ترە ({0})، کە PadForge دەستکاری ناکات</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>پێویستی بە Logitech Gaming Software 8.52 یان نوێترە</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>Logitech Gaming Software دەست پێ بکە</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>چاوەڕوانی مۆبایلێک بە Arx Control</value></data>
@@ -4367,6 +4369,7 @@
   <data name="Devices_FalconHandle" xml:space="preserve"><value>دەسک</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} تریگەرەکانی ئەم کۆنترۆڵەرە ڕێک دەخات.</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} ڕووناکییەکانی ئەم کۆنترۆڵەرە ڕێک دەخات.</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} ڕووناکییەکانی ئەم ئامێرە ڕێک دەخات.</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} تریگەر و ڕووناکییەکانی ئەم کۆنترۆڵەرە ڕێک دەخات.</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} لەرزینەکانی تریگەر لەسەر تریگەرەکانی Impulse ی ئەم کۆنترۆڵەرە لێدەدات.</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>سڕینەوەی کاریگەرییەکانی مۆد</value></data>
@@ -4374,10 +4377,10 @@
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>چەپ/ڕاست</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>سەرەوە/خوارەوە</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>ناوەوە/دەرەوە</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>دوگمە {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}، بارکراوە لە {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>ئەو dhd64.dll ەی هەڵتبژارد بار نەبوو، بۆیە PadForge کۆپییەکەی سەرەوە بەکاردەهێنێت.</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>کتێبخانەکەی Force Dimension تەنها لە وەشانی x64 ی PadForge کار دەکات.</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>dhd64.dll دۆزرایەوە بەڵام نەتوانرا بار بکرێت.</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>ئەم dhd64.dll ە ئەو کتێبخانەیەی Force Dimension نییە کە PadForge چاوەڕێی دەکات.</value></data>
@@ -4387,11 +4390,12 @@
   <data name="Falcon_Status_Open" xml:space="preserve"><value>کراوەیە</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>ئامێرێکی Falcon لە بەرنامەیەکی تردا کراوەیە، وەک FalconJoyForce یان ئامرازەکانی خودی Force Dimension. لەوێ دایبخە.</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon ەکە لەسەر درایڤەرێکی ترە ({0})، بۆیە کتێبخانەی Force Dimension ناتوانێت بیکاتەوە. لە بەڕێوەبەری ئامێرەکان، درایڤەری Falcon لە فۆڵدەری drivers\usb لەناو فۆڵدەری SDK ی Force Dimension نوێ بکەرەوە.</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon ەکە لەسەر درایڤەری Force Dimension ە، و کتێبخانەی Force Dimension نەیتوانی بیکاتەوە: {0}. کارەباکەی و کەیبڵی USB ەکەی بپشکنە.</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>ئامێرێکی Falcon بەبێ درایڤەر بەستراوە. «دامەزراندنی درایڤەری Falcon» درایڤەری Force Dimension ی پێ دەدات.</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>ئامێرێکی Falcon بەبێ درایڤەر بەستراوە، و فۆڵدەری SDK هیچ پاکێجێکی درایڤەری تێدا نییە بۆ ئەوەی پێی بدات. SDK ی Force Dimension دووبارە دابمەزرێنە.</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>هیچ ئامێرێکی Falcon نەدۆزرایەوە. کەیبڵی کارەبا و کەیبڵی USB ەکەی ببەستە.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>هەڵبژاردنی dhd64.dll…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>ئەم کۆپییەی کتێبخانەی Force Dimension پێش هەموو کۆپییەکانی تر بار دەکات. ئەو کۆپییانەی SDK دایاندەمەزرێنێت بەبێ ئەمە دەدۆزرێنەوە.</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>ئەم کۆپییەی کتێبخانەی Force Dimension لە جیاتی هەر کۆپییەکی تر بار دەکات. ئامێرێکی Falcon کە لەسەر کۆپییەکی تر کراوەیە دادەخرێت و دووبارە لەسەر ئەم کۆپییە دەکرێتەوە. ئەو کۆپییانەی SDK دایاندەمەزرێنێت بەبێ ئەمە دەدۆزرێنەوە.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|کتێبخانەکان (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>دامەزراندنی درایڤەری Falcon</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>درایڤەری Force Dimension لە فۆڵدەری SDK ەوە لەسەر ئەو Falcon ە دادەمەزرێنێت کە درایڤەری نییە. لەوانەیە Windows سەرەتا بپرسێت کە ئایا متمانە بە Force Dimension بکرێت.</value></data>
@@ -4408,7 +4412,7 @@
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>ڕێگە دەدات یاری بە Novint Falcon بکەیت لە ڕێگەی SDK ی Force Dimension، کە لە Force Dimension ەوە دایدەمەزرێنیت. دەسکەکە ستیکێکە، چوار دوگمەکەی دەسکەکە دوگمەن، و PadForge لەرزین و کاریگەرییەکانی یارییەکە وەک هێز دەخاتە سەر دەسکەکە. تابی فیدباکی هێز لە هەر شوێنێک دیاری دەکات کە Falcon چۆن هەست پێ دەکرێت.</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>بەڕێوەبردنی Novint Falcon</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>هەموو ئامێرەکانی Falcon لە ڕێگەی dhd64.dll ی Force Dimension دەکاتەوە. Falcon ی کراوە تەنها هی PadForge ە، بۆیە FalconJoyForce و ئامرازەکانی Force Dimension ناتوانن بیکەنەوە کاتێک ئەمە چالاکە. کاتێک ناچالاکە، PadForge هەموو Falcon ەکان دادەخات.</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>کتێبخانەی Falcon دانرا بۆ {0}. کۆپییەک کە ئێستا بەکاردێت دەمێنێتەوە تا PadForge دووبارە دەست پێ دەکاتەوە.</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>کتێبخانەی Falcon دانرا بۆ {0}. PadForge لە ماوەی چەند چرکەیەکدا باری دەکات، و ئامێرێکی Falcon کە لەسەر کۆپییەکی تر کراوەیە دووبارە لەسەر ئەم کۆپییە دەکرێتەوە.</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>دامەزراندنی درایڤەری Falcon ی Force Dimension…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>پاکێجی درایڤەری Falcon ی Force Dimension، یان کەتەلۆگەکەی، بوونی نییە: {0}. SDK ی Force Dimension دووبارە دابمەزرێنە.</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>هیچ ئامێرێکی Falcon نەبەستراوە.</value></data>

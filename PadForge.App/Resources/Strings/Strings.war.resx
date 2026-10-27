@@ -168,6 +168,7 @@
   <data name="Tour_Cards_Title" xml:space="preserve"><value>Mga virtual nga controller</value></data>
   <data name="Dashboard_GameMods" xml:space="preserve"><value>Mga game mod</value></data>
   <data name="Dashboard_GameModPort" xml:space="preserve"><value>Port han game mod</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>Namamati ha :{0}. Nagpapadara an {1} ha controller index {2}, ngan waray virtual nga controller nga may PlayStation nga controller nga may-ada hito nga index.</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>Usa nga game mod</value></data>
   <data name="Settings_AnalogKeyboardsStatus_None" xml:space="preserve"><value>Waray nakita nga suportado nga analog keyboard.</value></data>
   <data name="Settings_BlissBoxStatus_None" xml:space="preserve"><value>Waray nakita nga Bliss-Box port.</value></data>
@@ -1130,7 +1131,7 @@
   <data name="RemoteLink_AssignmentProfile_Format" xml:space="preserve">
     <value>Profile: {0}</value>
   </data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Nagdudugang hin padayon nga rumble samtang nahirayo ha tunga an napili nga virtual nga stick axis. Naggagamit han mapped nga output tikang ha ngatanan nga assigned nga source. Kon "Bulag kada direksyon", an negatibo nga paglihok nagpapalihok han wala nga motor ngan an positibo nga paglihok han tuo. An "Wala nga motor" o "Tuo nga motor" nagbubutang han duha nga direksyon ha usa la nga motor. Para ha Xbox ngan PlayStation nga output nga may rumble nga device. Diri kaapi an native nga force feedback han manibela.</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>Nagdudugang hin padayon nga rumble samtang nahirayo ha tunga an napili nga virtual nga stick axis. Naggagamit han mapped nga output tikang ha ngatanan nga assigned nga source. Kon "Bulag kada direksyon", an negatibo nga paglihok nagpapalihok han wala nga motor ngan an positibo nga paglihok han tuo. An "Wala nga motor" o "Tuo nga motor" nagbubutang han duha nga direksyon ha usa la nga motor. Para ha Xbox ngan PlayStation nga output nga may rumble nga device. Diri kaapi an mga manibela, an iba nga device nga may padayon nga force feedback, ngan an mga Fanatec nga pedal.</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>Virtual nga axis</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>Wala nga stick X</value></data>
   <data name="Pad_SteeringAngleRumble_LY" xml:space="preserve"><value>Wala nga stick Y</value></data>
@@ -1199,6 +1200,7 @@
   <data name="KeyboardScreens_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="KeyboardScreens_Status_Lgs" xml:space="preserve"><value>pinaagi ha Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>direkta ha {0}</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>an screen han G19 aada ha driver han iba nga programa ({0}), nga diri ginhihilabtan han PadForge</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>kinahanglan an Logitech Gaming Software 8.52 o mas bag-o</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>buksi an Logitech Gaming Software</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>naghuhulat hin telepono nga may Arx Control</value></data>
@@ -1219,18 +1221,22 @@
   <data name="Macro_Pan_Direction" xml:space="preserve"><value>Direksyon</value></data>
   <data name="Common_Pixels" xml:space="preserve"><value>px</value></data>
   <data name="DeviceType_NovintFalcon" xml:space="preserve"><value>Novint Falcon</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>Ginbubutang han {0} an suga hini nga device.</value></data>
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>Wala/Tuo</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>Igbaw/Ubos</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>Sulod/Gawas</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>Button {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>Waray nakarga an dhd64.dll nga imo ginpili, salit ginagamit han PadForge an kopya ha igbaw.</value></data>
   <data name="Falcon_Status_Open" xml:space="preserve"><value>bukas</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>An Falcon aada ha driver han Force Dimension, kundi diri nabuksan han library han Force Dimension: {0}. Tan-awa an kuryente ngan an USB nga kable hini.</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>Pilia an dhd64.dll…</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Ginkakarga ini nga kopya han library han Force Dimension imbes han iba. An Falcon nga bukas ha iba nga kopya nasisirado ngan nabubukas utro ha ini. An mga kopya nga gin-install han SDK nakikita bisan waray ini.</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|Mga library (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>I-install an Falcon driver</value></data>
   <data name="Falcon_OpenDownload" xml:space="preserve"><value>Kuhaa an SDK han Force Dimension</value></data>
   <data name="Settings_Falcon_Title" xml:space="preserve"><value>Novint Falcon</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Gin-set an Falcon nga library ha {0}. Ginkakarga ini han PadForge ha sulod han pipira nga segundo, ngan an Falcon nga bukas ha iba nga kopya nabubukas utro ha ini.</value></data>
   <data name="Pad_Falcon_Header" xml:space="preserve"><value>Novint Falcon</value></data>
   <data name="Pad_Falcon_ResetAll" xml:space="preserve"><value>I-reset an Novint Falcon</value></data>
   <data name="Pad_Falcon_Feel_Joystick" xml:space="preserve"><value>Joystick</value></data>

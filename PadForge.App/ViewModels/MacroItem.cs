@@ -294,9 +294,7 @@ namespace PadForge.ViewModels
                             if (entry.RawButton >= 0)
                             {
                                 var obj = objects?.FirstOrDefault(o => o.IsButton && o.InputIndex == entry.RawButton);
-                                inputs.Add(obj != null && !string.IsNullOrEmpty(obj.Name)
-                                    ? obj.Name
-                                    : string.Format(Strings.Instance.Macro_Button_Format, entry.RawButton));
+                                inputs.Add(ButtonLabel(obj, entry.RawButton));
                             }
                             else if (!string.IsNullOrEmpty(entry.Pov))
                             {
@@ -344,9 +342,7 @@ namespace PadForge.ViewModels
                         if (entry.RawButton >= 0)
                         {
                             var obj = objects?.FirstOrDefault(o => o.IsButton && o.InputIndex == entry.RawButton);
-                            parts.Add(obj != null && !string.IsNullOrEmpty(obj.Name)
-                                ? obj.Name
-                                : string.Format(Strings.Instance.Macro_Button_Format, entry.RawButton));
+                            parts.Add(ButtonLabel(obj, entry.RawButton));
                         }
                         else if (!string.IsNullOrEmpty(entry.Pov))
                         {
@@ -381,7 +377,7 @@ namespace PadForge.ViewModels
                         foreach (int b in _triggerRawButtons)
                         {
                             var obj = objects?.FirstOrDefault(o => o.IsButton && o.InputIndex == b);
-                            parts.Add(obj != null && !string.IsNullOrEmpty(obj.Name) ? obj.Name : string.Format(Strings.Instance.Macro_Button_Format, b));
+                            parts.Add(ButtonLabel(obj, b));
                         }
                     }
                     else if (_buttonStyle == MacroButtonStyle.Numbered && UsesCustomTrigger)
@@ -465,6 +461,17 @@ namespace PadForge.ViewModels
             var ud = SettingsManager.FindDeviceByInstanceGuid(deviceGuid);
             return ud?.DeviceObjects;
         }
+
+        /// <summary>A raw button's label in a trigger's text: the device
+        /// object's name as the mapping picker shows it
+        /// (<see cref="PadForge.Common.MappingDisplayResolver.LocalizeObjectName"/>),
+        /// or "Button N" when the device names none. A row that publishes its
+        /// names in English, a keyboard screen's keys or a Falcon's grip
+        /// buttons, reads in the current language here too.</summary>
+        internal static string ButtonLabel(DeviceObjectItem obj, int index)
+            => obj != null && !string.IsNullOrEmpty(obj.Name)
+                ? PadForge.Common.MappingDisplayResolver.LocalizeObjectName(obj.Name)
+                : string.Format(Strings.Instance.Macro_Button_Format, index);
 
         /// <summary>
         /// Formats a stored POV trigger ("povIndex:centidegrees") to display text ("POV 0 Up").
@@ -1595,9 +1602,7 @@ namespace PadForge.ViewModels
             if (entry.RawButton >= 0)
             {
                 var obj = objects?.FirstOrDefault(o => o.IsButton && o.InputIndex == entry.RawButton);
-                input = obj != null && !string.IsNullOrEmpty(obj.Name)
-                    ? obj.Name
-                    : string.Format(Strings.Instance.Macro_Button_Format, entry.RawButton);
+                input = ButtonLabel(obj, entry.RawButton);
             }
             else if (!string.IsNullOrEmpty(entry.Pov))
             {
@@ -2868,6 +2873,9 @@ namespace PadForge.ViewModels
             // x:Static binding never re-reads it; the instance accessor +
             // this raise are what reach open views.
             OnPropertyChanged(nameof(VirtualKeyChoices));
+            // The trigger effect rows outlive a language change (they are
+            // rebuilt only with the effect), so each row's caption is raised.
+            foreach (var row in _triggerEffectRows) row.RaiseLabelChanged();
         }
 
         /// <summary>Instance accessor over <see cref="VirtualKeyValues"/>.
@@ -2953,7 +2961,6 @@ namespace PadForge.ViewModels
                     OnPropertyChanged(nameof(RumbleStopEditorBody));
                     OnPropertyChanged(nameof(IsPlaySoundType));
                     OnPropertyChanged(nameof(IsSoundStopType));
-                    OnPropertyChanged(nameof(IsAnyRumbleType));
                     OnPropertyChanged(nameof(IsSetGyroEngagedType));
                     OnPropertyChanged(nameof(IsMouseRecenterType));
                     OnPropertyChanged(nameof(IsMouseFixPositionType));
@@ -3334,15 +3341,6 @@ namespace PadForge.ViewModels
         [System.Xml.Serialization.XmlIgnore]
         public bool IsDisconnectSpecificDevice =>
             IsDisconnectControllerType && _disconnectTarget == MacroDisconnectTarget.SpecificDevice;
-
-        /// <summary>True when Type is any rumble-related action — drives
-        /// the macro editor's grouping into a single CardBorder.</summary>
-        [System.Xml.Serialization.XmlIgnore]
-        public bool IsAnyRumbleType
-            => _type == MacroActionType.Rumble
-            || _type == MacroActionType.RumbleStop
-            || _type == MacroActionType.RumbleTrigger
-            || _type == MacroActionType.RumbleTriggerStop;
 
         /// <summary>True when the Rumble action is in Reactive hold mode —
         /// drives visibility of the hold/fade sliders in the editor.</summary>
@@ -4483,6 +4481,16 @@ namespace PadForge.ViewModels
             }
         }
 
+        /// <summary>Puts the effect's own starting values back, whatever the
+        /// effect, and refreshes every row.</summary>
+        internal void ResetTriggerEffectValues()
+        {
+            _triggerEffectValues = TriggerEffectCatalog.Defaults(_triggerEffectMode);
+            foreach (var row in _triggerEffectRows) row.RaisePropertyChangedForValue();
+            OnPropertyChanged(nameof(TriggerEffectParameters));
+            OnPropertyChanged(nameof(TriggerEffectIsValid));
+        }
+
         internal int TriggerEffectValue(int index)
             => index >= 0 && index < _triggerEffectValues.Length ? _triggerEffectValues[index] : 0;
 
@@ -4899,10 +4907,14 @@ namespace PadForge.ViewModels
             ScreenFrames = PadForge.Services.KeyboardScreenService.JoinFrames(frames);
         }
 
-        /// <summary>Removes the picture at <paramref name="index"/>.</summary>
+        /// <summary>Removes the picture at <paramref name="index"/> in the
+        /// editor's list. The editor lists only the entries that hold a
+        /// picture (<see cref="ScreenFrameImages"/>), so the index counts
+        /// those, and an entry that holds none goes too: it shows nowhere
+        /// and plays nowhere.</summary>
         internal void RemoveScreenFrame(int index)
         {
-            var frames = SplitScreenFrames();
+            var frames = SplitScreenFrames().FindAll(f => PadForge.Services.KeyboardScreenService.FramePicture(_screenKind, f) != null);
             if (index < 0 || index >= frames.Count) return;
             frames.RemoveAt(index);
             ScreenFrames = PadForge.Services.KeyboardScreenService.JoinFrames(frames);
@@ -7735,9 +7747,7 @@ namespace PadForge.ViewModels
                 {
                     var objects = ResolveDeviceObjects();
                     var obj = objects?.FirstOrDefault(o => o.IsButton && o.InputIndex == _rawButton);
-                    string label = obj != null && !string.IsNullOrEmpty(obj.Name)
-                        ? obj.Name
-                        : string.Format(Strings.Instance.Macro_Button_Format, _rawButton);
+                    string label = MacroItem.ButtonLabel(obj, _rawButton);
                     return prefix + label;
                 }
                 if (!string.IsNullOrEmpty(_pov)) return prefix + MacroItem.FormatPovTrigger(_pov);

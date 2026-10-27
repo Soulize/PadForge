@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using PadForge.Engine.Data;
 
 namespace PadForge.Common.Input
 {
@@ -67,7 +69,8 @@ namespace PadForge.Common.Input
                                System.Threading.Volatile.Read(ref st.VoiceWantedTicks), now);
 
         /// <summary>True while this pad's headset microphone is armed, which
-        /// puts 0xA1 in byte 2 of its effects and audio reports.</summary>
+        /// puts 0xA1 in byte 2 of its effects and audio reports and of the
+        /// voice lane's own mode reports.</summary>
         internal static bool IsDs4MicArmed(Guid pad)
             => _ds4Mic.TryGetValue(pad, out var st) && ArmedNow(st, Environment.TickCount64);
 
@@ -161,7 +164,7 @@ namespace PadForge.Common.Input
             IntPtr h = NativeMethods.OpenHidSync(hidPath);
             if (h == IntPtr.Zero || h == new IntPtr(-1))
             {
-                Engine.SdlDiagLog.WriteLine("PERSONA ds4mic bt-reader open FAILED");
+                NoteBtMicOpenFailed(feed, gen, generation, "ds4mic");
                 return;
             }
             var reader = new PersonaReader { Thread = System.Threading.Thread.CurrentThread, Handle = h };
@@ -171,6 +174,7 @@ namespace PadForge.Common.Input
                 if (feed.Retired || feed.RouteGeneration != generation || feed.BtMicGen != gen) { NativeMethods.CloseHandle(h); return; }
                 feed.BtMicHandle = h;
                 feed.BtMicReader = reader;
+                feed.BtMicRetryPad = Guid.Empty;
                 pad = feed.BtMicPadGuid;
             }
             var stream = new Ds4MicStream();
@@ -197,6 +201,12 @@ namespace PadForge.Common.Input
             var report = new byte[Ds4BtAudio.MaxInputReportSize];
             bool wasArmed = false;
             long lastLog = 0, rxReports = 0, badCrc = 0;
+            // The want is noted under the slot whose dispatcher writes the
+            // pad. A lower slot can own the pad, and then the persona's own
+            // dispatcher skips it.
+            int slot = ResolveDs4MicWriterSlot(pad);
+            if (slot < 0) slot = feed.Slot;
+            long slotAt = Environment.TickCount64;
             try
             {
                 while (!lost && !feed.Retired && feed.RouteGeneration == generation && !feed.BtMicStop && feed.BtMicGen == gen)
@@ -229,7 +239,14 @@ namespace PadForge.Common.Input
                     // the controller's report mode.
                     var mic = feed.Audio.Microphone;
                     bool wanted = mic.IsStreaming || PadForge.Services.VoiceMacroService.PadMicWanted(pad);
-                    SetDs4MicWanted(pad, feed.Slot, persona: true, wanted);
+                    long tick = Environment.TickCount64;
+                    if (tick - slotAt >= 2000)
+                    {
+                        slot = ResolveDs4MicWriterSlot(pad);
+                        if (slot < 0) slot = feed.Slot;
+                        slotAt = tick;
+                    }
+                    SetDs4MicWanted(pad, slot, persona: true, wanted);
                     bool armed = IsDs4MicArmed(pad);
                     if (armed != wasArmed)
                     {
@@ -427,24 +444,81 @@ namespace PadForge.Common.Input
             return written;
         }
 
+        /// <summary>HIDMaestro's microphone ring for an endpoint format: 256
+        /// one-ms service intervals of the 16-bit samples PadForge submits
+        /// (UsbAudioEngine.cs:239-246 at HIDMaestro 2.1.0). The DualSense's
+        /// 48 kHz stereo makes 192 x 256 = 49152 bytes, and the virtual
+        /// DualShock 4's 16 kHz mono 32 x 256 = 8192.</summary>
+        internal static int MicRingBytes(int sampleRateHz, int channels)
+            => (sampleRateHz > 0 ? sampleRateHz : Rate) / 1000 * Math.Max(1, channels) * 2 * 256;
+
+        internal static int MicRingBytes(HIDMaestro.HMMicrophoneInput mic)
+            => MicRingBytes(mic.SampleRateHz, mic.Channels);
+
+        /// <summary>True when a whole block fits the microphone ring, so the
+        /// submit cannot be truncated. HIDMaestro counts its free space as
+        /// capacity - 1 - buffered (UsbAudioEngine.SubmitMicSamples) and
+        /// copies only that much. A dropped 10 ms block costs 10 ms of
+        /// capture, where a truncated one could leave the ring off a sample
+        /// boundary in an SDK older than HIDMaestro 1.4.1.</summary>
+        internal static bool MicRingFits(int ringBytes, int bufferedBytes, int blockBytes)
+            => ringBytes - 1 - bufferedBytes >= blockBytes;
+
         /// <summary>Whole-block guard for any persona microphone, sized from
-        /// the endpoint's own format: HIDMaestro's ring holds 256 one-ms
-        /// intervals (the DualSense's 192 bytes an interval gives
-        /// <see cref="HmMicRingBytes"/>).</summary>
+        /// the endpoint's own format by <see cref="MicRingBytes(int, int)"/>.</summary>
         internal static bool MicRingFits(HIDMaestro.HMMicrophoneInput mic, int blockBytes)
-        {
-            int rate = mic.SampleRateHz > 0 ? mic.SampleRateHz : Rate;
-            int ring = rate / 1000 * Math.Max(1, mic.Channels) * 2 * 256;
-            return ring - 1 - mic.BufferedBytes >= blockBytes;
-        }
+            => MicRingFits(MicRingBytes(mic), mic.BufferedBytes, blockBytes);
 
         // ── Voice-macro microphone lane ─────────────────────────────────
 
+        /// <summary>Whether the pad's voice session wants its microphone. A
+        /// field so a test can want a pad of its own.</summary>
+        internal static Func<Guid, bool> VoiceLanePadMicWanted = PadForge.Services.VoiceMacroService.PadMicWanted;
+
+        /// <summary>How often the voice lane repeats its 0xA1 report while the
+        /// microphone is armed: the hbashton fork's microphone keepalive
+        /// (DS4Device.cs:2067-2068 at 68a5c64), well inside the controller's
+        /// four-second microphone timeout.</summary>
+        private const long Ds4MicKeepaliveMs = 1000;
+
+        /// <summary>The slot whose effects dispatcher writes this pad's
+        /// reports, elected by the dispatcher's own walk
+        /// (<see cref="UserEffectsDispatcher.ResolveOwnersAndGroup"/>): the
+        /// lowest slot among the pad's assignment rows with a live
+        /// dispatcher. −1 when no dispatcher serves the pad. An armed
+        /// microphone noted under any other slot wakes a dispatcher that
+        /// skips the pad.</summary>
+        internal static int Ds4MicWriterSlot(IList<UserSetting> items, Guid pad, Func<int, bool> slotLive)
+        {
+            var owners = new Dictionary<Guid, int>(1);
+            int mask = 0;
+            UserEffectsDispatcher.ResolveOwnersAndGroup(items, new List<Guid>(1) { pad }, MaxPads,
+                                                        slotLive, owners, ref mask);
+            return owners.TryGetValue(pad, out int slot) && slot < MaxPads ? slot : -1;
+        }
+
+        /// <summary><see cref="Ds4MicWriterSlot"/> over the live settings.
+        /// It walks them under their lock, so the lanes refresh it every two
+        /// seconds rather than on every input report.</summary>
+        private static int ResolveDs4MicWriterSlot(Guid pad)
+        {
+            var settings = SettingsManager.UserSettings;
+            if (settings == null || pad == Guid.Empty) return -1;
+            lock (settings.SyncRoot)
+                return Ds4MicWriterSlot(settings.Items, pad, UserEffectsDispatcher.HasLiveDispatcher);
+        }
+
         /// <summary>The DualShock 4 counterpart of
         /// <see cref="VoiceBtMicLoop"/>. With no session report to open or
-        /// close, the lane only states its want and decodes. It yields while
-        /// the persona lane decodes the same pad, which tees into the same
-        /// voice session.</summary>
+        /// close, the lane states its want, decodes, and carries the mode byte
+        /// itself: a voice-only pad can sit on a slot with no virtual
+        /// controller, where no effects dispatcher writes it, so the lane
+        /// sends <see cref="Ds4BtAudio.BuildMicModeReport"/> on arming, again
+        /// every <see cref="Ds4MicKeepaliveMs"/> while armed, and once with
+        /// 0xA0 when the microphone disarms. It notes the want under the slot
+        /// whose dispatcher writes the pad, so that dispatcher carries 0xA1
+        /// too. It yields the decode while the persona lane decodes the same
+        /// pad, which tees into the same voice session.</summary>
         private static void Ds4VoiceBtMicLoop(VoiceMicLane lane)
         {
             IntPtr h = NativeMethods.OpenHidSync(lane.Path);
@@ -466,9 +540,10 @@ namespace PadForge.Common.Input
             Ds4BtAudio.MicFrameHandler onFrame = (seq, frame) => stream.Feed(seq, frame, sink);
             var report = new byte[Ds4BtAudio.MaxInputReportSize];
             bool wasArmed = false;
-            // The slot lookup walks the settings under their lock, too much
-            // for every input report, so it refreshes every two seconds.
-            int slot = ResolveVoiceMicSlot(lane.Pad);
+            long keepaliveAt = 0;
+            byte[] armReport = Ds4BtAudio.BuildMicModeReport(true);
+            byte[] disarmReport = Ds4BtAudio.BuildMicModeReport(false);
+            int slot = ResolveDs4MicWriterSlot(lane.Pad);
             long slotAt = Environment.TickCount64;
             try
             {
@@ -487,10 +562,17 @@ namespace PadForge.Common.Input
                         NoteDs4MicPlugged(lane.Pad, (status & Ds4BtAudio.StatusMicrophone) != 0);
                     }
                     long now = Environment.TickCount64;
-                    if (now - slotAt >= 2000) { slot = ResolveVoiceMicSlot(lane.Pad); slotAt = now; }
-                    bool wanted = PadForge.Services.VoiceMacroService.PadMicWanted(lane.Pad);
+                    if (now - slotAt >= 2000) { slot = ResolveDs4MicWriterSlot(lane.Pad); slotAt = now; }
+                    bool wanted = VoiceLanePadMicWanted(lane.Pad);
                     SetDs4MicWanted(lane.Pad, slot, persona: false, wanted);
                     bool armed = IsDs4MicArmed(lane.Pad);
+                    if (armed && (!wasArmed || now - keepaliveAt >= Ds4MicKeepaliveMs))
+                    {
+                        NativeMethods.WriteFileSyncBestEffort(h, armReport, armReport.Length);
+                        keepaliveAt = now;
+                    }
+                    else if (!armed && wasArmed)
+                        NativeMethods.WriteFileSyncBestEffort(h, disarmReport, disarmReport.Length);
                     if (armed != wasArmed) { stream.Reset(); up.Reset(); wasArmed = armed; }
                     // The persona lane already tees this pad's microphone into
                     // its voice session, and two producers garble one recognizer.
@@ -501,6 +583,10 @@ namespace PadForge.Common.Input
             finally
             {
                 ClearDs4MicWant(lane.Pad, persona: false);
+                // Leaving with the microphone armed returns the pad to 0xA0,
+                // unless the persona lane still holds it armed.
+                if (wasArmed && !IsDs4MicArmed(lane.Pad))
+                    NativeMethods.WriteFileSyncBestEffort(h, disarmReport, disarmReport.Length);
                 NativeMethods.CloseHandle(h);
                 _voiceMicLanes.TryRemove(new System.Collections.Generic.KeyValuePair<Guid, VoiceMicLane>(lane.Pad, lane));
             }

@@ -139,6 +139,30 @@ namespace PadForge.Common.Input
             return r;
         }
 
+        /// <summary>The voice lane's own report 0x11, for a pad that may have
+        /// no effects writer to carry its mode byte. Armed, it is the
+        /// keepalive the hbashton fork sends once a second while the
+        /// microphone is on (DS4Device.cs:2061-2070 at 68a5c64): byte 2 is
+        /// 0xA1 and byte 3 enables only the microphone gain, in byte 23
+        /// (WriteAudioControlReport in DualShock4BluetoothAudioProtocol.cs).
+        /// Disarmed, byte 2 is 0xA0 and byte 3 enables nothing. Rumble,
+        /// lightbar and both volumes keep their enables clear, so the
+        /// firmware leaves them to their owners.</summary>
+        public static byte[] BuildMicModeReport(bool armed)
+        {
+            var r = new byte[ControlReportSize];
+            r[0] = 0x11;
+            r[1] = 0xC0;
+            r[2] = armed ? ModeMicrophone : ModeSpeaker;
+            if (armed)
+            {
+                r[3] = FlagMicrophone;
+                r[23] = MicGainMax;
+            }
+            WriteOutputCrc(r, ControlReportSize);
+            return r;
+        }
+
         // Byte-at-a-time table for the reflected polynomial 0xEDB88320. The
         // microphone reader checks every input report, up to 547 bytes at the
         // controller's report rate, so a bitwise loop would cost eight times

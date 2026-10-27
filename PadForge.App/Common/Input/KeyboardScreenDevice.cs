@@ -2,7 +2,6 @@ using System;
 using PadForge.Common.Input.KeyboardScreens;
 using PadForge.Engine;
 using PadForge.Engine.Common;
-using PadForge.Resources.Strings;
 
 namespace PadForge.Common.Input
 {
@@ -95,32 +94,43 @@ namespace PadForge.Common.Input
             return items;
         }
 
-        /// <summary>A key's name as the row lists it.</summary>
+        /// <summary>A key's name as the row publishes it, in English whatever
+        /// the language: the row keeps its objects in the settings file and
+        /// is not opened again when the language changes, so a translated
+        /// name would stay in the language the screen was found in.
+        /// <see cref="MappingDisplayResolver.LocalizeObjectName"/> translates
+        /// it where it is shown, as it does the NFC row's "Any NFC
+        /// Tag".</summary>
         internal static string KeyName(KeyboardScreenKind kind, int button)
         {
-            var s = Strings.Instance;
-            var culture = System.Globalization.CultureInfo.CurrentCulture;
+            var culture = System.Globalization.CultureInfo.InvariantCulture;
             if (kind == KeyboardScreenKind.Monochrome)
                 return button switch
                 {
                     >= KeyboardScreenFormats.MonoKey1 and < KeyboardScreenFormats.MonoAppletKey
-                        => string.Format(culture, s.KeyboardScreenKey_Mono_Format, button - KeyboardScreenFormats.MonoKey1 + 1),
-                    KeyboardScreenFormats.MonoAppletKey => s.KeyboardScreenKey_Applet,
+                        => string.Format(culture, MonoKeyPrefix + "{0}", button - KeyboardScreenFormats.MonoKey1 + 1),
+                    KeyboardScreenFormats.MonoAppletKey => AppletKeyName,
                     _ => string.Format(culture, "Button {0}", button + 1),
                 };
             return button switch
             {
-                KeyboardScreenFormats.G19Left => s.KeyboardScreenKey_G19Left,
-                KeyboardScreenFormats.G19Right => s.KeyboardScreenKey_G19Right,
-                KeyboardScreenFormats.G19Ok => s.KeyboardScreenKey_G19Ok,
-                KeyboardScreenFormats.G19Cancel => s.KeyboardScreenKey_G19Cancel,
-                KeyboardScreenFormats.G19Up => s.KeyboardScreenKey_G19Up,
-                KeyboardScreenFormats.G19Down => s.KeyboardScreenKey_G19Down,
-                KeyboardScreenFormats.G19Menu => s.KeyboardScreenKey_G19Menu,
-                KeyboardScreenFormats.G19Settings => s.KeyboardScreenKey_G19Settings,
+                KeyboardScreenFormats.G19Left => "Screen Left",
+                KeyboardScreenFormats.G19Right => "Screen Right",
+                KeyboardScreenFormats.G19Ok => "Screen OK",
+                KeyboardScreenFormats.G19Cancel => "Screen Cancel",
+                KeyboardScreenFormats.G19Up => "Screen Up",
+                KeyboardScreenFormats.G19Down => "Screen Down",
+                KeyboardScreenFormats.G19Menu => "Screen Menu",
+                KeyboardScreenFormats.G19Settings => "Screen Settings",
                 _ => string.Format(culture, "Button {0}", button + 1),
             };
         }
+
+        /// <summary>The English name of a monochrome screen's numbered soft
+        /// key, before its number.</summary>
+        internal const string MonoKeyPrefix = "Screen Key ";
+
+        internal const string AppletKeyName = "Applet Key";
 
         // ─── Lifecycle ───
 

@@ -304,6 +304,7 @@
   <data name="Dashboard_GameModsFooter" xml:space="preserve"><value>GTA V၊ Red Dead Redemption 2၊ Skyrim နှင့် Forza အတွက် မော့ဒ်များကဲ့သို့ DSX အတွက် ပြုလုပ်ထားသော မော့ဒ်များနှင့် အလုပ်လုပ်သည်။ ဆာဗာ နားထောင်နေစဉ် PadForge သည် ၎င်း၏ ပေါ့တ်ကို ထိုမော့ဒ်များ ရှာဖွေသည့်နေရာတွင် ရေးထားပေးသည်။</value></data>
   <data name="GameMods_Sending_Format" xml:space="preserve"><value>:{0} တွင် နားထောင်နေသည်။ {1} သည် ဗာချွယ်ကွန်ထရိုလာ {2} သို့ ပို့နေသည်။</value></data>
   <data name="GameMods_SendingNoController_Format" xml:space="preserve"><value>:{0} တွင် နားထောင်နေသည်။ {1} ပို့နေသော်လည်း မည်သည့် ဗာချွယ်ကွန်ထရိုလာတွင်မှ PlayStation ကွန်ထရိုလာ မရှိပါ။</value></data>
+  <data name="GameMods_SendingPastControllers_Format" xml:space="preserve"><value>:{0} တွင် နားထောင်နေသည်။ {1} သည် ကွန်ထရိုလာ နံပါတ် {2} သို့ ပို့နေသော်လည်း PlayStation ကွန်ထရိုလာပါသော ဗာချွယ်ကွန်ထရိုလာများတွင် ထိုနံပါတ် မရှိပါ။</value></data>
   <data name="GameMods_PortInUse_Format" xml:space="preserve"><value>ပေါ့တ် {0} ကို DSX ကဲ့သို့သော အခြားပရိုဂရမ်တစ်ခုက အသုံးပြုနေသည်။ ၎င်းကို ပိတ်ပါ သို့မဟုတ် အခြားပေါ့တ်တစ်ခု ရွေးပါ။</value></data>
   <data name="GameMods_UnknownSender" xml:space="preserve"><value>ဂိမ်းမော့ဒ်တစ်ခု</value></data>
   <data name="Dashboard_HeadTrackingFooter" xml:space="preserve"><value>OpenTrack နှင့်လည်းကောင်း၊ ၎င်း၏ UDP အထွက်ကို ပို့သော သို့မဟုတ် FreeTrack 2.0 မျှဝေမှတ်ဉာဏ်သို့ ရေးသော မည်သည့်ခြေရာခံကိရိယာနှင့်မဆိုလည်းကောင်း အလုပ်လုပ်သည်။ နောက်ခံတွင် ဆက်ရှင်တစ်ခု လည်ပတ်နိုင်သော ဤစက်ရှိ OpenXR ရန်တိုင်းနှင့်လည်း အလုပ်လုပ်သည်။</value></data>
@@ -4097,7 +4098,7 @@ PadForge က ၎င်းတို့ကို ယခုပင် ဖြုတ�
   <data name="HeadTracker_StatusFreeTrackWaiting" xml:space="preserve"><value>FreeTrack မျှဝေမှတ်ဉာဏ် ဒေတာကို စောင့်နေသည်။</value></data>
   <data name="HeadTracker_StatusFreeTrackUnavailable" xml:space="preserve"><value>FreeTrack မျှဝေမှတ်ဉာဏ် မရနိုင်ပါ။</value></data>
   <data name="Pad_SteeringAngleRumble_Header" xml:space="preserve"><value>စတီယာရင်ထောင့် တုန်ခါမှု</value></data>
-  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>ရွေးထားသော ဗာချွယ်စတစ်ဝင်ရိုး ဗဟိုမှ ဝေးလာသည်နှင့်အမျှ စဉ်ဆက်မပြတ် တုန်ခါမှုကို ထည့်သည်။ သတ်မှတ်ထားသော ရင်းမြစ်အားလုံးမှ မက်ပင်းလုပ်ထားသော အထွက်ကို အသုံးပြုသည်။ “ဦးတည်ရာအလိုက် ခွဲခြား” ကို ရွေးထားလျှင် အနုတ်လှုပ်ရှားမှုက ဘယ်မော်တာကို၊ အပေါင်းလှုပ်ရှားမှုက ညာမော်တာကို မောင်းနှင်သည်။ “ဘယ်မော်တာ” သို့မဟုတ် “ညာမော်တာ” ကို ရွေးထားလျှင် ဦးတည်ရာနှစ်ခုလုံးကို ထိုမော်တာတစ်ခုတည်းပေါ်တွင် ထားသည်။ တုန်ခါမှု စက်ပစ္စည်းများပါသော Xbox နှင့် PlayStation အထွက်အတွက်။ စတီယာရင်ဘီး၏ ကိုယ်ပိုင် အားပြန်တုံ့ပြန်မှုကို ချန်လှပ်ထားသည်။</value></data>
+  <data name="Pad_SteeringAngleRumble_Description" xml:space="preserve"><value>ရွေးထားသော ဗာချွယ်စတစ်ဝင်ရိုး ဗဟိုမှ ဝေးလာသည်နှင့်အမျှ စဉ်ဆက်မပြတ် တုန်ခါမှုကို ထည့်သည်။ သတ်မှတ်ထားသော ရင်းမြစ်အားလုံးမှ မက်ပင်းလုပ်ထားသော အထွက်ကို အသုံးပြုသည်။ “ဦးတည်ရာအလိုက် ခွဲခြား” ကို ရွေးထားလျှင် အနုတ်လှုပ်ရှားမှုက ဘယ်မော်တာကို၊ အပေါင်းလှုပ်ရှားမှုက ညာမော်တာကို မောင်းနှင်သည်။ “ဘယ်မော်တာ” သို့မဟုတ် “ညာမော်တာ” ကို ရွေးထားလျှင် ဦးတည်ရာနှစ်ခုလုံးကို ထိုမော်တာတစ်ခုတည်းပေါ်တွင် ထားသည်။ တုန်ခါမှု စက်ပစ္စည်းများပါသော Xbox နှင့် PlayStation အထွက်အတွက်။ စတီယာရင်ဘီးများ၊ စဉ်ဆက်မပြတ် အားပြန်တုံ့ပြန်မှုပါသော အခြားစက်ပစ္စည်းများနှင့် Fanatec ခြေနင်းများကို ချန်လှပ်ထားသည်။</value></data>
   <data name="Pad_SteeringAngleRumble_Enable" xml:space="preserve"><value>စတီယာရင်ထောင့် တုန်ခါမှု ဖွင့်ရန်</value></data>
   <data name="Pad_SteeringAngleRumble_Axis" xml:space="preserve"><value>ဗာချွယ် ဝင်ရိုး</value></data>
   <data name="Pad_SteeringAngleRumble_LX" xml:space="preserve"><value>ဘယ်စတစ် X</value></data>
@@ -4300,6 +4301,7 @@ PadForge က ၎င်းတို့ကို ယခုပင် ဖြုတ�
   <data name="KeyboardScreens_Status_Direct_Format" xml:space="preserve"><value>{0} ပေါ်တွင် တိုက်ရိုက်</value></data>
   <data name="KeyboardScreens_Status_G19Preparing" xml:space="preserve"><value>G19 ၏ မျက်နှာပြင်တွင် WinUSB ကို ချိတ်နေသည်</value></data>
   <data name="KeyboardScreens_Status_G19OtherDriver_Format" xml:space="preserve"><value>G19 ၏ မျက်နှာပြင်သည် အခြား ဒရိုက်ဗာ ({0}) ပေါ်တွင် ရှိနေသဖြင့် Logitech Gaming Software ကို စတင်ပါ</value></data>
+  <data name="KeyboardScreens_Status_G19ForeignDriver_Format" xml:space="preserve"><value>G19 ၏ မျက်နှာပြင်သည် အခြားပရိုဂရမ်တစ်ခု၏ ဒရိုက်ဗာ ({0}) ပေါ်တွင် ရှိနေပြီး PadForge က ၎င်းကို မပြောင်းလဲဘဲ ထားသည်</value></data>
   <data name="KeyboardScreens_Status_ArxNoLibrary" xml:space="preserve"><value>Logitech Gaming Software 8.52 သို့မဟုတ် နောက်ပိုင်းဗားရှင်း လိုအပ်သည်</value></data>
   <data name="KeyboardScreens_Status_ArxNotRunning" xml:space="preserve"><value>Logitech Gaming Software ကို စတင်ပါ</value></data>
   <data name="KeyboardScreens_Status_ArxWaiting" xml:space="preserve"><value>Arx Control ပါသော ဖုန်းကို စောင့်နေသည်</value></data>
@@ -4371,6 +4373,7 @@ PadForge က ၎င်းတို့ကို ယခုပင် ဖြုတ�
   <data name="Devices_FalconHandle" xml:space="preserve"><value>လက်ကိုင်</value></data>
   <data name="Devices_GameModTriggers_Format" xml:space="preserve"><value>{0} သည် ဤကွန်ထရိုလာ၏ ထရီဂါများကို သတ်မှတ်နေသည်။</value></data>
   <data name="Devices_GameModLights_Format" xml:space="preserve"><value>{0} သည် ဤကွန်ထရိုလာ၏ မီးများကို သတ်မှတ်နေသည်။</value></data>
+  <data name="Devices_GameModPeripheralLights_Format" xml:space="preserve"><value>{0} သည် ဤစက်ပစ္စည်း၏ မီးများကို သတ်မှတ်နေသည်။</value></data>
   <data name="Devices_GameModTriggersAndLights_Format" xml:space="preserve"><value>{0} သည် ဤကွန်ထရိုလာ၏ ထရီဂါများနှင့် မီးများကို သတ်မှတ်နေသည်။</value></data>
   <data name="Devices_GameModImpulse_Format" xml:space="preserve"><value>{0} သည် ဤကွန်ထရိုလာ၏ impulse ထရီဂါများပေါ်တွင် ထရီဂါ တုန်ခါမှုများကို ဖွင့်နေသည်။</value></data>
   <data name="Devices_ClearModEffects" xml:space="preserve"><value>မော့ဒ် အာနိသင်များကို ရှင်းရန်</value></data>
@@ -4378,10 +4381,10 @@ PadForge က ၎င်းတို့ကို ယခုပင် ဖြုတ�
   <data name="Falcon_Axis_LeftRight" xml:space="preserve"><value>ဘယ်/ညာ</value></data>
   <data name="Falcon_Axis_UpDown" xml:space="preserve"><value>အပေါ်/အောက်</value></data>
   <data name="Falcon_Axis_InOut" xml:space="preserve"><value>အတွင်း/အပြင်</value></data>
-  <data name="Falcon_Button_Format" xml:space="preserve"><value>ခလုတ် {0}</value></data>
   <data name="Falcon_Name_Format" xml:space="preserve"><value>Falcon {0}</value></data>
   <data name="Falcon_Status_Line_Format" xml:space="preserve"><value>{0}- {1}</value></data>
   <data name="Falcon_Status_Library_Format" xml:space="preserve"><value>Force Dimension SDK {0}၊ {1} မှ ဖွင့်ထားသည်</value></data>
+  <data name="Falcon_Status_PickNotLoaded" xml:space="preserve"><value>သင်ရွေးထားသော dhd64.dll ကို ဖွင့်၍ မရသဖြင့် PadForge သည် အထက်ပါ မိတ္တူကို အသုံးပြုသည်။</value></data>
   <data name="Falcon_Status_Arm64" xml:space="preserve"><value>Force Dimension ၏ လိုက်ဘရရီသည် PadForge ၏ x64 ဗားရှင်းတွင်သာ အလုပ်လုပ်သည်။</value></data>
   <data name="Falcon_Status_LoadFailed" xml:space="preserve"><value>dhd64.dll ကို တွေ့ရှိသော်လည်း ဖွင့်၍ မရပါ။</value></data>
   <data name="Falcon_Status_NotLibrary" xml:space="preserve"><value>ထို dhd64.dll သည် PadForge မျှော်လင့်သော Force Dimension လိုက်ဘရရီ မဟုတ်ပါ။</value></data>
@@ -4391,11 +4394,12 @@ PadForge က ၎င်းတို့ကို ယခုပင် ဖြုတ�
   <data name="Falcon_Status_Open" xml:space="preserve"><value>ဖွင့်ထားသည်</value></data>
   <data name="Falcon_Status_InUse" xml:space="preserve"><value>Falcon တစ်ခုကို FalconJoyForce သို့မဟုတ် Force Dimension ၏ ကိရိယာများကဲ့သို့ အခြားပရိုဂရမ်တွင် ဖွင့်ထားသည်။ ထိုပရိုဂရမ်တွင် ပိတ်ပါ။</value></data>
   <data name="Falcon_Status_OtherDriver_Format" xml:space="preserve"><value>Falcon သည် အခြားဒရိုက်ဗာ ({0}) ပေါ်တွင် ရှိနေသောကြောင့် Force Dimension ၏ လိုက်ဘရရီက ၎င်းကို ဖွင့်၍ မရပါ။ Device Manager တွင် Falcon ၏ ဒရိုက်ဗာကို Force Dimension ၏ SDK ဖိုင်တွဲရှိ drivers\usb ဖိုင်တွဲမှ အပ်ဒိတ်လုပ်ပါ။</value></data>
+  <data name="Falcon_Status_OwnDriverNotOpen_Format" xml:space="preserve"><value>Falcon သည် Force Dimension ၏ ဒရိုက်ဗာပေါ်တွင် ရှိသော်လည်း Force Dimension ၏ လိုက်ဘရရီက ၎င်းကို ဖွင့်၍ မရပါ: {0}။ ၎င်း၏ ပါဝါကြိုးနှင့် USB ကြိုးကို စစ်ဆေးပါ။</value></data>
   <data name="Falcon_Status_NoDriver" xml:space="preserve"><value>Falcon တစ်ခုကို ဒရိုက်ဗာမပါဘဲ ချိတ်ဆက်ထားသည်။ “Falcon ဒရိုက်ဗာ ထည့်သွင်းရန်” က ၎င်းကို Force Dimension ၏ ဒရိုက်ဗာ ထည့်ပေးသည်။</value></data>
   <data name="Falcon_Status_NoDriverNoPackage" xml:space="preserve"><value>Falcon တစ်ခုကို ဒရိုက်ဗာမပါဘဲ ချိတ်ဆက်ထားပြီး SDK ဖိုင်တွဲတွင် ထည့်ပေးရန် ဒရိုက်ဗာပက်ကေ့ချ် မရှိပါ။ Force Dimension ၏ SDK ကို ပြန်လည်ထည့်သွင်းပါ။</value></data>
   <data name="Falcon_Status_NotFound" xml:space="preserve"><value>Falcon မတွေ့ပါ။ ၎င်း၏ ပါဝါကြိုးနှင့် USB ကြိုးကို တပ်ဆင်ပါ။</value></data>
   <data name="Falcon_PickLibrary" xml:space="preserve"><value>dhd64.dll ကို ရွေးရန်…</value></data>
-  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Force Dimension ၏ လိုက်ဘရရီ၏ ဤမိတ္တူကို အခြားမိတ္တူများထက် အရင်ဖွင့်သည်။ SDK ထည့်သွင်းပေးသော မိတ္တူများကို ဤရွေးချယ်မှုမပါဘဲ ရှာတွေ့သည်။</value></data>
+  <data name="Falcon_PickLibrary_Tooltip" xml:space="preserve"><value>Force Dimension ၏ လိုက်ဘရရီ၏ ဤမိတ္တူကို အခြားမိတ္တူများအစား ဖွင့်သည်။ အခြားမိတ္တူဖြင့် ဖွင့်ထားသော Falcon ကို ပိတ်ပြီး ဤမိတ္တူဖြင့် ပြန်ဖွင့်သည်။ SDK ထည့်သွင်းပေးသော မိတ္တူများကို ဤရွေးချယ်မှုမပါဘဲ ရှာတွေ့သည်။</value></data>
   <data name="Falcon_LibraryFilter" xml:space="preserve"><value>dhd64.dll|dhd64.dll|လိုက်ဘရရီများ (*.dll)|*.dll</value></data>
   <data name="Falcon_InstallDriver" xml:space="preserve"><value>Falcon ဒရိုက်ဗာ ထည့်သွင်းရန်</value></data>
   <data name="Falcon_InstallDriver_Tooltip" xml:space="preserve"><value>ဒရိုက်ဗာမရှိသော Falcon တွင် SDK ဖိုင်တွဲမှ Force Dimension ၏ ဒရိုက်ဗာကို ထည့်သွင်းသည်။ Windows က Force Dimension ကို ယုံကြည်မလားဟု ဦးစွာ မေးနိုင်သည်။</value></data>
@@ -4412,7 +4416,7 @@ PadForge က ၎င်းတို့ကို ယခုပင် ဖြုတ�
   <data name="Settings_Falcon_Desc" xml:space="preserve"><value>Force Dimension ထံမှ သင်ထည့်သွင်းသော Force Dimension ၏ SDK မှတစ်ဆင့် Novint Falcon ဖြင့် ဂိမ်းကစားသည်။ လက်ကိုင်သည် စတစ်ဖြစ်ပြီး လက်ကိုင်ပေါ်ရှိ ခလုတ်လေးခုသည် ခလုတ်များဖြစ်သည်။ PadForge သည် ဂိမ်း၏ တုန်ခါမှုနှင့် အကျိုးသက်ရောက်မှုများကို လက်ကိုင်ပေါ်တွင် အားအဖြစ် ပေးသည်။ ဆလော့တစ်ခုစီ၏ အားပြန်တုံ့ပြန်မှု တဘ်တွင် Falcon ၏ ခံစားရပုံကို သတ်မှတ်သည်။</value></data>
   <data name="Settings_Falcon" xml:space="preserve"><value>Novint Falcon ကို ထိန်းချုပ်ရန်</value></data>
   <data name="Settings_FalconTooltip" xml:space="preserve"><value>Falcon တစ်ခုစီကို Force Dimension ၏ dhd64.dll မှတစ်ဆင့် ဖွင့်သည်။ ဖွင့်ထားသော Falcon သည် PadForge တစ်ခုတည်းအတွက်သာ ဖြစ်သောကြောင့် ဤဆက်တင် ဖွင့်ထားစဉ် FalconJoyForce နှင့် Force Dimension ၏ ကိရိယာများက ၎င်းကို ဖွင့်၍ မရပါ။ ပိတ်ထားလျှင် PadForge သည် Falcon အားလုံးကို ပိတ်သည်။</value></data>
-  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon လိုက်ဘရရီကို {0} အဖြစ် သတ်မှတ်ပြီးပါပြီ။ အသုံးပြုနေဆဲ မိတ္တူသည် PadForge ပြန်စသည်အထိ ဆက်ရှိနေမည်။</value></data>
+  <data name="Status_FalconLibraryPicked_Format" xml:space="preserve"><value>Falcon လိုက်ဘရရီကို {0} အဖြစ် သတ်မှတ်ပြီးပါပြီ။ PadForge သည် ၎င်းကို စက္ကန့်အနည်းငယ်အတွင်း ဖွင့်မည်ဖြစ်ပြီး အခြားမိတ္တူဖြင့် ဖွင့်ထားသော Falcon ကို ဤမိတ္တူဖြင့် ပြန်ဖွင့်မည်။</value></data>
   <data name="Status_InstallingFalconDriver" xml:space="preserve"><value>Force Dimension ၏ Falcon ဒရိုက်ဗာကို ထည့်သွင်းနေသည်…</value></data>
   <data name="Status_FalconDriverPackageMissing_Format" xml:space="preserve"><value>Force Dimension ၏ Falcon ဒရိုက်ဗာပက်ကေ့ချ် သို့မဟုတ် ၎င်း၏ ကတ်တလောက်ဖိုင် မရှိပါ- {0}။ Force Dimension ၏ SDK ကို ပြန်လည်ထည့်သွင်းပါ။</value></data>
   <data name="Status_FalconNotPluggedIn" xml:space="preserve"><value>Falcon တစ်ခုမျှ ချိတ်ဆက်ထားခြင်း မရှိပါ။</value></data>

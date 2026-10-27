@@ -1122,6 +1122,23 @@ namespace PadForge.Common
                 "Pen Inverted" => s.Tablet_Inverted,
                 "Pen In Range" => s.Tablet_InRange,
                 "Any NFC Tag" => s.Mapping_NfcAnyTag,
+                // The rows that publish English names and are translated
+                // here: a microphone's Any Phrase (#317), a Falcon's handle
+                // axes (#521) and a keyboard screen's keys (#519, the
+                // numbered soft keys below the switch).
+                PadForge.Common.Input.MicrophoneInputDevice.AnyPhraseName => s.Voice_AnyPhrase,
+                PadForge.Common.Input.Falcon.FalconDevice.AxisNameLeftRight => s.Falcon_Axis_LeftRight,
+                PadForge.Common.Input.Falcon.FalconDevice.AxisNameUpDown => s.Falcon_Axis_UpDown,
+                PadForge.Common.Input.Falcon.FalconDevice.AxisNameInOut => s.Falcon_Axis_InOut,
+                PadForge.Common.Input.KeyboardScreenDevice.AppletKeyName => s.KeyboardScreenKey_Applet,
+                "Screen Left" => s.KeyboardScreenKey_G19Left,
+                "Screen Right" => s.KeyboardScreenKey_G19Right,
+                "Screen OK" => s.KeyboardScreenKey_G19Ok,
+                "Screen Cancel" => s.KeyboardScreenKey_G19Cancel,
+                "Screen Up" => s.KeyboardScreenKey_G19Up,
+                "Screen Down" => s.KeyboardScreenKey_G19Down,
+                "Screen Menu" => s.KeyboardScreenKey_G19Menu,
+                "Screen Settings" => s.KeyboardScreenKey_G19Settings,
                 "Left Stick X" => s.DevObj_LeftStickX,
                 "Left Stick Y" => s.DevObj_LeftStickY,
                 "Left Trigger" => s.DevObj_LeftTrigger,
@@ -1301,6 +1318,12 @@ namespace PadForge.Common
                 _ => null
             };
             if (keyLocalized != null) return keyLocalized;
+
+            // A monochrome keyboard screen's soft keys: "Screen Key 1"
+            // through "Screen Key 4" (#519).
+            if (name.StartsWith(PadForge.Common.Input.KeyboardScreenDevice.MonoKeyPrefix, System.StringComparison.Ordinal) &&
+                int.TryParse(name.AsSpan(PadForge.Common.Input.KeyboardScreenDevice.MonoKeyPrefix.Length), out int screenKey))
+                return string.Format(s.KeyboardScreenKey_Mono_Format, screenKey);
 
             // Numpad digits: "Numpad 0" through "Numpad 9"
             if (name.StartsWith("Numpad ", System.StringComparison.Ordinal) &&

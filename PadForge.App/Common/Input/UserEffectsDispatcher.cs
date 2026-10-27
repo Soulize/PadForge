@@ -63,14 +63,16 @@ namespace PadForge.Common.Input
         private const ushort SonyVid = 0x054C;
         private const ushort PidStandard = 0x0CE6;  // DualSense
         private const ushort PidEdge = 0x0DF2;      // DualSense Edge
-        // DualShock 4 family — three PIDs cover the v1, v1 alternate, and
-        // v2 hardware revisions. Same VID, different output report
-        // shape (Report 0x05 USB / 0x11 BT, no AT / no player LEDs / no
-        // mic LED). Lighting tab base color + audio modes apply via the
-        // DS4 path; AT and Indicator LED settings are silently ignored.
-        private const ushort Ds4Pid_V1     = 0x05C4;
-        private const ushort Ds4Pid_V1Alt  = 0x09CC;
-        private const ushort Ds4Pid_V2     = 0x0BA0;
+        // DualShock 4 family, three PIDs: the v1 (CUH-ZCT1), the v2
+        // (CUH-ZCT2) and Sony's wireless USB adapter, which carries a DS4
+        // over its own radio link (linux hid-ids.h PS4_CONTROLLER,
+        // PS4_CONTROLLER_2 and PS4_CONTROLLER_DONGLE). Same VID, different
+        // output report shape (Report 0x05 USB / 0x11 BT, no AT / no player
+        // LEDs / no mic LED). Lighting tab base color + audio modes apply
+        // via the DS4 path. AT and Indicator LED settings are ignored.
+        private const ushort Ds4Pid_V1      = 0x05C4;
+        private const ushort Ds4Pid_V2      = 0x09CC;
+        private const ushort Ds4Pid_Adapter = 0x0BA0;
 
         // Map (PID, transport) → HM profile id. Each device's
         // extendedOutputReport spec tells HMOutputEncoder how to pack the
@@ -81,11 +83,11 @@ namespace PadForge.Common.Input
         {
             string id = pid switch
             {
-                PidStandard   => isBluetooth ? "dualsense-bt-full" : "dualsense",
-                PidEdge       => isBluetooth ? "dualsense-edge-bt" : "dualsense-edge",
-                Ds4Pid_V1     => isBluetooth ? "dualshock-4-v2-bt" : "dualshock-4-v1",
-                Ds4Pid_V1Alt  => isBluetooth ? "dualshock-4-v2-bt" : "dualshock-4-v2",
-                Ds4Pid_V2     => isBluetooth ? "dualshock-4-v2-bt" : "dualshock-4-v2",
+                PidStandard    => isBluetooth ? "dualsense-bt-full" : "dualsense",
+                PidEdge        => isBluetooth ? "dualsense-edge-bt" : "dualsense-edge",
+                Ds4Pid_V1      => isBluetooth ? "dualshock-4-v2-bt" : "dualshock-4-v1",
+                Ds4Pid_V2      => isBluetooth ? "dualshock-4-v2-bt" : "dualshock-4-v2",
+                Ds4Pid_Adapter => isBluetooth ? "dualshock-4-v2-bt" : "dualshock-4-v2",
                 _ => null,
             };
             return id != null ? HMaestroProfileCatalog.GetProfileById(id) : null;
@@ -116,6 +118,17 @@ namespace PadForge.Common.Input
         /// SDL3's separate SDL_RumbleJoystick writes off the BT HID
         /// channel.</summary>
         public static Func<int, Guid, (byte right, byte left)> SlotRumbleForDeviceProvider { get; set; }
+
+        /// <summary>Static provider for the slot's persona haptics alone as
+        /// one device takes them (discussion #522): the haptic level through
+        /// each of the device's rows' Overall Gain, motor strengths and swap,
+        /// with no game rumble, macro rumble, audio rumble or any other source
+        /// in it, and (0, 0) when the level is not fresh or the device plays
+        /// the haptic track itself. InputService wires it to
+        /// <see cref="PersonaHapticRumble.ForDevice"/>. Read only inside a
+        /// game's rumble release grace, where it is the one PadForge source a
+        /// DualSense gets.</summary>
+        public static Func<int, Guid, (byte right, byte left)> SlotPersonaRumbleForDeviceProvider { get; set; }
 
         /// <summary>Static provider for the slot's raw (unscaled) rumble
         /// used for change detection only — when this changes mid audio
@@ -359,10 +372,48 @@ namespace PadForge.Common.Input
         // once, the same change gating as the headphone volume.
         private readonly Dictionary<Guid, bool> _prevDs4MicArmed = new();
 
+        // The three maps above hold what the pad has RECEIVED. A frame
+        // commits its values only after PlayStationEffectWriter.Write accepts
+        // it (CommitDeliveredAudio), the delivery contract SpeakerCleared and
+        // BtBarReleased follow, so a frame the stale-skip drops or the writer
+        // rejects leaves its asserts owed to the next capture. The commit runs
+        // after s_writeGate is released, outside devices.SyncRoot, so the maps
+        // take their own leaf lock. _audioCommitSeq holds, per device, the
+        // dispatch sequence of the last commit or re-arm
+        // (RearmAudioAsserts): a frame captured before it commits nothing, so
+        // a late commit can neither undo a re-arm nor a newer commit.
+        private readonly object _audioPrevGate = new();
+        private readonly Dictionary<Guid, long> _audioCommitSeq = new();
+
+        private void RearmAudioAsserts(Guid device)
+        {
+            lock (_audioPrevGate)
+            {
+                _prevHeadphoneVolume.Remove(device);
+                _prevAudioOutputPath.Remove(device);
+                _prevDs4MicArmed.Remove(device);
+                _audioCommitSeq[device] = System.Threading.Interlocked.Read(ref s_dispatchSeq);
+            }
+        }
+
+        private void CommitDeliveredAudio(Guid device, long seq,
+            (int HeadphoneVolume, int OutputPath, bool Ds4MicArmed) audio)
+        {
+            lock (_audioPrevGate)
+            {
+                if (_audioCommitSeq.TryGetValue(device, out long last) && last >= seq) return;
+                _audioCommitSeq[device] = seq;
+                _prevHeadphoneVolume[device] = audio.HeadphoneVolume;
+                _prevAudioOutputPath[device] = audio.OutputPath;
+                _prevDs4MicArmed[device] = audio.Ds4MicArmed;
+            }
+        }
+
         // Devices seen offline since their last dispatch, so the return
         // re-arms every change-gated authority write (the duaLib
         // wasDisconnected pattern). Accessed only inside devices.SyncRoot
-        // during DispatchSnapshot, like the prev maps above.
+        // during DispatchSnapshot, like the prev maps above other than the
+        // three audio maps, which have their own gate.
         private readonly HashSet<Guid> _deviceWasOffline = new();
 
         // Devices this dispatcher wrote on its previous dispatch as their
@@ -696,9 +747,7 @@ namespace PadForge.Common.Input
                     _prevMacroRightTrig.Remove(g);
                     _prevMacroLeftTrig.Remove(g);
                     _audioMuteBurstLeft.Remove(g);
-                    _prevHeadphoneVolume.Remove(g);
-                    _prevAudioOutputPath.Remove(g);
-                    _prevDs4MicArmed.Remove(g);
+                    RearmAudioAsserts(g);
                 }
                 // A new assignment starts with no external lighting claim.
                 // Keep the established devices-before-external lock order.
@@ -2197,9 +2246,12 @@ namespace PadForge.Common.Input
             // one-shot this payload is spending, or Guid.Empty. The one-shot is
             // only consumed after the write for this entry actually lands, so a
             // stale-skip or a failed write leaves it armed for the next tick.
+            // Audio carries the values this frame's audio asserts were judged
+            // against, committed under the same rule (CommitDeliveredAudio).
             var pending = new List<(Guid Device, string Path, HMProfile Profile,
                 IReadOnlyDictionary<string, object> Fields, long Seq, long RecoveredThrough,
-                Guid SpeakerCleared, Guid BtBarReleased)>();
+                Guid SpeakerCleared, Guid BtBarReleased,
+                (int HeadphoneVolume, int OutputPath, bool Ds4MicArmed) Audio)>();
             int litPeripherals = 0;
             Dictionary<Guid, bool> peripheralKinds = null;
 
@@ -2243,7 +2295,7 @@ namespace PadForge.Common.Input
                     bool isDs5 = ud.VendorId == SonyVid &&
                                  (ud.ProdId == PidStandard || ud.ProdId == PidEdge);
                     bool isDs4 = ud.VendorId == SonyVid &&
-                                 (ud.ProdId == Ds4Pid_V1 || ud.ProdId == Ds4Pid_V1Alt || ud.ProdId == Ds4Pid_V2);
+                                 (ud.ProdId == Ds4Pid_V1 || ud.ProdId == Ds4Pid_V2 || ud.ProdId == Ds4Pid_Adapter);
                     bool isPs = isDs5 || isDs4;
 
                     if (!guids.Contains(ud.InstanceGuid)) continue;
@@ -2292,9 +2344,7 @@ namespace PadForge.Common.Input
                         _prevPadForgeWantsMicLed[ud.InstanceGuid] = true;
                         _prevPadForgeWantsPips[ud.InstanceGuid] = true;
                         _audioMuteBurstLeft[ud.InstanceGuid] = AudioMuteBurstFrames;
-                        _prevHeadphoneVolume.Remove(ud.InstanceGuid);
-                        _prevAudioOutputPath.Remove(ud.InstanceGuid);
-                        _prevDs4MicArmed.Remove(ud.InstanceGuid);
+                        RearmAudioAsserts(ud.InstanceGuid);
                         // A BT re-pair also puts the LEDs back under firmware
                         // control, so the connect release is owed again.
                         if (isDs5 && PlayStationEffectWriter.IsBluetoothPath(ud.DevicePath))
@@ -2486,9 +2536,7 @@ namespace PadForge.Common.Input
                         // claim re-arms the bounded unmute burst.
                         _audioMuteBurstLeft[ud.InstanceGuid] = AudioMuteBurstFrames;
                         // Force one headphone-volume write on a fresh claim.
-                        _prevHeadphoneVolume.Remove(ud.InstanceGuid);
-                        _prevAudioOutputPath.Remove(ud.InstanceGuid);
-                        _prevDs4MicArmed.Remove(ud.InstanceGuid);
+                        RearmAudioAsserts(ud.InstanceGuid);
                     }
 
                     // Identity precedence: a pad shared across virtual
@@ -2548,15 +2596,44 @@ namespace PadForge.Common.Input
                     // rumble bytes so the Sony dispatcher's effect packet
                     // doesn't race the passthrough write to the same
                     // device. Test rumble doesn't go through OutputDecoded,
-                    // so the override is null and this branch is skipped —
+                    // so the override is null and this branch is skipped:
                     // the bytes flow through to the real DualSense via
-                    // the dispatcher path, which is the only writer.
+                    // the dispatcher path, and the rumble claim published
+                    // below carries them into the pass-through lane's
+                    // frames too, so a game still writing the virtual pad
+                    // does not cancel them.
                     bool gameDrivenRumble = devOverrides.RumbleRight.HasValue && devOverrides.RumbleLeft.HasValue;
                     if (gameDrivenRumble && isDs5
                         && DualSensePassthroughDispatcher.IsPassthroughTarget(_padIndex, ud.InstanceGuid))
                     {
                         rR = 0;
                         rL = 0;
+                    }
+
+                    // A release in its grace window (the game cleared every
+                    // rumble bit to go back to audio haptics) on a DualSense
+                    // that takes the persona haptics as rumble because its
+                    // haptic route is down: the converted haptics stand in for
+                    // the haptics it cannot play, the rule the DualShock 4
+                    // already follows (Ds4EffectSynthesizer, rumbleReleased).
+                    // The pass owns the rumble for this device at the persona
+                    // level alone, and the claim published below carries it
+                    // into the pass-through lane's frames, which the game keeps
+                    // sending with bit 1 clear. Every other PadForge source
+                    // keeps the grace.
+                    if (isDs5 && gameDrivenRumble
+                        && devOverrides.RumbleFlag0Bits == 0 && devOverrides.RumbleFlag2Bits == 0)
+                    {
+                        (byte right, byte left) persona = deliverRumble
+                            ? SlotPersonaRumbleForDeviceProvider?.Invoke(_padIndex, ud.InstanceGuid) ?? ((byte)0, (byte)0)
+                            : ((byte)0, (byte)0);
+                        if ((persona.right | persona.left) != 0)
+                        {
+                            rR = persona.right;
+                            rL = persona.left;
+                            devOverrides.RumbleRight = null;
+                            devOverrides.RumbleLeft = null;
+                        }
                     }
 
                     // The lightbar has the same conflict and never got the
@@ -2736,6 +2813,22 @@ namespace PadForge.Common.Input
                     bool assertRumbleEnable = padForgeHasRumble || prevHadRumble;
                     _prevHadRumble[ud.InstanceGuid] = padForgeHasRumble;
 
+                    // One rumble state on the wire from both writers. The
+                    // pass-through lane forwards a game's frames to this same
+                    // DualSense, and a frame without haptics select puts the pad
+                    // back on audio haptics, so PadForge's own rumble here was
+                    // canceled by every forwarded frame while a game that plays
+                    // audio haptics kept talking. Publish the rumble half of the
+                    // frame the synthesizer builds below, from the same
+                    // arguments, and the lane writes it into each game frame
+                    // that does not select rumble itself. While the mirror holds
+                    // a game's rumble the half is the game's, and nothing is
+                    // claimed: the game's own frames carry it.
+                    if (isDs5)
+                        DualSensePassthroughDispatcher.PublishRumbleClaim(ud.InstanceGuid,
+                            Ds5EffectSynthesizer.ResolveRumble(rR, rL, assertRumbleEnable, devOverrides),
+                            Environment.TickCount64);
+
                     // AT trigger enable gating — same shape as rumble.
                     // Assert when PadForge has AT configured OR external
                     // is currently mirroring OR we need a one-shot drop
@@ -2807,21 +2900,28 @@ namespace PadForge.Common.Input
 
                     // Headphone volume: assert the enable bit while the
                     // audio-hardware claim burst runs or when the configured
-                    // value changed (slider, macro, profile apply). Idle,
-                    // the bit stays clear and the firmware retains state.
+                    // value differs from the one the pad last received
+                    // (slider, macro, profile apply). Idle, the bit stays
+                    // clear and the firmware retains state.
                     int hpVol = devCfg?.HeadphoneVolume ?? 100;
-                    bool hpChanged = !_prevHeadphoneVolume.TryGetValue(ud.InstanceGuid, out var prevHp)
-                        || prevHp != hpVol;
-                    _prevHeadphoneVolume[ud.InstanceGuid] = hpVol;
-                    bool assertHeadphone = assertAudioMute || hpChanged;
-
                     // Output path: only a non-Automatic choice is ever
                     // authored, asserted on the claim burst or a change.
                     int pathVal = AudioPassthroughService.ResolveOutputPath(
                         devCfg != null ? (int)devCfg.AudioOutputPath : 0, ud.InstanceGuid);
-                    bool pathChanged = !_prevAudioOutputPath.TryGetValue(ud.InstanceGuid, out var prevPath)
-                        || prevPath != pathVal;
-                    _prevAudioOutputPath[ud.InstanceGuid] = pathVal;
+                    bool ds4Bt = !isDs5 && isBluetooth;
+                    bool ds4MicArmed = ds4Bt && AudioPassthroughService.IsDs4MicArmed(ud.InstanceGuid);
+                    // Compared with what the pad last received. The values
+                    // are committed when this frame lands (CommitDeliveredAudio).
+                    bool hpChanged, pathChanged, ds4MicWasArmed;
+                    lock (_audioPrevGate)
+                    {
+                        hpChanged = !_prevHeadphoneVolume.TryGetValue(ud.InstanceGuid, out var prevHp)
+                            || prevHp != hpVol;
+                        pathChanged = !_prevAudioOutputPath.TryGetValue(ud.InstanceGuid, out var prevPath)
+                            || prevPath != pathVal;
+                        ds4MicWasArmed = _prevDs4MicArmed.TryGetValue(ud.InstanceGuid, out var dma) && dma;
+                    }
+                    bool assertHeadphone = assertAudioMute || hpChanged;
                     bool assertAudioCtl = pathVal > 0 && (assertAudioMute || pathChanged);
 
                     // DualShock 4 on Bluetooth (#528). Byte 2 is 0xA1 while its
@@ -2833,12 +2933,8 @@ namespace PadForge.Common.Input
                     // DualSense rule: the claim burst, a level change, a route
                     // change. Wired, PadForge sends the pad no audio, and Sony's
                     // USB adapter keeps its own.
-                    bool ds4Bt = !isDs5 && isBluetooth;
                     var (ds4Headphone, ds4Speaker) = Ds4BtAudio.VolumesFor(pathVal, hpVol);
                     bool assertDs4Volumes = ds4Bt && (assertAudioMute || hpChanged || pathChanged);
-                    bool ds4MicArmed = ds4Bt && AudioPassthroughService.IsDs4MicArmed(ud.InstanceGuid);
-                    bool ds4MicWasArmed = _prevDs4MicArmed.TryGetValue(ud.InstanceGuid, out var dma) && dma;
-                    _prevDs4MicArmed[ud.InstanceGuid] = ds4MicArmed;
                     bool assertDs4Mic = ds4MicArmed && (!ds4MicWasArmed || assertAudioMute);
                     // Track whether THIS tick wrote a trigger effect for
                     // either source — PadForge cfg OR a dispatcher-injected
@@ -3022,7 +3118,8 @@ namespace PadForge.Common.Input
                             System.Threading.Interlocked.Increment(ref s_dispatchSeq),
                             recoveredThrough,
                             speakerCleared,
-                            btConnectRelease ? ud.InstanceGuid : Guid.Empty));
+                            btConnectRelease ? ud.InstanceGuid : Guid.Empty,
+                            (hpVol, pathVal, ds4MicArmed)));
                     }
                     catch
                     {
@@ -3043,6 +3140,7 @@ namespace PadForge.Common.Input
             // why this gate is a leaf and not an outer dispatch lock.
             if (pending.Count == 0) return;
             bool deliveryStateChanged = false;
+            List<(Guid Device, long Seq, (int HeadphoneVolume, int OutputPath, bool Ds4MicArmed) Audio)> delivered = null;
             lock (s_writeGate)
             {
                 foreach (var w in pending)
@@ -3082,6 +3180,9 @@ namespace PadForge.Common.Input
                         // or failed frame leaves it armed for the next tick.
                         if (w.BtBarReleased != Guid.Empty)
                             _btBarReleasePending.TryRemove(w.BtBarReleased, out _);
+                        // The audio values are committed once the gate is
+                        // released, which takes nothing while held.
+                        (delivered ??= new()).Add((w.Device, w.Seq, w.Audio));
                     }
                     catch
                     {
@@ -3090,6 +3191,9 @@ namespace PadForge.Common.Input
                     }
                 }
             }
+            if (delivered != null)
+                foreach (var d in delivered)
+                    CommitDeliveredAudio(d.Device, d.Seq, d.Audio);
             if (deliveryStateChanged) UpdateAnimTimer();
         }
     }

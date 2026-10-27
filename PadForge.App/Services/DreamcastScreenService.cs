@@ -212,6 +212,24 @@ namespace PadForge.Services
             _markDirty();
         }
 
+        /// <summary>Remove Device on a port's row: the port's choices go back
+        /// to the defaults, as Reset to Defaults puts them
+        /// (<see cref="BlissBoxPortData.KeepAdapterPictures"/>). The copy of
+        /// the adapter's own picture stays, since it is the adapter's and not
+        /// a setting, so Adapter mode can still write it back when the port
+        /// returns. True when the port had an entry.</summary>
+        internal static bool Forget(ViewModels.SettingsViewModel settings, Guid device)
+        {
+            string key = device.ToString("D");
+            var port = settings.BlissBoxPorts.Find(p => string.Equals(p.Device, key, StringComparison.OrdinalIgnoreCase));
+            if (port == null) return false;
+            port.ScreenMode = DreamcastScreenMode.Adapter;
+            port.Picture = null;
+            port.NativeArrows = false;
+            if (port.IsEmpty) settings.BlissBoxPorts.Remove(port);
+            return true;
+        }
+
         /// <summary>Drops a port's choices: its player number changed, so it
         /// returns as a new device and they would never be read again.</summary>
         public void Remove(Guid device)

@@ -422,15 +422,35 @@ namespace PadForge.Tests
             Assert.True(cell.Engaged);
         }
 
+        // ── The Rumble source family ──
+
+        /// <summary>The slot's inbound pack, which the Rumble source family
+        /// and the shaker lane read, takes the haptics on its two body voices
+        /// as a max, and leaves the game's trigger voices alone.</summary>
+        [Fact]
+        public void TheInboundPack_TakesTheHapticsOnTheBodyVoices()
+        {
+            long now = Environment.TickCount64;
+            long game = LfeOutputState.Pack(50000, 10000, 7, 9);
+            Assert.Equal(0L, _im.WithPersonaHaptics(0, 0L, now));
+            Assert.Equal(game, _im.WithPersonaHaptics(0, game, now));
+
+            Feed(0, LfeOutputState.Pack(40000, 20000, 1234, 4321));
+            Assert.Equal(LfeOutputState.Pack(40000, 20000, 0, 0), _im.WithPersonaHaptics(0, 0L, now));
+            Assert.Equal(LfeOutputState.Pack(50000, 20000, 7, 9), _im.WithPersonaHaptics(0, game, now));
+            // Another slot's feed reaches nothing here.
+            Assert.Equal(0L, _im.WithPersonaHaptics(1, 0L, now));
+        }
+
         // ── Every reader of a slot's rumble takes the persona layer ──
 
         /// <summary>The sibling set (discussion #522): a game's haptics are
         /// its rumble on a DualSense persona slot, so every read of a slot's
-        /// vibration state is followed by the persona layer. A new reader that
-        /// skips it fails here: route it through
-        /// <c>InputManager.WithPersonaHaptics</c> (per device) or
-        /// <c>PersonaHapticLevel</c> (per slot), or list it below with the
-        /// reason it does not read rumble.</summary>
+        /// vibration state, and every read of its inbound pack, is followed by
+        /// the persona layer. A new reader that skips it fails here: route it
+        /// through <c>InputManager.WithPersonaHaptics</c> (per device, or per
+        /// slot on a pack) or <c>PersonaHapticLevel</c> (per slot), or list it
+        /// below with the reason it does not read rumble.</summary>
         [Fact]
         public void EveryReaderOfASlotsRumble_TakesThePersonaHaptics()
         {
@@ -443,9 +463,11 @@ namespace PadForge.Tests
             };
             var persona = new Regex(@"WithPersonaHaptics\(|PersonaHapticLevel\(|SonyPadTakesPersonaHaptics\(");
             var read = new Regex(@"=\s*(_inputManager\.)?VibrationStates\[[^\]]+\];");
+            // The inbound pack's readers, its definition aside.
+            var packRead = new Regex(@"(?<!public long )GetInboundRumblePack\(");
             string app = Path.Combine(BassShakerPersonaHapticsTests.RepoRoot(), "PadForge.App");
             var missing = new List<string>();
-            int readers = 0;
+            int readers = 0, packReaders = 0;
             foreach (var file in Directory.EnumerateFiles(app, "*.cs", SearchOption.AllDirectories))
             {
                 if (file.Contains(Path.DirectorySeparatorChar + "obj" + Path.DirectorySeparatorChar)
@@ -454,15 +476,26 @@ namespace PadForge.Tests
                 var lines = File.ReadAllLines(file);
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (!read.IsMatch(lines[i])) continue;
-                    if (exempt.ContainsKey(rel + "|" + lines[i].Trim())) continue;
-                    readers++;
+                    Regex kind;
+                    if (read.IsMatch(lines[i]))
+                    {
+                        if (exempt.ContainsKey(rel + "|" + lines[i].Trim())) continue;
+                        kind = read;
+                        readers++;
+                    }
+                    else if (packRead.IsMatch(lines[i]))
+                    {
+                        kind = packRead;
+                        packReaders++;
+                    }
+                    else continue;
                     // The layer follows within 40 lines and before the next
-                    // read, so one reader's call cannot stand in for another's.
+                    // read of the same kind, so one reader's call cannot stand
+                    // in for another's.
                     bool found = false;
                     for (int j = i; j < Math.Min(lines.Length, i + 40) && !found; j++)
                     {
-                        if (j > i && read.IsMatch(lines[j])) break;
+                        if (j > i && kind.IsMatch(lines[j])) break;
                         found = persona.IsMatch(lines[j]);
                     }
                     if (!found) missing.Add($"{rel}:{i + 1}: {lines[i].Trim()}");
@@ -473,6 +506,8 @@ namespace PadForge.Tests
             // mirror gate, the UI raw bar and the dispatcher's three providers
             // (two of them with a row-less fallback).
             Assert.Equal(11, readers);
+            // The shaker lane and the Rumble source family's provider.
+            Assert.Equal(2, packReaders);
         }
 
         [Fact]
@@ -480,7 +515,7 @@ namespace PadForge.Tests
         {
             string step2 = Source("Common", "Input", "InputManager.Step2.UpdateInputStates.cs");
             int aff = step2.IndexOf("private void ApplyForceFeedback(UserDevice ud)", StringComparison.Ordinal);
-            int sonySkip = step2.IndexOf("|| ud.ProdId == 0x0BA0)) // DS4 v2", aff, StringComparison.Ordinal);
+            int sonySkip = step2.IndexOf("|| ud.ProdId == 0x0BA0)) // DS4 wireless adapter", aff, StringComparison.Ordinal);
             int layer = step2.IndexOf("raw = WithPersonaHaptics(padIndex, ud.InstanceGuid, raw, _personaHapticScratch, hapticNow);", aff, StringComparison.Ordinal);
             int macro = step2.IndexOf("var withMacro = ResolveUserRumble(padIndex, devicePs, raw, _macroRumbleScratch,", aff, StringComparison.Ordinal);
             Assert.True(aff > 0 && sonySkip > aff && layer > sonySkip && macro > layer,
