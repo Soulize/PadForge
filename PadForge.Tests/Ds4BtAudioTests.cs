@@ -475,6 +475,30 @@ namespace PadForge.Tests
         public void BluetoothDs4_IsRecognizedByModelAndTransport(int pid, string path, bool expected)
             => Assert.Equal(expected, AudioPassthroughService.IsBluetoothDs4(0x054C, (ushort)pid, path));
 
+        // A wired CUH-ZCT2 presents a USB headset, 2-channel 32 kHz out and a
+        // 16 kHz microphone (the CUH-ZCT2E descriptor dump in
+        // DJm00n/ControllersInfo, HIDMaestro's dualshock-4-v2-composite
+        // profile). The sink plays to it as it plays to Sony's adapter. Until
+        // 5.2.0 every wired DualShock 4 but the adapter was skipped.
+        [Theory]
+        [InlineData(0x05C4, true, true)]
+        [InlineData(0x09CC, true, true)]
+        [InlineData(0x05C4, false, false)] // the first model has no USB audio
+        [InlineData(0x09CC, false, true)]
+        [InlineData(0x0BA0, false, true)]  // Sony's USB adapter
+        public void Ds4HasAudio_FollowsTheModelOnUsb(int pid, bool bluetooth, bool expected)
+            => Assert.Equal(expected, AudioPassthroughService.Ds4HasAudio((ushort)pid, bluetooth));
+
+        [Fact]
+        public void EveryDs4AudioGate_AsksDs4HasAudio()
+        {
+            string service = RepoFile("PadForge.App", "Common", "Input", "AudioPassthroughService.cs");
+            Assert.DoesNotContain("!= 0x0BA0) continue", service);
+            Assert.Equal(3, Count(service, "if (isDs4 && !Ds4HasAudio((ushort)ud.ProdId, isBt)) continue;"));
+            string pad = RepoFile("PadForge.App", "ViewModels", "PadViewModel.cs");
+            Assert.Equal(2, Count(pad, "AudioPassthroughService.Ds4HasAudio((ushort)ud.ProdId,"));
+        }
+
         private static string RepoPath(params string[] parts)
         {
             var dir = new DirectoryInfo(AppContext.BaseDirectory);

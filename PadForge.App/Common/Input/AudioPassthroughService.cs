@@ -57,6 +57,17 @@ namespace PadForge.Common.Input
         private static readonly ushort[] Ds5Pids = { 0x0CE6, 0x0DF2 };
         private static readonly ushort[] Ds4Pids = { 0x05C4, 0x09CC, 0x0BA0 };
 
+        /// <summary>Whether a DualShock 4 has audio on the link it is on.
+        /// Bluetooth always does (SBC over report 0x17). On USB the second
+        /// model (0x09CC, CUH-ZCT2) and Sony's wireless adapter (0x0BA0)
+        /// present a USB headset, 2-channel 32 kHz out and a 1-channel
+        /// 16 kHz microphone (the CUH-ZCT2E descriptor dump in
+        /// DJm00n/ControllersInfo, HIDMaestro's dualshock-4-v2-composite
+        /// profile), and the USB sink plays to that endpoint as it does to a
+        /// DualSense's. The first model (0x05C4) has no USB audio.</summary>
+        internal static bool Ds4HasAudio(ushort productId, bool isBluetooth)
+            => isBluetooth || productId is 0x09CC or 0x0BA0;
+
         private static readonly object _lock = new();
 
         // ─────────────────────────────────────────────
@@ -1215,9 +1226,8 @@ namespace PadForge.Common.Input
                 if ((ud.DevicePath ?? "").StartsWith("peer://", StringComparison.Ordinal)) { anyEligible = true; break; }
                 bool isBt = (ud.DevicePath ?? "").IndexOf("{00001124", StringComparison.OrdinalIgnoreCase) >= 0;
                 bool isDs4 = Ds4Pids.Contains((ushort)ud.ProdId);
-                // Wired DS4 has no audio interface (BT-only audio); the USB
-                // wireless adapter (0x0BA0) does. See ReconcileOnWorker.
-                if (isDs4 && !isBt && (ushort)ud.ProdId != 0x0BA0) continue;
+                // A wired first-model DS4 has no audio. See ReconcileOnWorker.
+                if (isDs4 && !Ds4HasAudio((ushort)ud.ProdId, isBt)) continue;
                 anyEligible = true;
                 break;
             }
@@ -3083,13 +3093,11 @@ namespace PadForge.Common.Input
                             lock (_dualDropLock) _dualDropDoneForPath.Remove(guid);
                         }
                     bool isDs4 = Ds4Pids.Contains((ushort)ud.ProdId);
-                    // DS4 audio is BLUETOOTH-ONLY: the wired DS4 exposes no
-                    // USB audio interface at all (ds4mac docs §3.1 — HID
-                    // endpoints only, no UAC descriptors). BT DS4 streams SBC
-                    // over report 0x17. Exception: Sony's USB wireless
-                    // adapter (PID 0x0BA0) tunnels the radio link and exposes
-                    // real UAC endpoints, so it keeps the USB container path.
-                    if (isDs4 && !isBt && (ushort)ud.ProdId != 0x0BA0) continue;
+                    // A Bluetooth DS4 streams SBC over report 0x17. On USB the
+                    // second model and Sony's wireless adapter present a USB
+                    // headset and take the USB container path, and the first
+                    // model has no audio (Ds4HasAudio).
+                    if (isDs4 && !Ds4HasAudio((ushort)ud.ProdId, isBt)) continue;
                     // A sink exists while the device's mirror toggle is on,
                     // the slot's macros have asked for controller routing,
                     // or the slot's VC is a composite persona feeding audio.
@@ -3114,7 +3122,7 @@ namespace PadForge.Common.Input
                 if ((ud.DevicePath ?? "").StartsWith("peer://", StringComparison.Ordinal)) continue;
                 bool isBt = ud.DevicePath.IndexOf("{00001124", StringComparison.OrdinalIgnoreCase) >= 0;
                 bool isDs4 = Ds4Pids.Contains((ushort)ud.ProdId);
-                if (isDs4 && !isBt && (ushort)ud.ProdId != 0x0BA0) continue;
+                if (isDs4 && !Ds4HasAudio((ushort)ud.ProdId, isBt)) continue;
                 desired.Add((255, kv.Key, ud.DevicePath, isBt, isDs4, false, "", true, false));
             }
 
@@ -3215,9 +3223,9 @@ namespace PadForge.Common.Input
             // requires a persona lane, which is what tied Follow Headphone
             // Jack to owning a virtual DualSense. The DualSense on either
             // transport, and the DualShock 4 on Bluetooth (#528), each with its
-            // own status-byte shape. A wired DualShock 4 builds no sink (the
-            // reconcile above skips it), and Sony's USB adapter (0x0BA0) keeps
-            // its Windows endpoint's routing.
+            // own status-byte shape. A DualShock 4 on USB, the second model or
+            // Sony's adapter (0x0BA0), keeps its Windows endpoint's routing,
+            // and a wired first model builds no sink.
             var jackWanted = new HashSet<Guid>();
             lock (_lock)
             {
