@@ -51,6 +51,21 @@ PadForge is for sim racers running wheels in games that only understand Xbox con
 </p>
 
 <details>
+<summary><b>New in 5.2.0:</b> driving games' telemetry as controller inputs, DSX game mods with no DSX installed, the Novint Falcon as a force-feedback stick, keyboard screens, and DualSense haptics on every rumble pad</summary>
+
+- Driving games send PadForge their speed, RPM, gear, pedals and steering: Forza, F1, the Codemasters rally games, EA SPORTS WRC, BeamNG.drive, Live for Speed, Project CARS 2, Automobilista 2 and the truck simulators over the network, and Assetto Corsa and Assetto Corsa Competizione through shared memory. Turn on Listen for Game Telemetry on the Dashboard, and the values appear as a Game Telemetry row on the Devices page, ready to map like any controller's inputs, start macros, or light a DualSense's adaptive triggers. Custom Formats describes a game PadForge does not know, field by field, and Forward to Port passes every packet on to a program such as SimHub.
+- Game mods made for DSX now send to PadForge, with no DSX installed. These fan mods give the Grand Theft Auto games, Red Dead Redemption 2, Skyrim, Fallout 4 and others adaptive triggers. Turn on Accept DSX Game Mods, and their trigger effects, lightbar, player lights and mute light play on the PlayStation controllers on your virtual controllers.
+- A Novint Falcon runs through Force Dimension's SDK. Its handle is a stick and its grip's four buttons are buttons, and a game's rumble and force feedback push back on the handle, with a self-centering Joystick feel or an Aim feel that moves like a mouse. No Falcon has run against PadForge yet.
+- The screens on Logitech's GamePanel devices, among them the G15, G19, G510 and G13, on the Mad Catz S.T.R.I.K.E. 7 and on a phone running Logitech Arx Control show the profile, a clock, play time, a stopwatch, a picture or a PlayStation controller's lightbar color. The keys beside each screen map as buttons. None of these screens has run against PadForge yet.
+- A game that plays a DualSense's haptics as audio now rumbles every rumble pad on that virtual controller, and Bass Shakers follow the haptics too ([#522](https://github.com/hifihedgehog/PadForge/discussions/522)).
+- A Bluetooth DualShock 4 plays sound through its headphone jack, and its headset microphone works ([#528](https://github.com/hifihedgehog/PadForge/issues/528)). Steering Angle Rumble can play on one motor ([#510](https://github.com/hifihedgehog/PadForge/issues/510)), and axis macros set a virtual DualShock 3's button pressure ([#530](https://github.com/hifihedgehog/PadForge/issues/530)).
+- HIDMaestro 2.1.0 keeps virtual Xbox 360 controllers working through sleep, delivers every frame once and in order, and holds up when every processor is busy. In HIDMaestro's own test under that load, a virtual DualShock 4's slowest frame took 1.4 ms instead of 360.
+- Fixes. Fanatec wheel commands go out on report 0x01, the report Fanatec bases read. They went out on report 0x00, so a CSL DD felt no force feedback, and no Fanatec base has run the fix yet. PadForge no longer rewrites PadForge.xml every 30 seconds while nothing changes. The web controller starts once another program frees its port, and a wheel's RPM shift lights follow F1 22 and F1 25.
+- Bundled: HIDMaestro 2.1.0 with 337 device profiles, and BthPS3 3.2.1.
+
+</details>
+
+<details>
 <summary><b>New in 5.1.0:</b> HIDMaestro 2.0 with faster virtual controllers, an interface in 109 languages that works with screen readers such as NVDA, mice and keyboards that light up with the game, and haptic mice that rumble with it</summary>
 
 - HIDMaestro 2.0, the driver behind PadForge's virtual controllers, is rebuilt around data. Each of its 337 device profiles now carries everything specific to its device, from the layout of its input to a PlayStation pad's calibration replies and a Switch Pro's handshake, and the driver holds no code written for any single device. A new controller of a known kind needs only a new file. It is faster too. HIDMaestro timed 2.0 against its last 1.x release: a virtual DualShock 4 appears in 217 ms instead of 467, an Xbox 360 controller in 358 ms instead of 674, and a DualSense's input reaches the game in 48 microseconds instead of 66. A PlayStation controller that Steam holds open no longer stays broken until a reboot after PadForge removes it.
@@ -277,6 +292,12 @@ PadForge translates a PS5 DualSense into the Xbox pad a Steam game expects. A Lo
 
 One mapping row can read from any number of physical inputs across any number of physical devices. Six combine modes (Strongest, Combined, Average, Either, Both, Only One) plus a drag-and-drop custom formula editor. Cross-device chords so a button on the wheel and a button on the shifter trigger one virtual press. A Primary Mode dropdown sets how the main source reads: Direct, Incremental, Ramp, Toggle, Rapid Trigger, or Invert On Hold. Ramp builds a stick axis from two keyboard keys. The Up key drives toward +1 and the Down key toward -1, each over an Attack time. Release ramps back to center over a Release time when Autocenter is on, or holds where you left it when off. A Reverse multiplier sets how fast it returns when you press the opposite key.
 
+### Your racing game's speed, RPM and pedals, as inputs.
+
+Driving games send PadForge their telemetry: Forza, F1, the Codemasters rally games, EA SPORTS WRC, BeamNG.drive, Live for Speed, Project CARS 2, Automobilista 2 and the truck simulators over the network, and Assetto Corsa and Assetto Corsa Competizione through shared memory. Turn on Listen for Game Telemetry on the Dashboard, and a Game Telemetry row on the Devices page carries speed, RPM, throttle, brake, clutch, handbrake and steering as axes, and the gear as buttons. Map them like any controller's inputs, start a macro when the RPM passes a mark, or play an adaptive trigger effect on a DualSense near the limiter. Custom Formats describes a game PadForge does not know, field by field, and Forward to Port hands every packet on to a program such as SimHub.
+
+![The Game Telemetry section on the Dashboard](screenshots/game-telemetry.jpg)
+
 ### Squeeze a digital trigger like it's analog.
 
 Stick Trim is a combine mode on the mapping row. Hold a digital trigger to arm it, then a stick sets how hard it presses, from a feather to full. Each row gets its own deadzone and ramp rate, and you choose whether that level snaps back to full the moment you let go. A keyboard bumper becomes a trigger you can modulate.
@@ -404,6 +425,18 @@ Seven adaptive trigger modes with a live preview that draws the resistance curve
 | ![Adaptive Triggers tab](screenshots/adaptive-triggers.jpg) | ![Lighting tab](screenshots/lighting.jpg) |
 |:---:|:---:|
 
+### Game mods made for DSX, with no DSX.
+
+Fan mods give the Grand Theft Auto games, Red Dead Redemption 2, Skyrim, Fallout 4 and others adaptive triggers, and they send their effects to a program named DSX. PadForge takes DSX's place. Turn on Accept DSX Game Mods, and a mod's trigger effects, lightbar, player lights and mute light play on the PlayStation controllers on your virtual controllers, with no DSX installed. Mods written for DualSenseY, DSZ or the DS4Windows fork that speaks the same protocol work too.
+
+![The Game Mods section on the Dashboard](screenshots/game-mods.jpg)
+
+### A Novint Falcon that pushes back.
+
+The Novint Falcon's handle moves in three dimensions and pushes back with three motors. Through Force Dimension's SDK, PadForge reads the handle as a stick and the grip's four buttons as buttons, and puts a game's rumble and force feedback on the handle as force, about a thousand times a second. Pick the Joystick feel for a self-centering stick or the Aim feel to aim like a mouse, on the Force Feedback tab.
+
+![The Novint Falcon card on the Force Feedback tab](screenshots/novint-falcon.jpg)
+
 ### Turn the glowing Xbox button up or down.
 
 PadForge sets the Guide button LED brightness on an Xbox One, Elite, or Series pad over USB, the home LED on the 2015 Steam Controller, and the HOME button LED on a Switch Pro Controller or right Joy-Con on any connection. Pick a fixed level or let it track the battery, so the button dims as the charge drops. A macro action changes it mid-game.
@@ -418,7 +451,7 @@ Haptic mice rumble the way a gamepad does. Assign a Logitech MX Master 4, or a S
 
 ### Sound from the speaker in your hands.
 
-The DualSense and DualShock 4 have a speaker built into the pad, and PadForge can drive it. Mirror a Windows audio output to the pad, or send a slot's macro sounds straight to it. The DualSense plays over USB or Bluetooth. The DualShock 4 plays over Bluetooth. Each speaker-capable pad gets its own per-slot Audio tab, with a source picker and a master volume. Controllers with haptic actuators instead of a speaker (Joy-Con, Switch Pro, the Steam Controller, the Steam Deck, and the Steam Controller 2026) play the same macro sounds as a vibrating tone, so beeps and short cues come through the grip. On a combined Joy-Con pair the tone follows the motor the game drives, left motor through the left coil and right through the right. A Wii Remote plays them through its own speaker.
+The DualSense and DualShock 4 have a speaker built into the pad, and PadForge can drive it. Mirror a Windows audio output to the pad, or send a slot's macro sounds straight to it. The DualSense plays over USB or Bluetooth. The DualShock 4 plays over Bluetooth, through its speaker or its headphone jack, and its headset microphone works there too. Each speaker-capable pad gets its own per-slot Audio tab, with a source picker and a master volume. Controllers with haptic actuators instead of a speaker (Joy-Con, Switch Pro, the Steam Controller, the Steam Deck, and the Steam Controller 2026) play the same macro sounds as a vibrating tone, so beeps and short cues come through the grip. On a combined Joy-Con pair the tone follows the motor the game drives, left motor through the left coil and right through the right. A Wii Remote plays them through its own speaker.
 
 The DualSense headset jack gets a processing chain of its own: bs2b crossfeed with the classic presets, Jan Meier, and a custom cutoff and feed, a graphic parametric EQ you drag into shape or load from an AutoEq profile for your exact headphones, and a limiter so a boosted band never clips the pad's encoder. Follow Headphone Jack switches the pad's output the moment you plug in, with or without a virtual DualSense on the slot.
 
@@ -429,6 +462,10 @@ The DualSense headset jack gets a processing chain of its own: bs2b crossfeed wi
 ### Native haptics on the 2026 Steam Controller.
 
 With a DualSense persona on the slot, a Steam Controller 2026 on USB or its dongle plays the persona's authored haptic track as PCM on its own actuators, instead of reducing it to a single tone. Sound macros, the system-audio mirror, and touchpad swipe ticks ride the same stream. An actuator low-pass cutoff, 250 Hz by default, keeps the pads vibrating rather than audibly playing the sound. Over Bluetooth the pad stays on the tone lane.
+
+### DualSense haptics on every rumble pad.
+
+Some games play a DualSense's haptics as audio, which a plain rumble pad never felt. PadForge now turns that haptic track into rumble for every rumble pad on the virtual controller, and Bass Shakers follow it too. A DualSense that plays the track itself keeps it.
 
 ---
 
@@ -574,6 +611,12 @@ Turn on Disconnect Bluetooth When Plugged In over USB and a controller that repo
 
 Turn on Read Bliss-Box Adapters and each port of a Bliss-Box adapter names the console controller plugged into it and maps it the way SDL maps that console's pad. A DualShock 2's pressure-sensitive buttons read as analog, rumble reaches the pads that have motors, a Dreamcast pad's VMU shows your pictures, and an N64 Controller Pak backs up to a file and restores from one.
 
+### The screen on your keyboard, and the keys beside it.
+
+Logitech's GamePanel devices, the G15, G19, G510 and G13 among them, the Mad Catz S.T.R.I.K.E. 7, and a phone running Logitech Arx Control each get a row of their own. The screen shows the profile, a clock, play time, a stopwatch, a picture, or a PlayStation controller's lightbar color, and the keys beside it map as buttons. A macro can play pictures on a screen, switch its mode and run its stopwatch.
+
+![The Keyboard Screens card in Settings](screenshots/settings-keyboard-screens.jpg)
+
 ### 1,110 devices by name, and the ones Windows can't read.
 
 PadForge's SDL3 build adds 289 pads from the community SDL_GameControllerDB to the pads SDL knows on its own, and it reads controllers Windows gives no usable input: Bluetooth LE pads, the iCade, serial I-Force wheels with their force feedback, DJI RC remotes, clone Xbox 360 receivers, the Ring-Con, the PS Move Sharp Shooter and Racing Wheel, Namco USIO arcade boards and more. The [Supported Devices](https://padforge.org/docs/devices/supported/) page names every one.
@@ -683,7 +726,11 @@ Floor and ceiling per trigger. Anti-deadzone. Sensitivity curves. Live value bar
 
 ### Force feedback and rumble
 ![Force Feedback](screenshots/force-feedback.jpg)
-Per-motor strength, overall gain, motor swap. Live motor activity bars. Audio Bass Rumble captures system audio, isolates bass through a 48 dB/octave filter, and pushes it to the rumble motors. Music feels physical even when the game is silent.
+Per-motor strength, overall gain, motor swap. Live motor activity bars. Audio Rumble captures system audio, isolates bass through a 48 dB/octave filter, and pushes it to the rumble motors. Music feels physical even when the game is silent.
+
+### Novint Falcon
+![The Novint Falcon section on the Force Feedback tab](screenshots/novint-falcon.jpg)
+How a Falcon feels on this slot: the Joystick or Aim feel, the centering spring, the kick and shake a game's rumble plays, gravity compensation and the force limit.
 
 ### Trigger routing
 ![Trigger Routing](screenshots/trigger-routing.jpg)
@@ -692,6 +739,10 @@ Send the main rumble motors into the trigger motors, one trigger at a time. Dupl
 ### Wheel
 ![Wheel](screenshots/wheel.jpg)
 Native force feedback for Logitech, Fanatec, and Thrustmaster wheels: constant force plus spring, damper, and friction from the game. Set rotation range in degrees, auto-center strength, and the RPM shift LEDs. Other force-feedback wheels still work through the generic path.
+
+### Steering Angle Rumble
+![The Steering Angle Rumble card on the Force Feedback tab](screenshots/steering-angle-rumble.jpg)
+Rumble that grows as a virtual stick axis leaves center, split by direction across the two motors or kept on one.
 
 ### DualSense Adaptive Triggers
 ![Adaptive Triggers](screenshots/adaptive-triggers.jpg)
@@ -857,6 +908,18 @@ Pair your PCs and share their controllers every way. A wheel on one drives a gam
 ![The Head Tracking section on the Dashboard](screenshots/dashboard-head-tracking.jpg)
 OpenTrack over UDP, the FreeTrack 2.0 shared memory, and a VR headset through an OpenXR runtime, as one six-axis Head Tracker device. Set the UDP port, the rotation range in degrees, and the translation range in centimeters, and pin any single axis to its own range.
 
+### Game Mods
+![The Game Mods section on the Dashboard](screenshots/game-mods.jpg)
+Accept DSX Game Mods, the port mods send to, the DSX.exe stand-in some mods look for, and the line that says the server is listening.
+
+### Game Telemetry
+![The Game Telemetry section on the Dashboard](screenshots/game-telemetry.jpg)
+Listen for Game Telemetry, the game, the port, Forward to Port and Full Speed, with the line that waits for a game.
+
+### Custom telemetry formats
+![The Custom Telemetry Formats window](screenshots/telemetry-custom-formats.jpg)
+A game PadForge does not know, described field by field: what each value reads into, its offset, its type and its scale.
+
 ### VR controller input
 With OpenXR headset input on, each hand controller is its own device row: six pose axes in the same order as the head's, named Controller rather than Head, plus the thumbstick, trigger, grip, and four buttons. PadForge suggests bindings for Oculus Touch, Valve Index, and the Khronos simple profile, and the runtime picks the match. Not to be confused with a VR virtual controller slot, which is the opposite direction.
 
@@ -878,6 +941,14 @@ Language (109 languages, switched live with no restart, and laid out right to le
 ### Input Engine
 ![The Input Engine card in Settings](screenshots/settings-input-engine.jpg)
 Read Analog Keyboards and Read Bliss-Box Adapters, each with a line that says what it found.
+
+### Keyboard screens
+![The Keyboard Screens card in Settings](screenshots/settings-keyboard-screens.jpg)
+Drive Keyboard Screens, the lines that say what a PC without a screen is missing, and the S.T.R.I.K.E. 7 library's buttons.
+
+### Novint Falcon library
+![The Novint Falcon card in Settings](screenshots/settings-novint-falcon.jpg)
+Drive Novint Falcon, the line that says which Force Dimension library loaded, and the buttons that choose one or fetch it.
 
 ### Updates
 ![Updates](screenshots/settings-updates.jpg)
