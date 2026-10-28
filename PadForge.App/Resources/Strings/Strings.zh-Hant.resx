@@ -2912,6 +2912,7 @@
   <data name="Pad_ResetToneLimit" xml:space="preserve"><value>重設音調上限</value></data>
   <data name="Pad_Audio_Mirror_Tooltip" xml:space="preserve"><value>將系統預設輸出播放的內容，同步複製到此控制器的內建喇叭。USB 和藍牙都適用。</value></data>
   <data name="Pad_Audio_NoSpeaker" xml:space="preserve"><value>所選裝置沒有內建喇叭。此手把的巨集聲音會在系統預設輸出上播放。</value></data>
+  <data name="Pad_Audio_HeadsetOnly" xml:space="preserve"><value>透過 USB 連接時，此控制器只會從耳機插孔播放聲音。耳機插孔未插入任何裝置時，巨集聲音會略過此控制器，改在系統預設輸出或此手把上的另一個控制器播放。</value></data>
   <data name="Pad_Audio_Reset_All" xml:space="preserve"><value>重設聲音輸出</value></data>
   <data name="About_DsTester" xml:space="preserve"><value>dualsense-tester</value></data>
   <data name="About_DsTesterDesc" xml:space="preserve"><value>Xuezhou Dai(daidr)的瀏覽器版 DualSense 測試套件：PadForge 從虛擬手把轉送到實體手把的 Sony 功能報告 CRC 訊框格式和韌體測試指令，即以此為參考。MIT。</value></data>
@@ -4307,7 +4308,7 @@
   <data name="About_GameModRefs" xml:space="preserve"><value>DSX 遊戲模組參考資料</value></data>
   <data name="About_GameModRefsDesc" xml:space="preserve"><value>遊戲模組所用的 UDP 指令、回覆、連接埠檔案和扳機效果位元組，讀自 Paliverse 官方的 DSX v3.1 與 DualSenseX v2 模組範例、DualSenseY 的兩個版本和 DualSense4Rockstar(未公開授權)、DSZ 和 pydualsense(MIT)，以及 Wujek Dualsense API 和 hbashton 的 DS4Windows 分支中的 DSX 伺服器(GPL-3.0)。僅作為文件參考，未隨附任何程式碼。</value></data>
   <data name="About_Ds4HeadsetRefs" xml:space="preserve"><value>DualShock 4 耳麥參考資料</value></data>
-  <data name="About_Ds4HeadsetRefsDesc" xml:space="preserve"><value>DualShock 4 藍牙音訊所用的耳機與喇叭路由、音量上限、麥克風封包格式和報告模式，讀自 DS4-Sound-Link(MIT)、ds4mac(GPL-2.0)、ds4drv(MIT)和 hbashton 的 DS4Windows 分支(GPL-3.0)，SBC 解碼器的合成視窗則與 Google 的 libsbc(Apache-2.0)比對。僅作為文件參考，未隨附任何程式碼。</value></data>
+  <data name="About_Ds4HeadsetRefsDesc" xml:space="preserve"><value>DualShock 4 藍牙音訊所用的耳機與喇叭路由、音量上限、麥克風封包格式和報告模式，讀自 DS4-Sound-Link(MIT)、ds4mac(GPL-2.0)、ds4drv(MIT)和 hbashton 的 DS4Windows 分支(GPL-3.0)，SBC 解碼器的合成視窗則與 Google 的 libsbc(Apache-2.0)比對，第二代機型的 USB 耳麥則讀自 DJm00n 的 ControllersInfo 描述元傾印檔(未公開授權)。僅作為文件參考，未隨附任何程式碼。</value></data>
   <data name="About_KeyboardScreenRefs" xml:space="preserve"><value>鍵盤螢幕參考資料</value></data>
   <data name="About_KeyboardScreenRefsDesc" xml:space="preserve"><value>鍵盤螢幕所用的程式庫、畫面和按鍵，讀自 Logitech 的 LCD 與 Arx Control SDK 以及 Mad Catz 的 S.T.R.I.K.E. 7 SDK，並與 logitech-lcd(MIT 或 Apache-2.0)、dcspy(MIT)、foo_logitech_lcd(LGPL-2.1)、LogitechStuff 和 ArxWidgetManager(未公開授權)、Linux 的 hid-lg-g15 驅動程式(GPL-2.0-or-later)、libg15、G15Interface 和 lcdproc(GPL-2.0)、gnome15(GPL-3.0)及 G19USB(Apache-2.0)交叉比對。PadForge 會載入 Logitech Gaming Software 的程式庫，以及您下載或選擇的 Strike7API.dll，未隨附其中任何程式碼。</value></data>
   <data name="About_FalconRefs" xml:space="preserve"><value>Novint Falcon 參考資料</value></data>

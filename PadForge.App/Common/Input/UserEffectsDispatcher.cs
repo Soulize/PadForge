@@ -2931,8 +2931,10 @@ namespace PadForge.Common.Input
                     // carries the route's volumes instead (the jack routes mute
                     // the speaker, Speaker Only mutes the jack), asserted on the
                     // DualSense rule: the claim burst, a level change, a route
-                    // change. Wired, PadForge sends the pad no audio, and Sony's
-                    // USB adapter keeps its own.
+                    // change. On USB nothing here applies: a second-model pad
+                    // and Sony's adapter play through their own Windows audio
+                    // endpoints, whose volume Windows keeps, and a first-model
+                    // pad has no USB audio.
                     var (ds4Headphone, ds4Speaker) = Ds4BtAudio.VolumesFor(pathVal, hpVol);
                     bool assertDs4Volumes = ds4Bt && (assertAudioMute || hpChanged || pathChanged);
                     bool assertDs4Mic = ds4MicArmed && (!ds4MicWasArmed || assertAudioMute);

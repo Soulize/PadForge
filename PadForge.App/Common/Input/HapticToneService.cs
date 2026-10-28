@@ -2720,10 +2720,10 @@ namespace PadForge.Common.Input
                         (toneHz, amp) = ApplyToneFilter(s.ToneFilterMode, s.ToneLimitHz,
                             toneHz, amp, ref s.ToneLastPassHz, ref s.ToneAboveLatch);
 
-                    // On-controller sinks own their loudness (SoundMacroService
-                    // deliberately skips master-volume scaling for OnController
-                    // placements; the Sony dispatcher applies the slot volume as
-                    // the firmware volume byte per report). Apply the same slot
+                    // This sink owns its loudness (SoundMacroService leaves the
+                    // master volume out of its placements, PlacementVolume, as
+                    // it does for a DualSense, whose dispatcher applies the slot
+                    // volume as the firmware volume byte per report). Apply the same slot
                     // volume here at the sink: it reaches the Triton/Joy-Con gain
                     // and gates the pitch-only 0x8F square. Covers macro sounds,
                     // the system-audio mirror, and the Test button alike. Remote

@@ -499,6 +499,136 @@ namespace PadForge.Tests
             Assert.Equal(2, Count(pad, "AudioPassthroughService.Ds4HasAudio((ushort)ud.ProdId,"));
         }
 
+        // The wired CUH-ZCT2 ends its USB output and its microphone in a
+        // Headset terminal (0x0402, the CUH-ZCT2E dump), and HIDMaestro names
+        // its two output channels headsetLeft and headsetRight.
+        [Theory]
+        [InlineData(0x09CC, false, true)]
+        [InlineData(0x09CC, true, false)]  // Bluetooth reaches the speaker
+        [InlineData(0x05C4, false, false)] // no USB audio at all
+        [InlineData(0x05C4, true, false)]
+        [InlineData(0x0BA0, false, false)] // Sony's adapter keeps its routing
+        public void Ds4HeadsetOnly_IsTheWiredSecondModel(int pid, bool bluetooth, bool expected)
+            => Assert.Equal(expected, AudioPassthroughService.Ds4HeadsetOnly((ushort)pid, bluetooth));
+
+        [Fact]
+        public void MacroSounds_SkipAHeadsetOnlyPadUntilItsJackReportsHeadphones()
+        {
+            var states = (ConcurrentDictionary<Guid, bool>)typeof(AudioPassthroughService)
+                .GetField("s_padJackState", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
+            Guid pad = Guid.NewGuid();
+            try
+            {
+                Assert.True(AudioPassthroughService.TakesMacroSounds(false, pad));
+                Assert.False(AudioPassthroughService.TakesMacroSounds(true, pad)); // never read
+                AudioPassthroughService.NoteHeadphoneJack(pad, false);
+                Assert.False(AudioPassthroughService.TakesMacroSounds(true, pad));
+                Assert.True(AudioPassthroughService.TakesMacroSounds(false, pad));
+                AudioPassthroughService.NoteHeadphoneJack(pad, true);
+                Assert.True(AudioPassthroughService.TakesMacroSounds(true, pad));
+            }
+            finally { states.TryRemove(pad, out _); }
+        }
+
+        [Fact]
+        public void MacroRouting_AsksTakesMacroSounds_AndWatchesAWiredSecondModel()
+        {
+            string service = RepoFile("PadForge.App", "Common", "Input", "AudioPassthroughService.cs");
+            Assert.Contains("if (isDs4 && !TakesMacroSounds(Ds4HeadsetOnly((ushort)ud.ProdId, isBt), padGuid)) continue;", service);
+            Assert.Contains("(deviceFilter == null ? TakesMacroSounds(s) : s.DeviceGuid == deviceFilter.Value)", service);
+            Assert.Contains("if (SinkAlive(s) && TakesMacroSounds(s) && (uint)s.Slot < MaxPads) routed[s.Slot] = true;", service);
+            Assert.Equal(2, Count(service, "isDs4 && Ds4HeadsetOnly((ushort)ud.ProdId, isBt)"));
+            Assert.Contains("if (d.IsPeer || (d.IsDs4 && !d.IsBt && !d.HeadsetOnly)) continue;", service);
+            Assert.Contains("if (w.IsDs4 && !w.IsBt) _workSignal.Set();", service);
+        }
+
+        [Fact]
+        public void UsbStatus_IsByte30OfReport0x01()
+        {
+            // Bluetooth report 0x11 puts two more bytes before the same state.
+            Assert.Equal(Ds4BtAudio.StatusOffset, Ds4BtAudio.UsbStatusOffset + 2);
+            var r = new byte[64];
+            r[0] = 0x01;
+            r[30] = Ds4BtAudio.StatusHeadphones | 0x0B;
+            Assert.True(Ds4BtAudio.TryReadUsbStatus(r, 64, out byte status));
+            Assert.Equal(r[30], status);
+            Assert.True(Ds4BtAudio.TryReadUsbStatus(r, 31, out _));
+            Assert.False(Ds4BtAudio.TryReadUsbStatus(r, 30, out _));
+            r[0] = 0x11;
+            Assert.False(Ds4BtAudio.TryReadUsbStatus(r, 64, out _));
+        }
+
+        private static (Guid Mic, string MicPath, Guid BtMic, string BtMicPath, bool BtMicIsDs4) PickMics(
+            bool btDualSense, bool btDs4, params (Guid Guid, string Path, bool IsBt, bool IsDs4)[] pads)
+            => AudioPassthroughService.PickPersonaMics(pads.ToList(), btDualSense, btDs4);
+
+        [Fact]
+        public void PersonaMic_PrefersADualSenseOnEitherLink_ThenAWiredDs4_AndNeverAPeer()
+        {
+            var usbDs5 = (Guid.NewGuid(), "usb-ds5", false, false);
+            var btDs5 = (Guid.NewGuid(), "bt-ds5", true, false);
+            var usbDs4 = (Guid.NewGuid(), "usb-ds4", false, true);
+            var btDs4 = (Guid.NewGuid(), "bt-ds4", true, true);
+            var peer = (Guid.NewGuid(), "peer://host/pad", true, true);
+
+            var m = PickMics(true, true, usbDs4, usbDs5);
+            Assert.Equal((usbDs5.Item1, Guid.Empty), (m.Mic, m.BtMic));
+
+            m = PickMics(true, true, usbDs4, btDs5);
+            Assert.Equal((Guid.Empty, btDs5.Item1, false), (m.Mic, m.BtMic, m.BtMicIsDs4));
+
+            m = PickMics(false, true, usbDs4, btDs5);
+            Assert.Equal((usbDs4.Item1, "usb-ds4", Guid.Empty), (m.Mic, m.MicPath, m.BtMic));
+
+            m = PickMics(true, true, btDs4, usbDs4);
+            Assert.Equal((usbDs4.Item1, Guid.Empty), (m.Mic, m.BtMic));
+
+            m = PickMics(true, true, peer, btDs4);
+            Assert.Equal((Guid.Empty, btDs4.Item1, "bt-ds4", true), (m.Mic, m.BtMic, m.BtMicPath, m.BtMicIsDs4));
+
+            m = PickMics(true, true, peer);
+            Assert.Equal((Guid.Empty, Guid.Empty), (m.Mic, m.BtMic));
+
+            m = PickMics(true, false, btDs4);
+            Assert.Equal((Guid.Empty, Guid.Empty), (m.Mic, m.BtMic));
+        }
+
+        // Master Volume multiplies every placement whose sink drives its
+        // speaker at one level. A DualSense's firmware speaker byte and a
+        // haptic-tone sink apply it themselves.
+        [Theory]
+        [InlineData(0.8f, false, 50, 0.4f)]
+        [InlineData(0.8f, true, 50, 0.8f)]
+        [InlineData(1f, false, 100, 1f)]
+        [InlineData(1f, false, 0, 0f)]
+        [InlineData(0.5f, false, 150, 0.5f)]
+        public void PlacementVolume_CarriesMasterWhereTheSinkDoesNot(float action, bool sinkOwnsMaster, int master, float expected)
+            => Assert.Equal(expected, SoundMacroService.PlacementVolume(action, sinkOwnsMaster, master), 5);
+
+        [Fact]
+        public void MasterVolume_ReachesDs4AndWiiMacroSounds()
+        {
+            string service = RepoFile("PadForge.App", "Common", "Input", "AudioPassthroughService.cs");
+            Assert.Contains(".Select(s => (s.MacroMixer, !s.IsDs4))", service);
+            string macros = RepoFile("PadForge.App", "Common", "Input", "SoundMacroService.cs");
+            Assert.Contains("foreach (var m in WiiSpeakerService.GetSlotSinkMixers(slot, deviceFilter))\n                    targets.Add((m, false));",
+                macros.Replace("\r\n", "\n"));
+            Assert.Contains("foreach (var m in HapticToneService.GetSlotSinkMixers(slot, deviceFilter))\n                    targets.Add((m, true));",
+                macros.Replace("\r\n", "\n"));
+            Assert.Contains("targets = new List<(MixingSampleProvider Mixer, bool OwnsMaster)> { (o.Mixer, false) };", macros);
+            Assert.Equal(2, Count(macros, "PlacementVolume(a"));
+        }
+
+        [Fact]
+        public void AudioTab_ExplainsAHeadsetOnlyPad()
+        {
+            string xaml = RepoFile("PadForge.App", "Views", "PadPage.xaml");
+            Assert.Contains("Visibility=\"{Binding SelectedDeviceIsHeadsetOnly,", xaml);
+            string pad = RepoFile("PadForge.App", "ViewModels", "PadViewModel.cs");
+            Assert.Equal(3, Count(pad, "OnPropertyChanged(nameof(SelectedDeviceIsHeadsetOnly));"));
+            Assert.Equal(3, Count(pad, "OnPropertyChanged(nameof(SelectedDeviceHasNoSpeaker));"));
+        }
+
         private static string RepoPath(params string[] parts)
         {
             var dir = new DirectoryInfo(AppContext.BaseDirectory);
@@ -954,6 +1084,50 @@ namespace PadForge.Tests
                 lock (gate) watch = watches[id];
                 Assert.NotNull(watch);
                 Assert.True(SpinWait.SpinUntil(() => AudioPassthroughService.TryGetHeadphoneJack(id) == plugged, 2000));
+            }
+            finally
+            {
+                if (watch != null)
+                {
+                    watch.GetType().GetField("Stop")!.SetValue(watch, true);
+                    Assert.True(((Thread)watch.GetType().GetField("Thread")!.GetValue(watch)).Join(2000));
+                }
+                lock (gate) watches.Remove(id);
+                states.TryRemove(id, out _);
+                mics.Remove(id);
+                if (File.Exists(path)) File.Delete(path);
+            }
+        }
+
+        // A wired second model sends report 0x01, 64 bytes with no CRC, and
+        // its microphone bit stays out of the Bluetooth microphone's table.
+        [Theory]
+        [InlineData(0x20, true)]
+        [InlineData(0x6B, true)]
+        [InlineData(0x40, false)]
+        public void AWiredDs4ReportSetsTheJackFromByte30(byte status, bool plugged)
+        {
+            const BindingFlags flags = BindingFlags.Static | BindingFlags.NonPublic;
+            var type = typeof(AudioPassthroughService);
+            var ensure = type.GetMethod("EnsureJackWatch", flags)!;
+            var watches = (IDictionary)type.GetField("_jackWatch", flags)!.GetValue(null);
+            var gate = type.GetField("_jackLock", flags)!.GetValue(null);
+            var states = (ConcurrentDictionary<Guid, bool>)type.GetField("s_padJackState", flags)!.GetValue(null);
+            var mics = (IDictionary)type.GetField("_ds4Mic", flags)!.GetValue(null);
+            Guid id = Guid.NewGuid();
+            string path = Path.Combine(Path.GetTempPath(), "padforge-ds4usbjack-" + Guid.NewGuid() + ".bin");
+            var report = new byte[64];
+            report[0] = 0x01;
+            report[Ds4BtAudio.UsbStatusOffset] = status;
+            File.WriteAllBytes(path, report);
+            object watch = null;
+            try
+            {
+                ensure.Invoke(null, [id, path, false, true]);
+                lock (gate) watch = watches[id];
+                Assert.NotNull(watch);
+                Assert.True(SpinWait.SpinUntil(() => AudioPassthroughService.TryGetHeadphoneJack(id) == plugged, 2000));
+                Assert.False(mics.Contains(id));
             }
             finally
             {

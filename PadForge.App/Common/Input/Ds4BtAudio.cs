@@ -58,6 +58,12 @@ namespace PadForge.Common.Input
         public const byte StatusHeadphones = 0x20;
         public const byte StatusMicrophone = 0x40;
 
+        /// <summary>Offset of the same status byte in a USB input report 0x01,
+        /// counting the report ID: ds4drv's parse_report reads buf[30], and
+        /// SDL_hidapi_ps4.c's PS4StatePacket_t puts ucBatteryLevel 29 bytes
+        /// after the ID. The report carries no CRC.</summary>
+        public const int UsbStatusOffset = 30;
+
         private const int StateBytes = 75;
 
         /// <summary>Length of a Bluetooth input report by ID: 0x11 is 78
@@ -221,6 +227,16 @@ namespace PadForge.Common.Input
             if (!ValidateInputCrc(report, got)) return false;
             if ((report[1] & 0x80) == 0) return false;
             status = report[StatusOffset];
+            return true;
+        }
+
+        /// <summary>Reads the status byte of a USB input report 0x01:
+        /// headphones in bit 5, a microphone in bit 6.</summary>
+        public static bool TryReadUsbStatus(ReadOnlySpan<byte> report, int got, out byte status)
+        {
+            status = 0;
+            if (got <= UsbStatusOffset || report.Length <= UsbStatusOffset || report[0] != 0x01) return false;
+            status = report[UsbStatusOffset];
             return true;
         }
 

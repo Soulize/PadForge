@@ -59,14 +59,37 @@ namespace PadForge.Common.Input
 
         /// <summary>Whether a DualShock 4 has audio on the link it is on.
         /// Bluetooth always does (SBC over report 0x17). On USB the second
-        /// model (0x09CC, CUH-ZCT2) and Sony's wireless adapter (0x0BA0)
-        /// present a USB headset, 2-channel 32 kHz out and a 1-channel
-        /// 16 kHz microphone (the CUH-ZCT2E descriptor dump in
-        /// DJm00n/ControllersInfo, HIDMaestro's dualshock-4-v2-composite
-        /// profile), and the USB sink plays to that endpoint as it does to a
-        /// DualSense's. The first model (0x05C4) has no USB audio.</summary>
+        /// model (0x09CC, CUH-ZCT2) presents a USB headset, 2-channel 32 kHz
+        /// out and a 1-channel 16 kHz microphone (the CUH-ZCT2E descriptor
+        /// dump in DJm00n/ControllersInfo, HIDMaestro's
+        /// dualshock-4-v2-composite profile), and Sony's wireless adapter
+        /// (0x0BA0) presents an audio device of its own. The USB sink finds
+        /// either endpoint by its container, as it finds a DualSense's. Sony's
+        /// own release for the CUH-ZCT2 lists "USB HID Class, USB Audio Class"
+        /// as new, and the first model (0x05C4) has no USB audio.</summary>
         internal static bool Ds4HasAudio(ushort productId, bool isBluetooth)
             => isBluetooth || productId is 0x09CC or 0x0BA0;
+
+        /// <summary>Whether a DualShock 4's audio reaches only its headphone
+        /// jack on the link it is on: the second model on a cable. Its USB
+        /// output stream and its microphone both end in a Headset terminal
+        /// (0x0402, the CUH-ZCT2E descriptor dump), HIDMaestro's
+        /// dualshock-4-v2-composite profile names the two channels headsetLeft
+        /// and headsetRight, and DS4-Sound-Link's research has Windows route
+        /// the pad's USB audio to the 3.5 mm jack. Such a pad takes macro
+        /// sounds only while its jack reports headphones, so with nothing
+        /// plugged in they play on the PC, where they played before the pad had
+        /// audio. Sony's adapter keeps its routing: no dump of its descriptors
+        /// is on hand.</summary>
+        internal static bool Ds4HeadsetOnly(ushort productId, bool isBluetooth)
+            => !isBluetooth && productId == 0x09CC;
+
+        /// <summary>Whether a pad takes the slot's macro sounds: every pad
+        /// but a headset-only one whose jack has not reported headphones.</summary>
+        internal static bool TakesMacroSounds(bool headsetOnly, Guid device)
+            => !headsetOnly || TryGetHeadphoneJack(device) == true;
+
+        private static bool TakesMacroSounds(Sink s) => TakesMacroSounds(s.HeadsetOnly, s.DeviceGuid);
 
         private static readonly object _lock = new();
 
@@ -99,6 +122,9 @@ namespace PadForge.Common.Input
             public int Slot;
             public bool IsBt;
             public bool IsDs4;
+            /// <summary>A pad whose audio reaches only its headphone jack
+            /// (<see cref="Ds4HeadsetOnly"/>).</summary>
+            public bool HeadsetOnly;
             public string HidPath;
             public bool PassthroughOn;
 
@@ -647,8 +673,10 @@ namespace PadForge.Common.Input
                 var cap = _sink.Capture;
                 if (_sink.PassthroughOn && cap != null)
                 {
-                    // Full scale: master volume lives in the firmware speaker
-                    // volume byte (UserEffectsDispatcher), not the samples.
+                    // Full scale: the master volume is the macro sounds' level
+                    // (SoundMacroService.PlacementVolume), and a DualSense's
+                    // firmware speaker volume byte (UserEffectsDispatcher)
+                    // carries it for the whole speaker.
                     // While AUDIBLE, the cursor is steered by the BT thread's
                     // trim, never by jumping here (a hard jump drops audio):
                     // this branch resyncs only on a genuine stall (cursor
@@ -892,7 +920,8 @@ namespace PadForge.Common.Input
             public IntPtr Handle = IntPtr.Zero;
             public string Path;
             public bool IsBt;
-            /// <summary>A Bluetooth DualShock 4 (#528): its own report shape.</summary>
+            /// <summary>A DualShock 4, on Bluetooth (#528) or a wired second
+            /// model: its own report shape.</summary>
             public bool IsDs4;
             /// <summary>The last open failed. Keep the entry until the retry
             /// deadline so repeated reconciliation does not spin up readers.</summary>
@@ -991,7 +1020,9 @@ namespace PadForge.Common.Input
         /// and every one with controller state carries the status byte at
         /// raw offset 32, headphones in bit 5 and a microphone in bit 6
         /// (ds4drv device.py, ds4mac). Its microphone mode sends reports up
-        /// to 547 bytes, so the buffer holds the largest.</para></summary>
+        /// to 547 bytes, so the buffer holds the largest. A wired second model
+        /// sends report 0x01 with the same byte at raw offset 30
+        /// (Ds4BtAudio.UsbStatusOffset).</para></summary>
         private static void JackWatchLoop(JackWatch w, Guid pad)
         {
             IntPtr h = NativeMethods.OpenHidSync(w.Path);
@@ -1017,7 +1048,9 @@ namespace PadForge.Common.Input
                 w.Handle = h;
             }
             byte wantId = w.IsBt ? (byte)0x31 : (byte)0x01;
-            int need = w.IsDs4 ? Ds4BtAudio.ControlReportSize : (w.IsBt ? 56 : 55);
+            int need = w.IsDs4
+                ? (w.IsBt ? Ds4BtAudio.ControlReportSize : Ds4BtAudio.UsbStatusOffset + 1)
+                : (w.IsBt ? 56 : 55);
             int bitByte = w.IsBt ? 55 : 54;
             var report = new byte[w.IsDs4 ? Ds4BtAudio.MaxInputReportSize : 78];
             bool haveLast = false, last = false;
@@ -1037,9 +1070,13 @@ namespace PadForge.Common.Input
                     bool plugged;
                     if (w.IsDs4)
                     {
-                        if (!Ds4BtAudio.TryReadStatus(report, got, out byte status)) continue;
+                        byte status;
+                        if (w.IsBt ? !Ds4BtAudio.TryReadStatus(report, got, out status)
+                                   : !Ds4BtAudio.TryReadUsbStatus(report, got, out status)) continue;
                         plugged = (status & Ds4BtAudio.StatusHeadphones) != 0;
-                        NoteDs4MicPlugged(pad, (status & Ds4BtAudio.StatusMicrophone) != 0);
+                        // The microphone state arms the Bluetooth microphone
+                        // only. A wired pad's microphone is its USB endpoint.
+                        if (w.IsBt) NoteDs4MicPlugged(pad, (status & Ds4BtAudio.StatusMicrophone) != 0);
                     }
                     else
                     {
@@ -1063,6 +1100,10 @@ namespace PadForge.Common.Input
                         // The resolver + the dispatcher's change gating turn
                         // this into the route re-arm.
                         UserEffectsDispatcher.NotifySoundRoutingChanged(SlotOfDevice(pad));
+                        // A wired DualShock 4's jack decides whether its slot's
+                        // macro sounds play on the pad or on the PC, which the
+                        // worker settles (TakesMacroSounds).
+                        if (w.IsDs4 && !w.IsBt) _workSignal.Set();
                         Engine.SdlDiagLog.WriteLine("JACKWATCH plugged=" + plugged + " bt=" + w.IsBt + " ds4=" + w.IsDs4);
                     }
                 }
@@ -1213,11 +1254,14 @@ namespace PadForge.Common.Input
         /// (engine / UI). <paramref name="pendingActivation"/> is true when
         /// the slot has eligible speaker pads whose sinks aren't live yet —
         /// the caller should drop the sound (not leak it to the PC speakers);
-        /// the worker is signalled and the next trigger lands on the pad.</summary>
-        public static List<MixingSampleProvider> GetSlotSinkMixers(int slot, out bool pendingActivation, Guid? deviceFilter = null)
+        /// the worker is signalled and the next trigger lands on the pad.
+        /// OwnsMaster is true where the sink applies the slot's master volume
+        /// itself, so the caller leaves the samples at the action's
+        /// volume.</summary>
+        public static List<(MixingSampleProvider Mixer, bool OwnsMaster)> GetSlotSinkMixers(int slot, out bool pendingActivation, Guid? deviceFilter = null)
         {
             bool anyEligible = false;
-            foreach (var (_, ud) in EnumerateAssignedSonyPads(slot))
+            foreach (var (padGuid, ud) in EnumerateAssignedSonyPads(slot))
             {
                 // A peer:// pad's transport realities (BT vs USB) are the owner's
                 // problem; the consumer just ships the mix. Always eligible so a
@@ -1228,18 +1272,29 @@ namespace PadForge.Common.Input
                 bool isDs4 = Ds4Pids.Contains((ushort)ud.ProdId);
                 // A wired first-model DS4 has no audio. See ReconcileOnWorker.
                 if (isDs4 && !Ds4HasAudio((ushort)ud.ProdId, isBt)) continue;
+                // A wired second model hears macro sounds only through
+                // headphones in its jack.
+                if (isDs4 && !TakesMacroSounds(Ds4HeadsetOnly((ushort)ud.ProdId, isBt), padGuid)) continue;
                 anyEligible = true;
                 break;
             }
 
-            List<MixingSampleProvider> live;
+            List<(MixingSampleProvider Mixer, bool OwnsMaster)> live;
             lock (_lock)
             {
                 EnsureThreads_NoLock();
+                // The Audio tab's test signal names its device and plays there
+                // whatever the jack says. Macro sounds skip a headset-only pad
+                // with nothing in its jack.
                 live = _sinks.Values
                     .Where(s => s.Slot == slot && SinkAlive(s)
-                                && (deviceFilter == null || s.DeviceGuid == deviceFilter.Value))
-                    .Select(s => s.MacroMixer)
+                                && (deviceFilter == null ? TakesMacroSounds(s) : s.DeviceGuid == deviceFilter.Value))
+                    // A DualSense carries the slot's master volume in its
+                    // firmware speaker byte, and a peer's owner renders its
+                    // own. PadForge drives a DualShock 4's speaker at one
+                    // level and leaves its USB endpoint to Windows, so its
+                    // macro sounds carry the master volume in their samples.
+                    .Select(s => (s.MacroMixer, !s.IsDs4))
                     .ToList();
             }
             pendingActivation = anyEligible && live.Count == 0;
@@ -2082,6 +2137,34 @@ namespace PadForge.Common.Input
         /// the slot's current Sony pad GUIDs, so the pacing-thread
         /// callback never walks settings. Also starts/moves the mic
         /// capture to the first USB pad in the set.</summary>
+        /// <summary>The persona's microphone source, in preference order: a
+        /// USB DualSense's real capture endpoint (WASAPI, container-matched),
+        /// else a BT DualSense via the 0x31 HasMic Opus stream (TechAntohere
+        /// protocol dump), else a wired second-model DualShock 4's capture
+        /// endpoint, else a BT DualShock 4's headset microphone (#528, SBC in
+        /// its larger input reports, behind EnableDs4BtMic). A DualSense
+        /// carries its own microphone and a DualShock 4 hears only a headset
+        /// in its jack, so a DualSense on either link comes first. Mic is the
+        /// WASAPI pick and BtMic the Bluetooth reader's, and at most one is
+        /// set. A peer pad, marked Bluetooth and DualShock 4, takes no mic
+        /// role.</summary>
+        internal static (Guid Mic, string MicPath, Guid BtMic, string BtMicPath, bool BtMicIsDs4) PickPersonaMics(
+            List<(Guid Guid, string Path, bool IsBt, bool IsDs4)> pads, bool btDualSenseMic, bool btDs4Mic)
+        {
+            foreach (var p in pads)
+                if (!p.IsBt && !p.IsDs4) return (p.Guid, p.Path, Guid.Empty, null, false);
+            if (btDualSenseMic)
+                foreach (var p in pads)
+                    if (p.IsBt && !p.IsDs4) return (Guid.Empty, null, p.Guid, p.Path, false);
+            foreach (var p in pads)
+                if (!p.IsBt && p.IsDs4) return (p.Guid, p.Path, Guid.Empty, null, false);
+            if (btDs4Mic)
+                foreach (var p in pads)
+                    if (p.IsBt && p.IsDs4 && !(p.Path ?? "").StartsWith("peer://", StringComparison.Ordinal))
+                        return (Guid.Empty, null, p.Guid, p.Path, true);
+            return (Guid.Empty, null, Guid.Empty, null, false);
+        }
+
         internal static void RefreshPersonaTargets(PersonaFeed feed, int slot, int generation,
             List<(Guid Guid, string Path, bool IsBt, bool IsDs4)> pads, Thread audioWorker = null)
         {
@@ -2123,27 +2206,14 @@ namespace PadForge.Common.Input
                     $"PERSONA targets slot={slot} count={guids.Length}"
                     + (guids.Length > 0 ? $" first={guids[0].ToString("N").Substring(0, 8)}" : ""));
 
-            // Microphone source, in preference order: a USB-connected pad's
-            // real capture endpoint (WASAPI, container-matched), else a BT
-            // DualSense via the 0x31 HasMic Opus stream (TechAntohere
-            // protocol dump), else a BT DualShock 4's headset microphone
-            // (#528, SBC in its larger input reports, behind EnableDs4BtMic).
-            Guid micPad = Guid.Empty; string micPath = null;
-            foreach (var p in pads)
-                if (!p.IsBt) { micPad = p.Guid; micPath = p.Path; break; }
+            var (micPad, micPath, btMicPad, btMicPath, btMicIsDs4) =
+                PickPersonaMics(pads, EnableBtMic, EnableDs4BtMic);
             if (micPad != feed.MicPadGuid)
             {
                 StopPersonaMic(feed);
                 if (micPad != Guid.Empty) StartPersonaMic(feed, micPad, micPath, slot, generation);
             }
 
-            Guid btMicPad = Guid.Empty; string btMicPath = null; bool btMicIsDs4 = false;
-            if (EnableBtMic && micPad == Guid.Empty)
-                foreach (var p in pads)
-                    if (p.IsBt && !p.IsDs4) { btMicPad = p.Guid; btMicPath = p.Path; break; }
-            if (EnableDs4BtMic && micPad == Guid.Empty && btMicPad == Guid.Empty)
-                foreach (var p in pads)
-                    if (p.IsBt && p.IsDs4) { btMicPad = p.Guid; btMicPath = p.Path; btMicIsDs4 = true; break; }
             // USB jack reader for Follow Headphone Jack: the status byte
             // never reaches us through SDL, so read it ourselves from the
             // first USB DS5 pad. Runs whenever the persona feed does,
@@ -3043,7 +3113,7 @@ namespace PadForge.Common.Input
             // Phase 1 — desired state, no locks (SettingsManager and the
             // config provider take their own locks; never nest them under
             // ours).
-            var desired = new List<(int Slot, Guid Guid, string Path, bool IsBt, bool IsDs4, bool PtOn, string MirrorSrc, bool RemoteFed, bool IsPeer)>();
+            var desired = new List<(int Slot, Guid Guid, string Path, bool IsBt, bool IsDs4, bool PtOn, string MirrorSrc, bool RemoteFed, bool IsPeer, bool HeadsetOnly)>();
             for (int slot = 0; slot < MaxPads; slot++)
             {
                 // Demand for macro audio is config-derived, never latched:
@@ -3079,7 +3149,7 @@ namespace PadForge.Common.Input
                         // the mic capture never binds to it.
                         // Peer pads are excluded from every mic role.
                         personaPads?.Add((guid, ud.DevicePath, true, true));
-                        desired.Add((slot, guid, ud.DevicePath, false, false, ptOn, mirrorSrc, false, true));
+                        desired.Add((slot, guid, ud.DevicePath, false, false, ptOn, mirrorSrc, false, true, false));
                         continue;
                     }
                     bool isBt = (ud.DevicePath ?? "").IndexOf("{00001124", StringComparison.OrdinalIgnoreCase) >= 0;
@@ -3105,7 +3175,8 @@ namespace PadForge.Common.Input
                     // speaker-path assertion.
                     if (!ptOn && !demand && !personaDemand) continue;
                     personaPads?.Add((guid, ud.DevicePath, isBt, isDs4));
-                    desired.Add((slot, guid, ud.DevicePath, isBt, isDs4, ptOn, mirrorSrc, false, false));
+                    desired.Add((slot, guid, ud.DevicePath, isBt, isDs4, ptOn, mirrorSrc, false, false,
+                        isDs4 && Ds4HeadsetOnly((ushort)ud.ProdId, isBt)));
                 }
                 if (personaDemand) RefreshPersonaTargets(personaFeed, slot, personaGeneration, personaPads, worker);
             }
@@ -3123,7 +3194,8 @@ namespace PadForge.Common.Input
                 bool isBt = ud.DevicePath.IndexOf("{00001124", StringComparison.OrdinalIgnoreCase) >= 0;
                 bool isDs4 = Ds4Pids.Contains((ushort)ud.ProdId);
                 if (isDs4 && !Ds4HasAudio((ushort)ud.ProdId, isBt)) continue;
-                desired.Add((255, kv.Key, ud.DevicePath, isBt, isDs4, false, "", true, false));
+                desired.Add((255, kv.Key, ud.DevicePath, isBt, isDs4, false, "", true, false,
+                    isDs4 && Ds4HeadsetOnly((ushort)ud.ProdId, isBt)));
             }
 
             // Phase 2 — state sync under the lock; no I/O.
@@ -3143,6 +3215,7 @@ namespace PadForge.Common.Input
                             DeviceGuid = d.Guid,
                             IsBt = d.IsBt,
                             IsDs4 = d.IsDs4,
+                            HeadsetOnly = d.HeadsetOnly,
                             MacroMixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(Rate, 2)) { ReadFully = true },
                         };
                         sink.Source = new SinkSource(sink);
@@ -3167,6 +3240,7 @@ namespace PadForge.Common.Input
                     sink.HidPath = d.Path;
                     sink.IsBt = d.IsBt;
                     sink.IsDs4 = d.IsDs4;
+                    sink.HeadsetOnly = d.HeadsetOnly;
                     sink.PassthroughOn = d.PtOn;
                     sink.MirrorSourceId = d.MirrorSrc ?? "";
                     sink.RemoteFed = d.RemoteFed;
@@ -3223,8 +3297,9 @@ namespace PadForge.Common.Input
             // requires a persona lane, which is what tied Follow Headphone
             // Jack to owning a virtual DualSense. The DualSense on either
             // transport, and the DualShock 4 on Bluetooth (#528), each with its
-            // own status-byte shape. A DualShock 4 on USB, the second model or
-            // Sony's adapter (0x0BA0), keeps its Windows endpoint's routing,
+            // own status-byte shape. A wired second-model DualShock 4 is watched
+            // too, because its macro sounds follow its jack (Ds4HeadsetOnly).
+            // Sony's adapter (0x0BA0) keeps its Windows endpoint's routing,
             // and a wired first model builds no sink.
             var jackWanted = new HashSet<Guid>();
             lock (_lock)
@@ -3232,7 +3307,7 @@ namespace PadForge.Common.Input
                 if (!IsCurrentAudioWorker(worker)) return;
                 foreach (var d in desired)
                 {
-                    if (d.IsPeer || (d.IsDs4 && !d.IsBt)) continue;
+                    if (d.IsPeer || (d.IsDs4 && !d.IsBt && !d.HeadsetOnly)) continue;
                     jackWanted.Add(d.Guid);
                     EnsureJackWatch(d.Guid, d.Path, d.IsBt, d.IsDs4);
                 }
@@ -3291,7 +3366,7 @@ namespace PadForge.Common.Input
             {
                 if (!IsCurrentAudioWorker(worker)) return;
                 foreach (var s in _sinks.Values)
-                    if (SinkAlive(s) && (uint)s.Slot < MaxPads) routed[s.Slot] = true;
+                    if (SinkAlive(s) && TakesMacroSounds(s) && (uint)s.Slot < MaxPads) routed[s.Slot] = true;
 
                 // Vendor-audio-test expiry sweep: an abandoned test (tab
                 // closed mid-tone) leaves the pad's mirror routing in the

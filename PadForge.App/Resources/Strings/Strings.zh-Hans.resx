@@ -2378,6 +2378,7 @@
   <data name="Pad_Audio_NewSoundMacro" xml:space="preserve"><value>新建声音宏</value></data>
   <data name="Pad_Audio_NoSoundMacros" xml:space="preserve"><value>还没有声音宏。创建一个并选择声音文件和触发条件。</value></data>
   <data name="Pad_Audio_NoSpeaker" xml:space="preserve"><value>所选设备没有内置扬声器。此手柄的宏声音将在系统默认输出上播放。</value></data>
+  <data name="Pad_Audio_HeadsetOnly" xml:space="preserve"><value>通过 USB 连接时，此手柄只通过耳机插孔播放声音。插孔未接入设备时，宏声音会跳过它，改在系统默认输出或此手柄上的其他手柄中播放。</value></data>
   <data name="Pad_Audio_OpenMacro_Tooltip" xml:space="preserve"><value>在“宏”选项卡中打开此宏</value></data>
   <data name="Pad_Audio_Output_Desc" xml:space="preserve"><value>声音会自动路由到所选手柄。USB 下按硬件容器匹配手柄自身的音频端点。蓝牙下音频以 Sony HID 帧流式发送。</value></data>
   <data name="Pad_Audio_Output_Header" xml:space="preserve"><value>声音输出</value></data>
@@ -4258,7 +4259,7 @@
   <data name="About_GameModRefs" xml:space="preserve"><value>DSX 游戏模组参考来源</value></data>
   <data name="About_GameModRefsDesc" xml:space="preserve"><value>“游戏模组”背后的 UDP 指令、应答、端口文件和扳机效果字节，读自 Paliverse 官方的 DSX v3.1 和 DualSenseX v2 模组示例、DualSenseY 的两个版本和 DualSense4Rockstar (未公布许可)、DSZ 和 pydualsense (MIT)，以及 Wujek Dualsense API 和 hbashton 的 DS4Windows 分支中的 DSX 服务器 (GPL-3.0)。仅为文档参考，不含任何代码。</value></data>
   <data name="About_Ds4HeadsetRefs" xml:space="preserve"><value>DualShock 4 耳机参考来源</value></data>
-  <data name="About_Ds4HeadsetRefsDesc" xml:space="preserve"><value>DualShock 4 蓝牙音频背后的耳机与扬声器路由、音量上限、麦克风分帧和报告模式，读自 DS4-Sound-Link (MIT)、ds4mac (GPL-2.0)、ds4drv (MIT) 和 hbashton 的 DS4Windows 分支 (GPL-3.0)，SBC 解码器的合成窗口与 Google 的 libsbc (Apache-2.0) 核对。仅为文档参考，不含任何代码。</value></data>
+  <data name="About_Ds4HeadsetRefsDesc" xml:space="preserve"><value>DualShock 4 蓝牙音频背后的耳机与扬声器路由、音量上限、麦克风分帧和报告模式，读自 DS4-Sound-Link (MIT)、ds4mac (GPL-2.0)、ds4drv (MIT) 和 hbashton 的 DS4Windows 分支 (GPL-3.0)，SBC 解码器的合成窗口与 Google 的 libsbc (Apache-2.0) 核对，第二款机型的 USB 耳机则读自 DJm00n 的 ControllersInfo 描述符转储 (未公布许可)。仅为文档参考，不含任何代码。</value></data>
   <data name="About_KeyboardScreenRefs" xml:space="preserve"><value>键盘屏幕参考来源</value></data>
   <data name="About_KeyboardScreenRefsDesc" xml:space="preserve"><value>键盘屏幕背后的库、帧和按键，读自 Logitech 的 LCD 和 Arx Control SDK 以及 Mad Catz 的 S.T.R.I.K.E. 7 SDK，并与 logitech-lcd (MIT 或 Apache-2.0)、dcspy (MIT)、foo_logitech_lcd (LGPL-2.1)、LogitechStuff 和 ArxWidgetManager (未公布许可)、Linux 的 hid-lg-g15 驱动 (GPL-2.0-or-later)、libg15、G15Interface 和 lcdproc (GPL-2.0)、gnome15 (GPL-3.0) 以及 G19USB (Apache-2.0) 比对。PadForge 加载 Logitech Gaming Software 的库以及你下载或选择的 Strike7API.dll，不随附其中任何一个的代码。</value></data>
   <data name="About_FalconRefs" xml:space="preserve"><value>Novint Falcon 参考来源</value></data>

@@ -2785,6 +2785,7 @@ public class Strings : INotifyPropertyChanged
     public string Pad_ResetMirrorEngageInput => Get("Pad_ResetMirrorEngageInput");
     public string Pad_ResetMirrorEngageRelease => Get("Pad_ResetMirrorEngageRelease");
     public string Pad_Audio_NoSpeaker => Get("Pad_Audio_NoSpeaker");
+    public string Pad_Audio_HeadsetOnly => Get("Pad_Audio_HeadsetOnly");
     public string Pad_Audio_OpenMacro_Tooltip => Get("Pad_Audio_OpenMacro_Tooltip");
     public string Pad_Audio_SoundMacroName_Format => Get("Pad_Audio_SoundMacroName_Format");
     public string MacroAction_Type_PlaySound => Get("MacroAction_Type_PlaySound");

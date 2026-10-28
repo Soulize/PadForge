@@ -69,12 +69,11 @@ namespace PadForge.Common.Input
         // ── Active sounds: one logical sound = placements in 1..N mixers ──
         private sealed class ActiveSound
         {
-            public List<(MixingSampleProvider Mixer, VolumeSampleProvider Volume, ISampleProvider Input)> Placements = new();
+            public List<(MixingSampleProvider Mixer, VolumeSampleProvider Volume, ISampleProvider Input, bool OwnsMaster)> Placements = new();
             public float ActionVolume;           // 0..1, from the action
             public bool Loop;
             public object MacroKey;
             public string FilePath;              // loop idempotence key
-            public bool OnController;            // sinks own loudness via the firmware volume byte
         }
         private static readonly List<ActiveSound>[] _active = CreateLists();
 
@@ -89,11 +88,12 @@ namespace PadForge.Common.Input
         //  Per-slot configuration
         // ─────────────────────────────────────────────
 
-        /// <summary>Per-slot master volume (0-100). On the PC fallback output
-        /// it scales the sample amplitude; on controller sinks loudness is the
-        /// firmware speaker volume byte (the DS5 dispatcher reads
-        /// <see cref="GetSlotVolume"/> per output report), so live sounds
-        /// retune immediately on both paths.</summary>
+        /// <summary>Per-slot master volume (0-100). A sink that owns its
+        /// loudness applies it there: a DualSense's firmware speaker volume
+        /// byte (the DS5 dispatcher reads <see cref="GetSlotVolume"/> per
+        /// output report) and a haptic-tone pad's sink. Every other placement
+        /// scales its samples (<see cref="PlacementVolume"/>), so live sounds
+        /// retune immediately on every path.</summary>
         public static void SetSlotVolume(int slot, int volumePct)
         {
             if ((uint)slot >= MaxPads) return;
@@ -101,14 +101,19 @@ namespace PadForge.Common.Input
             lock (_lock)
             {
                 _masterVolume[slot] = v;
-                // Controller-routed sounds get master volume from the firmware
-                // speaker volume byte (live, per output report); only the PC
-                // fallback applies it in the sample domain.
                 foreach (var a in _active[slot])
                     foreach (var p in a.Placements)
-                        p.Volume.Volume = a.ActionVolume * (a.OnController ? 1f : v / 100f);
+                        p.Volume.Volume = PlacementVolume(a.ActionVolume, p.OwnsMaster, v);
             }
         }
+
+        /// <summary>A placement's sample gain: the action's volume, times the
+        /// slot's master volume unless the sink owns its loudness. The PC
+        /// fallback, a DualShock 4 on either link and a Wii Remote drive their
+        /// speakers at one level, so their samples carry the master
+        /// volume.</summary>
+        internal static float PlacementVolume(float actionVolume, bool sinkOwnsMaster, int masterPct)
+            => actionVolume * (sinkOwnsMaster ? 1f : Math.Clamp(masterPct, 0, 100) / 100f);
 
         /// <summary>Current per-slot master volume (0-100).</summary>
         public static int GetSlotVolume(int slot)
@@ -347,11 +352,15 @@ namespace PadForge.Common.Input
                 // trigger lands on the pad.
                 var targets = AudioPassthroughService.GetSlotSinkMixers(slot, out bool pendingActivation, deviceFilter);
                 // Wii Remote speakers are a parallel sink family (#146); fan the
-                // same macro sound into them too.
-                targets.AddRange(WiiSpeakerService.GetSlotSinkMixers(slot, deviceFilter));
+                // same macro sound into them too. They play at full hardware
+                // volume, so the samples carry the master volume.
+                foreach (var m in WiiSpeakerService.GetSlotSinkMixers(slot, deviceFilter))
+                    targets.Add((m, false));
                 // Switch HD Rumble + Steam Controller haptics are a parallel
                 // tone-sink family (#147); fan the same macro sound to them.
-                targets.AddRange(HapticToneService.GetSlotSinkMixers(slot, deviceFilter));
+                // Their sink applies the master volume itself.
+                foreach (var m in HapticToneService.GetSlotSinkMixers(slot, deviceFilter))
+                    targets.Add((m, true));
 
                 lock (_lock)
                 {
@@ -365,7 +374,7 @@ namespace PadForge.Common.Input
                         if (pendingActivation || _controllerRouted[slot]) return;
                         var o = EnsureDefaultOutput_NoLock(slot);
                         if (o?.Mixer == null) return;
-                        targets = new List<MixingSampleProvider> { o.Mixer };
+                        targets = new List<(MixingSampleProvider Mixer, bool OwnsMaster)> { (o.Mixer, false) };
                     }
 
                     var entry = new ActiveSound
@@ -374,19 +383,15 @@ namespace PadForge.Common.Input
                         Loop = loop,
                         MacroKey = macroKey,
                         FilePath = filePath,
-                        OnController = onController,
                     };
-                    foreach (var mixer in targets)
+                    foreach (var (mixer, ownsMaster) in targets)
                     {
                         var input = makeInput();
                         var vol = new VolumeSampleProvider(input)
                         {
-                            // Controller sinks play full-scale samples; the
-                            // firmware speaker volume byte carries the master
-                            // volume there. The PC fallback has no such byte.
-                            Volume = actionVolume * (onController ? 1f : _masterVolume[slot] / 100f),
+                            Volume = PlacementVolume(actionVolume, ownsMaster, _masterVolume[slot]),
                         };
-                        entry.Placements.Add((mixer, vol, vol));
+                        entry.Placements.Add((mixer, vol, vol, ownsMaster));
                         mixer.AddMixerInput((ISampleProvider)vol);
                     }
 

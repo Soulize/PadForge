@@ -1568,6 +1568,7 @@ namespace PadForge.ViewModels
                     OnPropertyChanged(nameof(SelectedDeviceHasHeadsetAndSpeakerPath));
                     OnPropertyChanged(nameof(SelectedDeviceHasDs5AudioBuffer));
                     OnPropertyChanged(nameof(SelectedDeviceHasNoSpeaker));
+                    OnPropertyChanged(nameof(SelectedDeviceIsHeadsetOnly));
                     OnPropertyChanged(nameof(SelectedDeviceHasHapticTones));
                     OnPropertyChanged(nameof(SelectedDeviceIsTritonPcm));
                     OnPropertyChanged(nameof(SelectedDeviceHasTouchpadPulse));
@@ -1646,6 +1647,7 @@ namespace PadForge.ViewModels
             OnPropertyChanged(nameof(SelectedDeviceHasHeadsetAndSpeakerPath));
             OnPropertyChanged(nameof(SelectedDeviceHasDs5AudioBuffer));
             OnPropertyChanged(nameof(SelectedDeviceHasNoSpeaker));
+            OnPropertyChanged(nameof(SelectedDeviceIsHeadsetOnly));
             OnPropertyChanged(nameof(SelectedDeviceHasHapticTones));
             OnPropertyChanged(nameof(SelectedDeviceIsTritonPcm));
             OnPropertyChanged(nameof(SelectedDeviceHasTouchpadPulse));
@@ -6186,8 +6188,9 @@ namespace PadForge.ViewModels
         /// DualSense (0x0CE6) and DualSense Edge (0x0DF2), and a DualShock 4
         /// (0x05C4, 0x09CC) over Bluetooth, which writes its split left and
         /// right headphone bytes from the same Headphone Volume (#528). A
-        /// wired DualShock 4 gets no audio lane, and Sony's USB adapter keeps
-        /// its own Windows endpoint.</summary>
+        /// wired second-model DualShock 4 and Sony's USB adapter play through
+        /// their own Windows audio endpoints, whose volume Windows keeps, and
+        /// a wired first-model pad has no USB audio.</summary>
         public bool SelectedDeviceHasHeadphoneJack
         {
             get
@@ -6273,6 +6276,23 @@ namespace PadForge.ViewModels
         }
 
         public bool SelectedDeviceHasNoSpeaker => !SelectedDeviceHasSpeaker;
+
+        /// <summary>The selected device plays sound only through its headphone
+        /// jack on the link it is on, a wired second-model DualShock 4
+        /// (AudioPassthroughService.Ds4HeadsetOnly), so the Audio tab says
+        /// where its sound goes.</summary>
+        public bool SelectedDeviceIsHeadsetOnly
+        {
+            get
+            {
+                var sel = SelectedMappedDevice;
+                if (sel == null || sel.InstanceGuid == Guid.Empty) return false;
+                var ud = PadForge.Common.Input.SettingsManager.FindDeviceByInstanceGuid(sel.InstanceGuid);
+                return ud != null && ud.VendorId == 0x054C
+                    && PadForge.Common.Input.AudioPassthroughService.Ds4HeadsetOnly((ushort)ud.ProdId,
+                        (ud.DevicePath ?? "").IndexOf("{00001124", StringComparison.OrdinalIgnoreCase) >= 0);
+            }
+        }
 
         /// <summary>The selected device is a Sony pad whose audio rides an
         /// AudioPassthroughService sink, which is the only place the #347
@@ -8082,6 +8102,7 @@ namespace PadForge.ViewModels
                     OnPropertyChanged(nameof(SelectedDeviceHasHeadsetAndSpeakerPath));
                     OnPropertyChanged(nameof(SelectedDeviceHasDs5AudioBuffer));
                     OnPropertyChanged(nameof(SelectedDeviceHasNoSpeaker));
+                    OnPropertyChanged(nameof(SelectedDeviceIsHeadsetOnly));
                     OnPropertyChanged(nameof(SelectedDeviceHasHapticTones));
                     OnPropertyChanged(nameof(SelectedDeviceIsTritonPcm));
                     OnPropertyChanged(nameof(MirrorEngageSelectedInput));
