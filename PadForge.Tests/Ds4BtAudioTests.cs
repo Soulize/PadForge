@@ -499,15 +499,18 @@ namespace PadForge.Tests
             Assert.Equal(2, Count(pad, "AudioPassthroughService.Ds4HasAudio((ushort)ud.ProdId,"));
         }
 
-        // The wired CUH-ZCT2 ends its USB output and its microphone in a
-        // Headset terminal (0x0402, the CUH-ZCT2E dump), and HIDMaestro names
-        // its two output channels headsetLeft and headsetRight.
+        // The wired CUH-ZCT2 and Sony's adapter end their USB output and
+        // microphone in Headset terminals (0x0402) and name no speaker: the
+        // CUH-ZCT2E dump in DJm00n/ControllersInfo and a linuxhw/LsUSB probe of
+        // the adapter. HIDMaestro names the v2's output channels headsetLeft and
+        // headsetRight, and Sony lists only the stereo headset jack for the
+        // adapter.
         [Theory]
         [InlineData(0x09CC, false, true)]
         [InlineData(0x09CC, true, false)]  // Bluetooth reaches the speaker
         [InlineData(0x05C4, false, false)] // no USB audio at all
         [InlineData(0x05C4, true, false)]
-        [InlineData(0x0BA0, false, false)] // Sony's adapter keeps its routing
+        [InlineData(0x0BA0, false, true)]  // Sony's adapter
         public void Ds4HeadsetOnly_IsTheWiredSecondModel(int pid, bool bluetooth, bool expected)
             => Assert.Equal(expected, AudioPassthroughService.Ds4HeadsetOnly((ushort)pid, bluetooth));
 
@@ -552,8 +555,11 @@ namespace PadForge.Tests
             r[30] = Ds4BtAudio.StatusHeadphones | 0x0B;
             Assert.True(Ds4BtAudio.TryReadUsbStatus(r, 64, out byte status));
             Assert.Equal(r[30], status);
-            Assert.True(Ds4BtAudio.TryReadUsbStatus(r, 31, out _));
-            Assert.False(Ds4BtAudio.TryReadUsbStatus(r, 30, out _));
+            Assert.False(Ds4BtAudio.TryReadUsbStatus(r, 63, out _));   // short of a state report
+            Assert.False(Ds4BtAudio.TryReadUsbStatus(r.AsSpan(0, 63), 64, out _));
+            r[31] = 0x04;                                               // the adapter, no pad linked
+            Assert.False(Ds4BtAudio.TryReadUsbStatus(r, 64, out _));
+            r[31] = 0x00;
             r[0] = 0x11;
             Assert.False(Ds4BtAudio.TryReadUsbStatus(r, 64, out _));
         }
@@ -617,6 +623,31 @@ namespace PadForge.Tests
                 macros.Replace("\r\n", "\n"));
             Assert.Contains("targets = new List<(MixingSampleProvider Mixer, bool OwnsMaster)> { (o.Mixer, false) };", macros);
             Assert.Equal(2, Count(macros, "PlacementVolume(a"));
+        }
+
+        // A DualShock 4's USB audio is a stereo headset, channel 0 left and
+        // channel 1 right (wChannelConfig 0x0003 in the CUH-ZCT2E dump and the
+        // adapter's probe). The DualSense's Automatic route puts silence on
+        // channel 0 and a mono mix on channel 1, its speaker's tap.
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(4)]
+        [InlineData(5)]
+        public void UsbChannels_PassAHeadsetsStereoThroughOnEveryRoute(int path)
+        {
+            AudioPassthroughService.MapUsbChannels(true, path, 0.5f, -0.25f, out float c0, out float c1);
+            Assert.Equal((0.5f, -0.25f), (c0, c1));
+            AudioPassthroughService.MapUsbChannels(false, 0, 0.5f, -0.25f, out c0, out c1);
+            Assert.Equal((0f, 0.125f), (c0, c1));
+        }
+
+        [Fact]
+        public void UsbDs4Sink_IsStereoHeadphonesForTheDspChain()
+        {
+            string service = RepoFile("PadForge.App", "Common", "Input", "AudioPassthroughService.cs").Replace("\r\n", "\n");
+            Assert.Contains("bool stereoHeadphones = sk.IsDs4\n                        ? !sk.IsBt || Ds4BtAudio.IsStereoRoute(resolved)", service);
+            Assert.Contains("bool stereoHeadset = _sink.IsDs4;", service);
         }
 
         [Fact]
@@ -1141,6 +1172,56 @@ namespace PadForge.Tests
                 mics.Remove(id);
                 if (File.Exists(path)) File.Delete(path);
             }
+        }
+    }
+
+    /// <summary>The USB frame shaper on a DualShock 4's stereo headset and on
+    /// a DualSense. In the collection that swaps the output path provider,
+    /// which the DualSense case reads.</summary>
+    [Collection("AudioProfileLifecycle")]
+    public sealed class Ds4UsbShaperTests
+    {
+        private sealed class ConstantStereo : NAudio.Wave.ISampleProvider
+        {
+            public NAudio.Wave.WaveFormat WaveFormat { get; } = NAudio.Wave.WaveFormat.CreateIeeeFloatWaveFormat(48000, 2);
+            public int Read(float[] buffer, int offset, int count)
+            {
+                for (int i = 0; i < count; i++) buffer[offset + i] = i % 2 == 0 ? 0.5f : -0.25f;
+                return count;
+            }
+        }
+
+        private static float[] ShapeOneBlock(bool ds4)
+        {
+            const BindingFlags any = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+            var aps = typeof(AudioPassthroughService);
+            var sinkType = aps.GetNestedType("Sink", BindingFlags.NonPublic)!;
+            object sink = Activator.CreateInstance(sinkType, nonPublic: true)!;
+            sinkType.GetField("IsDs4")!.SetValue(sink, ds4);
+            sinkType.GetField("DeviceGuid")!.SetValue(sink, Guid.NewGuid());
+            var shaperType = aps.GetNestedType("UsbFrameProvider", BindingFlags.NonPublic)!;
+            var shaper = (NAudio.Wave.IWaveProvider)Activator.CreateInstance(shaperType, any, null,
+                new object[] { new ConstantStereo(), NAudio.Wave.WaveFormat.CreateIeeeFloatWaveFormat(48000, 2), sink }, null)!;
+            var bytes = new byte[8 * 2 * 4];
+            Assert.Equal(bytes.Length, shaper.Read(bytes, 0, bytes.Length));
+            var floats = new float[16];
+            Buffer.BlockCopy(bytes, 0, floats, 0, bytes.Length);
+            return floats;
+        }
+
+        [Fact]
+        public void TheShaperPlaysADs4HeadsetInStereo_AndADualSenseOnItsRoute()
+        {
+            var saved = AudioPassthroughService.DeviceAudioOutputPathProvider;
+            try
+            {
+                AudioPassthroughService.DeviceAudioOutputPathProvider = null;   // Automatic
+                var ds4 = ShapeOneBlock(true);
+                for (int f = 0; f < 8; f++) Assert.Equal((0.5f, -0.25f), (ds4[f * 2], ds4[f * 2 + 1]));
+                var ds5 = ShapeOneBlock(false);
+                for (int f = 0; f < 8; f++) Assert.Equal((0f, 0.125f), (ds5[f * 2], ds5[f * 2 + 1]));
+            }
+            finally { AudioPassthroughService.DeviceAudioOutputPathProvider = saved; }
         }
     }
 }

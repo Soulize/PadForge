@@ -64,6 +64,17 @@ namespace PadForge.Common.Input
         /// after the ID. The report carries no CRC.</summary>
         public const int UsbStatusOffset = 30;
 
+        /// <summary>Length of a USB input report 0x01 with the report ID:
+        /// ds4drv's HidrawUSBDS4Device reads 64 bytes, and SDL takes a state
+        /// packet from 64 bytes up.</summary>
+        public const int UsbReportSize = 64;
+
+        /// <summary>Bit 2 of byte 31 of a USB report 0x01 is set while no pad
+        /// is linked to Sony's adapter and is always clear on a wired pad
+        /// (SDL_hidapi_ps4.c HIDAPI_DriverPS4_IsPacketValid, DS4Windows'
+        /// synced check on the same byte).</summary>
+        public const byte UsbNoPadLinked = 0x04;
+
         private const int StateBytes = 75;
 
         /// <summary>Length of a Bluetooth input report by ID: 0x11 is 78
@@ -231,11 +242,14 @@ namespace PadForge.Common.Input
         }
 
         /// <summary>Reads the status byte of a USB input report 0x01:
-        /// headphones in bit 5, a microphone in bit 6.</summary>
+        /// headphones in bit 5, a microphone in bit 6. A report shorter than
+        /// a state report, or one from Sony's adapter with no pad linked,
+        /// carries no status, the rule SDL's packet check applies.</summary>
         public static bool TryReadUsbStatus(ReadOnlySpan<byte> report, int got, out byte status)
         {
             status = 0;
-            if (got <= UsbStatusOffset || report.Length <= UsbStatusOffset || report[0] != 0x01) return false;
+            if (got < UsbReportSize || report.Length < UsbReportSize || report[0] != 0x01
+                || (report[UsbStatusOffset + 1] & UsbNoPadLinked) != 0) return false;
             status = report[UsbStatusOffset];
             return true;
         }

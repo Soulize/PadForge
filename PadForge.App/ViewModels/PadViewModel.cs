@@ -6278,7 +6278,8 @@ namespace PadForge.ViewModels
         public bool SelectedDeviceHasNoSpeaker => !SelectedDeviceHasSpeaker;
 
         /// <summary>The selected device plays sound only through its headphone
-        /// jack on the link it is on, a wired second-model DualShock 4
+        /// jack on the link it is on, a DualShock 4 on USB, either a wired
+        /// second model or a pad on Sony's adapter
         /// (AudioPassthroughService.Ds4HeadsetOnly), so the Audio tab says
         /// where its sound goes.</summary>
         public bool SelectedDeviceIsHeadsetOnly
