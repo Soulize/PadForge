@@ -676,9 +676,11 @@ Protocol documentation references (no code from these projects ships)
   (https://github.com/chrippa/ds4drv, MIT) and hbashton's DS4Windows fork
   (https://github.com/hbashton/DS4Windows, GPL-3.0), with the SBC decoder's
   synthesis windows checked against Google's libsbc
-  (https://github.com/google/libsbc, Apache-2.0), and the second model's USB
-  headset read from DJm00n's ControllersInfo descriptor dumps
-  (https://github.com/DJm00n/ControllersInfo, no license published).
+  (https://github.com/google/libsbc, Apache-2.0), and the USB headsets of the
+  second model and Sony's adapter read from DJm00n's ControllersInfo
+  descriptor dumps (https://github.com/DJm00n/ControllersInfo, no license
+  published) and linux-hardware.org's LsUSB probes
+  (https://github.com/linuxhw/LsUSB, CC BY 4.0).
   Eden (https://git.eden-emu.dev/eden-emu/eden, GPL-3.0-or-later): the DSU
   motion axis signs, checked against its UDP decoder.
   EDRefCard2 (https://github.com/brammmers/edrefcard2, MIT): the Elite
