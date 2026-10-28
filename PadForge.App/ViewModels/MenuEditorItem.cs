@@ -26,13 +26,18 @@ namespace PadForge.ViewModels
     /// <summary>Generic labeled int option (fire mode, half, binding kind,
     /// key, button). <see cref="Description"/> feeds the option's tooltip
     /// and, for fire modes, the persistent caption under the combo; empty
-    /// for options that need no explanation.</summary>
+    /// for options that need no explanation. Equal by value, as
+    /// <see cref="MenuHostOption"/> is by descriptor: lists built per read
+    /// hand a combo new objects, and a combo whose list is replaced keeps
+    /// its selection only when the new list holds an equal item.</summary>
     public sealed class MenuIntOption
     {
         public int Value { get; init; }
         public string Label { get; init; } = "";
         public string Description { get; init; } = "";
         public override string ToString() => Label;
+        public override bool Equals(object obj) => obj is MenuIntOption o && o.Value == Value;
+        public override int GetHashCode() => Value;
     }
 
     /// <summary>
