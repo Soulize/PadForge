@@ -6,7 +6,7 @@
 # own lines pasted there (they start with a time such as 18:57:09.874). A
 # screenshot is not a log. A report without one is labeled missing-logs,
 # answered with how to capture a log, closed as not planned, locked, and then
-# deleted when the ISSUE_ADMIN_TOKEN secret (a repository admin token) is set.
+# deleted with ISSUE_BOT_TOKEN, the owner's token, as the discussion pause does.
 #
 # Never acts on issues whose author is OWNER, COLLABORATOR or MEMBER.
 # GITHUB_TOKEN with issues: write covers the label, comment, close and lock.
@@ -94,11 +94,11 @@ jobs:
       - name: Delete the rejected report
         if: ${{ steps.skip.outputs.skip == 'false' && steps.detect.outputs.missing == 'true' }}
         env:
-          GH_TOKEN: ${{ secrets.ISSUE_ADMIN_TOKEN }}
+          GH_TOKEN: ${{ secrets.ISSUE_BOT_TOKEN }}
         run: |
           set -euo pipefail
           if [ -z "${GH_TOKEN:-}" ]; then
-            echo "No ISSUE_ADMIN_TOKEN secret. The report stays closed and locked under missing-logs."
+            echo "No ISSUE_BOT_TOKEN secret. The report stays closed and locked under missing-logs."
             exit 0
           fi
           gh issue delete "$ISSUE_NUMBER" --repo "$REPO" --yes
