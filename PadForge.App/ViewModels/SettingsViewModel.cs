@@ -1338,6 +1338,21 @@ namespace PadForge.ViewModels
             }
         }
 
+        private int _flydigiVader5ProOutputIntervalMs = 30;
+
+        /// <summary>Four-motor HID pacing in milliseconds (10..60).
+        /// Default 30ms avoids assuming the pad can sustain fast writes.</summary>
+        public int FlydigiVader5ProOutputIntervalMs
+        {
+            get => _flydigiVader5ProOutputIntervalMs;
+            set
+            {
+                int safe = Math.Clamp(value, 10, 60);
+                if (SetProperty(ref _flydigiVader5ProOutputIntervalMs, safe))
+                    PadForge.Common.Input.FlydigiVader5ProHidWriter.SetOutputIntervalMs(safe);
+            }
+        }
+
         private bool _gKeysEnabled;
 
         /// <summary>Logitech G-keys through the G-key SDK (issue #454), the
