@@ -2379,6 +2379,7 @@ namespace PadForge.Services
             vm.EnableInputHiding = appSettings.EnableInputHiding;
             vm.KeepHidHideCloaksBetweenLaunches = appSettings.KeepHidHideCloaksBetweenLaunches;
             vm.FlydigiEnhancedProtocol = appSettings.FlydigiEnhancedProtocol;
+            vm.FlydigiVader5ProFourMotorEnabled = appSettings.FlydigiVader5ProFourMotorEnabled;
             vm.GKeysEnabled = appSettings.GKeysEnabled;
             vm.AnalogKeyboardsEnabled = appSettings.AnalogKeyboardsEnabled;
             vm.BlissBoxEnabled = appSettings.BlissBoxEnabled;
@@ -5066,6 +5067,7 @@ namespace PadForge.Services
                 EnableInputHiding = vm.EnableInputHiding,
                 KeepHidHideCloaksBetweenLaunches = vm.KeepHidHideCloaksBetweenLaunches,
                 FlydigiEnhancedProtocol = vm.FlydigiEnhancedProtocol,
+                FlydigiVader5ProFourMotorEnabled = vm.FlydigiVader5ProFourMotorEnabled,
                 GKeysEnabled = vm.GKeysEnabled,
                 AnalogKeyboardsEnabled = vm.AnalogKeyboardsEnabled,
                 BlissBoxEnabled = vm.BlissBoxEnabled,
@@ -7175,6 +7177,11 @@ namespace PadForge.Services
         /// vendor interface. Absent in older files = on, the shipped behavior.</summary>
         [XmlElement]
         public bool FlydigiEnhancedProtocol { get; set; } = true;
+
+        /// <summary>Opt-in native HID output for Vader 5 Pro four motors.
+        /// Off for all existing installations unless explicitly enabled.</summary>
+        [XmlElement]
+        public bool FlydigiVader5ProFourMotorEnabled { get; set; } = false;
 
         /// <summary>
         /// User-specified application paths to whitelist in HidHide.
