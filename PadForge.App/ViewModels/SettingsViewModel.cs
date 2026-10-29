@@ -27,6 +27,17 @@ namespace PadForge.ViewModels
             // Keep the per-item IsActive flame flag (#175) current when the
             // profile list is rebuilt or items are added/removed.
             ProfileItems.CollectionChanged += (_, _) => OnProfileItemsChanged();
+
+            // Status comes from a background HID worker, so marshal its
+            // transition notifications onto the WPF dispatcher.
+            FlydigiVader5ProHidWriter.StatusChanged += () =>
+            {
+                var ui = System.Windows.Application.Current?.Dispatcher;
+                if (ui == null) return;
+                if (ui.CheckAccess()) OnPropertyChanged(nameof(FlydigiVader5ProStatus));
+                else ui.BeginInvoke(new Action(() =>
+                    OnPropertyChanged(nameof(FlydigiVader5ProStatus))));
+            };
         }
 
         // ─────────────────────────────────────────────
@@ -1352,6 +1363,8 @@ namespace PadForge.ViewModels
                     PadForge.Common.Input.FlydigiVader5ProHidWriter.SetOutputIntervalMs(safe);
             }
         }
+
+        public string FlydigiVader5ProStatus => FlydigiVader5ProHidWriter.Status;
 
         // A single explicit channel at a time, 400ms at ~63% intensity.
         // The worker refuses output if two physical pads are present.

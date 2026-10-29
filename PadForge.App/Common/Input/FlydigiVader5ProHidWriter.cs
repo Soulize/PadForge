@@ -51,6 +51,19 @@ namespace PadForge.Common.Input
         private static long _nextScanAt;
         private static string _controlPath;
         private static string _pendingResetPath;
+        private static string _status = "Disabled";
+
+        internal static event Action StatusChanged;
+        internal static string Status => Volatile.Read(ref _status);
+
+        private static void SetStatus(string status)
+        {
+            if (Interlocked.Exchange(ref _status, status) == status) return;
+            try { PadForge.Engine.SdlDiagLog.WriteLine("FLYDIGI VADER5PRO: " + status); }
+            catch { /* diagnostic output is not essential to the motors */ }
+            try { StatusChanged?.Invoke(); }
+            catch { /* consumers cannot break the writer thread */ }
+        }
 
         // Injected in tests; called only on the background thread in production.
         internal static Func<IReadOnlyList<VendorHidCollection>> EnumerateControls =
@@ -101,6 +114,7 @@ namespace PadForge.Common.Input
                 }
             }
             Wake.Set();
+            SetStatus(enabled ? "Searching for 37D7:2401 vendor HID interface" : "Disabled");
         }
 
         /// <summary>
@@ -327,6 +341,9 @@ namespace PadForge.Common.Input
                         }
                         path = _controlPath;
                     }
+                    SetStatus(path != null
+                        ? "Vader 5 Pro HID interface ready"
+                        : "No unique Vader 5 Pro control interface (FFA0:0001)");
                 }
                 if (path == null) continue;
 
@@ -368,7 +385,15 @@ namespace PadForge.Common.Input
                             _nextScanAt = Clock() + RetryIntervalMs;
                         }
                     }
-                    if (!ok) RawHidOutput.ResetDevice(path);
+                    if (!ok)
+                    {
+                        RawHidOutput.ResetDevice(path);
+                        SetStatus("HID write failed; retrying after 1000 ms");
+                    }
+                    else if (Enabled)
+                    {
+                        SetStatus("Four-motor HID output available");
+                    }
                 }
             }
         }
