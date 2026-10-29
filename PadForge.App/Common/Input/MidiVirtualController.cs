@@ -246,12 +246,18 @@ namespace PadForge.Common.Input
         {
             if (_connected) return;
 
-            for (int attempt = 1; ; attempt++)
+            // One service restart per create at most, and one wait for each
+            // service instance to load its transports.
+            bool restarted = false, waitedForTransports = false;
+            while (true)
             {
                 int gen = Interlocked.Increment(ref _creationGen);
                 // A hang in a legacy open is a WinMM driver's, which a
                 // service restart does not always reach (118).
                 bool legacyCall = _backend is MidiBackendLegacy;
+                // Read before the create, since a service that finishes
+                // loading as the create fails reads as loaded afterward.
+                bool transportsLoading = !waitedForTransports && TransportsLoading();
 
                 // Event-based bound, NOT Task.Wait(timeout): Wait can inline
                 // an unstarted task onto the waiting thread, and an inlined
@@ -269,16 +275,30 @@ namespace PadForge.Common.Input
                 if (done.Wait(ConnectTimeoutMs))
                 {
                     if (fault == null) return;
+                    // The service turns a virtual device create down until it
+                    // has loaded the virtual transport, and it answers a
+                    // connectivity check after 10 s whether or not it has
+                    // loaded them all (bench 2026-10-28: loaded 10.15 s after
+                    // a restart, and the create made at 10.0 s failed). The
+                    // failed attempt already released its endpoint claim.
+                    if (transportsLoading)
+                    {
+                        waitedForTransports = true;
+                        AwaitTransports();
+                        continue;
+                    }
                     // A refused session is what a stopped or broken service
                     // answers, so it gets the restart a hung create gets.
-                    // The failed attempt already released its endpoint claim.
-                    if (fault is MidiSessionUnavailableException && attempt == 1
-                        && RestartService("the service refused a MIDI session", legacyCall: false) == MidiServiceRestart.Running)
+                    if (fault is MidiSessionUnavailableException && !restarted)
                     {
-                        if (!IsAvailable())
-                            throw new TimeoutException(
-                                $"Windows MIDI Services stayed unavailable after a service restart while creating '{"PadForge MIDI " + _instanceNum}'.");
-                        continue;
+                        restarted = true;
+                        if (RestartService("the service refused a MIDI session", legacyCall: false) == MidiServiceRestart.Running)
+                        {
+                            if (!AvailableAfterRestart())
+                                throw new MidiServiceUnavailableException("PadForge MIDI " + _instanceNum);
+                            waitedForTransports = false;
+                            continue;
+                        }
                     }
                     throw fault;
                 }
@@ -298,13 +318,16 @@ namespace PadForge.Common.Input
                 // 2026-07-23: instance stuck in StopPending; kill+restart
                 // took the same create from 15 s timeout to 63 ms). Recover
                 // the service (cooldown-gated) and retry once.
-                if (attempt == 1
-                    && RestartService("a MIDI create hung", legacyCall) == MidiServiceRestart.Running)
+                if (!restarted)
                 {
-                    if (!IsAvailable())
-                        throw new TimeoutException(
-                            $"Windows MIDI Services stayed unavailable after a service restart while creating '{"PadForge MIDI " + _instanceNum}'.");
-                    continue;
+                    restarted = true;
+                    if (RestartService("a MIDI create hung", legacyCall) == MidiServiceRestart.Running)
+                    {
+                        if (!AvailableAfterRestart())
+                            throw new MidiServiceUnavailableException("PadForge MIDI " + _instanceNum);
+                        waitedForTransports = false;
+                        continue;
+                    }
                 }
 
                 if (legacyCall)
@@ -313,6 +336,51 @@ namespace PadForge.Common.Input
                 throw new TimeoutException(
                     $"Windows MIDI Services did not answer within {ConnectTimeoutMs / 1000} s while creating '{"PadForge MIDI " + _instanceNum}'.");
             }
+        }
+
+        /// <summary>Whether the service the API in use talks through is still
+        /// loading its transports (<see cref="MidiServiceRecovery.TransportsLoaded"/>).
+        /// False for an API that does not talk to it, and for a service that
+        /// gives no such signal.</summary>
+        private static bool TransportsLoading()
+            => _backend is { } backend && TalksToService(backend)
+               && MidiServiceRecovery.TransportsLoaded(0) == false;
+
+        /// <summary>Waits for the service to load its transports, through the
+        /// create path's bound, and logs how that went.</summary>
+        private static void AwaitTransports()
+        {
+            SdlDiagLog.WriteLine("MIDIRECOVER a create failed while midisrv was loading its transports: waiting for them");
+            long start = Environment.TickCount64;
+            bool? loaded = MidiServiceRecovery.TransportsLoaded(ConnectTimeoutMs);
+            SdlDiagLog.WriteLine(loaded switch
+            {
+                true => $"MIDIRECOVER midisrv loaded its transports {Environment.TickCount64 - start} ms later: creating again",
+                false => $"MIDIRECOVER midisrv was still loading its transports after {ConnectTimeoutMs / 1000} s: creating again",
+                null => "MIDIRECOVER midisrv stopped signaling its transports: creating again",
+            });
+        }
+
+        /// <summary>Whether MIDI answers on the instance a create's own
+        /// service restart brought up. That instance's first probe waits for
+        /// the service's device enumeration, up to the 10 s Microsoft's client
+        /// gives it (MidiSrvTransport.cpp VerifyConnectivity,
+        /// g_midiSynchronizedStartTimeoutMs), and 10 s is also the bound an
+        /// ask gives a probe. So the ask gave up in the moment the answer came
+        /// (bench 2026-10-28: 2 ms after the bound), and the create failed
+        /// with MIDI running. A probe the ask gave up on is waited for here
+        /// through the create path's bound, counted from the probe's start,
+        /// the bound the recovery watches a probe for before it restarts
+        /// anything (<see cref="ProbeWatchMs"/>). The probe read again after
+        /// the wait may have answered in the instant after the ask, so it is
+        /// read whether or not one was pending.</summary>
+        private static bool AvailableAfterRestart()
+        {
+            if (IsAvailable()) return true;
+            var pending = s_hungProbe;
+            if (pending != null)
+                pending.Done.Wait(ProbeWatchMs(pending.StartedMs, Environment.TickCount64));
+            return IsAvailable();
         }
 
         /// <summary>Restarts the service for a call that hung or a session it

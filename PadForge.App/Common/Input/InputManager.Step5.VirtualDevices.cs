@@ -908,9 +908,23 @@ namespace PadForge.Common.Input
 
         /// <summary>The MIDI API in use when a MIDI create failed. A slot that
         /// failed under one API gets a fresh attempt once the probe settles
-        /// on another, as when the runtime goes in under the legacy
-        /// API.</summary>
+        /// on another, as when the runtime goes in under the legacy API. A
+        /// create that failed for want of an API keeps None here, whatever
+        /// the probe has answered since the failure, so an answer that came
+        /// between the failure and the latch still starts the retry.</summary>
         private readonly MidiApiKind[] _createFailedMidiApi = new MidiApiKind[MaxPads];
+
+        /// <summary>Set by the create when it failed for want of a MIDI API:
+        /// its own ask found none, or none answered on the instance its own
+        /// service restart brought up (<see cref="MidiServiceUnavailableException"/>).
+        /// The latch that follows on the same worker then keeps no API. A
+        /// probe on a new service instance answers in about the time an ask
+        /// waits for it, so the answer came a few milliseconds after the
+        /// create gave up, the latch stamped the API that had just started,
+        /// and nothing that failed changed again: the slot stayed failed with
+        /// MIDI running (bench 2026-10-28). Every create starts with it
+        /// cleared.</summary>
+        private readonly bool[] _createNoMidiApi = new bool[MaxPads];
 
         /// <summary>The MIDI generation (<see cref="MidiVirtualController.Generation"/>)
         /// when a MIDI create failed, read after the create's own service
@@ -1141,7 +1155,8 @@ namespace PadForge.Common.Input
             _createFailedProfile[padIndex] = failedProfile;
             _createFailedMidiPort[padIndex] = failedMidiPort ?? string.Empty;
             _createFailedKbm[padIndex] = failedKbm;
-            _createFailedMidiApi[padIndex] = MidiVirtualController.ActiveApi;
+            _createFailedMidiApi[padIndex] = _createNoMidiApi[padIndex] ? MidiApiKind.None : MidiVirtualController.ActiveApi;
+            _createNoMidiApi[padIndex] = false;
             _createFailedMidiGen[padIndex] = MidiVirtualController.Generation;
             _createFailedListingGen[padIndex] = Interlocked.Read(ref _legacyPortListingKicks);
             _createFailedPortMissing[padIndex] = _createPortMissing[padIndex];
@@ -2837,12 +2852,13 @@ namespace PadForge.Common.Input
         private IVirtualController CreateVirtualController(int padIndex, VirtualControllerType controllerType,
             string capturedProfileId, in ExtendedBuild build, in KbmBuild kbm)
         {
-            // Neither mark of an earlier create outlives it. A create that
+            // No mark of an earlier create outlives it. A create that
             // failed and took no latch, as when its slot lost its device
             // meanwhile, left its shared-port mark for the latch of the
             // slot's next failure, whatever that failure was.
             _createPortMissing[padIndex] = false;
             _createPortShared[padIndex] = false;
+            _createNoMidiApi[padIndex] = false;
 
             // MIDI and KeyboardMouse stay on their dedicated implementations.
             // Xbox / PlayStation / Nintendo / Extended route through HIDMaestro.
@@ -2908,6 +2924,7 @@ namespace PadForge.Common.Input
             {
                 vc?.Dispose();
                 _createPortMissing[padIndex] = ex is MidiPortNotConnectedException;
+                _createNoMidiApi[padIndex] = ex is MidiServiceUnavailableException;
                 RaiseCreateError(padIndex, controllerType, ex);
                 return null;
             }
@@ -2952,11 +2969,11 @@ namespace PadForge.Common.Input
         /// place. A failure that is not the port's (a session the service
         /// refused, a create that hung) is one the slot can get past by
         /// itself, since a later generation retries it, and its line used
-        /// to stay up after the slot ran. That line says Windows MIDI
-        /// Services did not create the port while one of its APIs is the
-        /// one in use, and that MIDI is not running otherwise, as after the
-        /// create's own service restart left no API started. The diagnostics
-        /// log gets its own line, in English
+        /// to stay up after the slot ran. That line says MIDI is not running
+        /// when no API answered on the instance the create's own service
+        /// restart brought up, or no API is in use. Otherwise it says Windows
+        /// MIDI Services did not create the port while one of its APIs is the
+        /// one in use. The diagnostics log gets its own line, in English
         /// (<see cref="CreateFailedLogLine"/>).</summary>
         private void RaiseCreateError(int padIndex, VirtualControllerType controllerType, Exception ex)
         {
@@ -2970,7 +2987,8 @@ namespace PadForge.Common.Input
             }
             else if (controllerType == VirtualControllerType.Midi)
             {
-                string format = MidiVirtualController.ActiveApi is MidiApiKind.InBox or MidiApiKind.AppSdk
+                string format = ex is not MidiServiceUnavailableException
+                                && MidiVirtualController.ActiveApi is MidiApiKind.InBox or MidiApiKind.AppSdk
                     ? Strings.Instance.Status_MidiCreateFailed_Format
                     : Strings.Instance.Status_MidiNotRunning_Format;
                 RaiseMidiCreateError(padIndex, string.Format(format, SlotLabel(padIndex)), logLine, ex);
@@ -3439,6 +3457,7 @@ namespace PadForge.Common.Input
 
             if (!MidiVirtualController.IsAvailable())
             {
+                _createNoMidiApi[padIndex] = true;
                 RaiseMidiCreateError(padIndex, string.Format(Strings.Instance.Status_MidiNotRunning_Format, SlotLabel(padIndex)),
                     CreateFailedLogLine(padIndex, VirtualControllerType.Midi), null);
                 return null;

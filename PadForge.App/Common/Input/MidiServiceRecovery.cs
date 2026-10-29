@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Microsoft.Win32.SafeHandles;
 
 namespace PadForge.Common.Input
 {
@@ -12,6 +13,15 @@ namespace PadForge.Common.Input
     internal sealed class MidiSessionUnavailableException : InvalidOperationException
     {
         internal MidiSessionUnavailableException() : base("Failed to create MIDI session.") { }
+    }
+
+    /// <summary>No MIDI API answered on the service instance a create's own
+    /// restart brought up, within the create's bound. The create failed for
+    /// want of an API, so its slot tries again once a probe answers.</summary>
+    internal sealed class MidiServiceUnavailableException : TimeoutException
+    {
+        internal MidiServiceUnavailableException(string deviceName)
+            : base($"Windows MIDI Services stayed unavailable after a service restart while creating '{deviceName}'.") { }
     }
 
     /// <summary>What a midisrv restart did.</summary>
@@ -336,6 +346,53 @@ namespace PadForge.Common.Input
                 finally { CloseServiceHandle(svc); }
             }
             finally { CloseServiceHandle(scm); }
+        }
+
+        private const uint SYNCHRONIZE = 0x00100000;
+        private const uint WAIT_OBJECT_0 = 0;
+
+        /// <summary>The event midisrv sets once it has loaded every transport
+        /// at start (MidiSrv.cpp DeviceManagerInitializeWorker). A new
+        /// instance resets it as it starts. Microsoft's client waits on it
+        /// for at most 10 s before it answers a connectivity check, and then
+        /// answers whether or not it was set (MidiSrvTransport.cpp
+        /// VerifyConnectivity, g_midiSynchronizedStartTimeoutMs).</summary>
+        private const string TransportsLoadedEvent = @"Global\Microsoft-Windows-MidiSrv-DeviceEnumerationComplete";
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern SafeWaitHandle OpenEventW(uint access, bool inheritHandle, string name);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern uint WaitForSingleObject(SafeWaitHandle handle, uint milliseconds);
+
+        /// <summary>Test seam: stands in for <see cref="TransportsLoaded"/>.
+        /// Null in production.</summary>
+        internal static Func<int, bool?> TransportsLoadedSeam;
+
+        /// <summary>Waits up to <paramref name="ms"/> for the running service
+        /// to finish loading its transports: true once it has, false while
+        /// it is still loading them, and null when there is no such event to
+        /// read, on a service without it or with none running. A virtual
+        /// device create sent before the virtual transport is loaded fails,
+        /// since the service has no configuration manager for it yet
+        /// (MidiDeviceManager.cpp UpdateTransportConfiguration). The event is
+        /// opened for SYNCHRONIZE alone, the right the service grants its
+        /// clients: an open that also asks to modify it is refused.</summary>
+        internal static bool? TransportsLoaded(int ms)
+        {
+            var seam = TransportsLoadedSeam;
+            if (seam != null) return seam(ms);
+            if (SeamsOnlyForTest) return null;
+            try
+            {
+                using var loaded = OpenEventW(SYNCHRONIZE, false, TransportsLoadedEvent);
+                if (loaded.IsInvalid) return null;
+                return WaitForSingleObject(loaded, (uint)Math.Max(0, ms)) == WAIT_OBJECT_0;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         /// <summary>The running midisrv's process id, or 0 when it is not

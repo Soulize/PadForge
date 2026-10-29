@@ -66,6 +66,7 @@ namespace PadForge.Tests
             MidiInputRuntime.SessionTimeoutMs = 3_000;
             MidiInputDevice.OpenTimeoutMs = 3_000;
             MidiServiceRecovery.RestartSeam = null;
+            MidiServiceRecovery.TransportsLoadedSeam = null;
             MidiRuntimeSwitch.ReleaseTimeoutMs = 60_000;
             MidiVirtualController.SendDrainMs = 3_000;
         }
@@ -329,6 +330,211 @@ namespace PadForge.Tests
             Assert.False(vc.IsConnected);
             Assert.Equal(1, restarts);
             Assert.Equal(0, backend.Stops);
+        }
+
+        /// <summary>A create that hung restarts the service, and the new
+        /// instance's first probe waits for its device enumeration, up to the
+        /// 10 s Microsoft's client gives it, which is also the bound an ask
+        /// gives a probe. The ask after the restart gave up in the moment the
+        /// answer came, and the create failed with MIDI running (bench
+        /// 2026-10-28: the probe answered 2 ms after the bound). The create
+        /// waits for that probe through its own bound, as the recovery does
+        /// before it restarts anything, and runs again.</summary>
+        [Fact]
+        public void AHungCreate_WaitsForTheNewInstancesFirstProbe_AndRunsAgain()
+        {
+            var hang = new ManualResetEventSlim(false);
+            var slowProbe = new ManualResetEventSlim(false);
+            try
+            {
+                var backend = Use(new FakeBackend(MidiApiKind.AppSdk));
+                int creates = 0, restarts = 0;
+                backend.OnCreate = (name, uid, pad) =>
+                {
+                    if (Interlocked.Increment(ref creates) == 1) hang.Wait(30_000);
+                    var ep = new FakeEndpoint(name, uid, pad);
+                    lock (backend.Endpoints) backend.Endpoints.Add(ep);
+                    return ep;
+                };
+                Assert.True(MidiVirtualController.IsAvailable());
+                MidiServiceRecovery.CooldownMs = FarOff;
+                MidiServiceRecovery.ResetCooldownForTest();
+                MidiServiceRecovery.RecoverSeam = () =>
+                {
+                    Interlocked.Increment(ref restarts);
+                    backend.StartGate = slowProbe;
+                    return true;
+                };
+                // An ask gives up after 200 ms. The create's bound, and the
+                // recovery's watch, is 2 s.
+                ProbeBounds(200, restartAtMs: 2_000);
+                // The probe answers as soon as the ask has given up on it.
+                MidiVirtualController.SyncPointForTest = point =>
+                {
+                    if (point == "recovery-watching") slowProbe.Set();
+                };
+
+                var vc = new MidiVirtualController(0, 0, 1);
+                vc.Connect();
+
+                Assert.True(vc.IsConnected);
+                Assert.Equal(1, Volatile.Read(ref restarts));
+                Assert.Equal(2, Volatile.Read(ref creates));
+                Assert.Equal(MidiApiKind.AppSdk, MidiVirtualController.ActiveApi);
+                Assert.Equal(MidiVirtualController.Generation, vc.CreatedGeneration);
+                vc.Dispose();
+            }
+            finally
+            {
+                slowProbe.Set();
+                hang.Set();
+            }
+        }
+
+        /// <summary>A new service instance answers a connectivity check
+        /// after 10 s whether or not it has loaded its transports
+        /// (MidiSrvTransport.cpp VerifyConnectivity), and a virtual device
+        /// create sent before the virtual transport is loaded fails
+        /// (MidiDeviceManager.cpp UpdateTransportConfiguration). The bench
+        /// took 10.15 s to load them after a restart, and the create made
+        /// 10.0 s in failed and latched the slot (2026-10-28). A create that
+        /// fails while the service is still loading its transports waits for
+        /// them and runs once more: after the create's own restart, and on a
+        /// service that started for some other reason.</summary>
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void ACreateTheServiceTurnsDownWhileItLoadsItsTransports_WaitsForThemAndRunsAgain(bool afterItsOwnRestart)
+        {
+            var hang = new ManualResetEventSlim(false);
+            // Set while the running instance has loaded every transport.
+            var loaded = new ManualResetEventSlim(afterItsOwnRestart);
+            try
+            {
+                var backend = Use(new FakeBackend(MidiApiKind.AppSdk));
+                int creates = 0, restarts = 0, waits = 0;
+                backend.OnCreate = (name, uid, pad) =>
+                {
+                    int n = Interlocked.Increment(ref creates);
+                    if (afterItsOwnRestart && n == 1) hang.Wait(30_000);
+                    else if (!loaded.IsSet) throw new InvalidOperationException("Failed to create virtual MIDI device.");
+                    var ep = new FakeEndpoint(name, uid, pad);
+                    lock (backend.Endpoints) backend.Endpoints.Add(ep);
+                    return ep;
+                };
+                Assert.True(MidiVirtualController.IsAvailable());
+                MidiServiceRecovery.CooldownMs = FarOff;
+                MidiServiceRecovery.ResetCooldownForTest();
+                // The restarted instance starts loading its transports.
+                MidiServiceRecovery.RecoverSeam = () => { Interlocked.Increment(ref restarts); loaded.Reset(); return true; };
+                // The service finishes loading them while PadForge waits.
+                MidiServiceRecovery.TransportsLoadedSeam = ms =>
+                {
+                    if (ms > 0)
+                    {
+                        Interlocked.Increment(ref waits);
+                        loaded.Set();
+                    }
+                    return loaded.IsSet;
+                };
+                ProbeBounds(200, restartAtMs: 1_000);
+
+                var vc = new MidiVirtualController(0, 0, 1);
+                vc.Connect();
+
+                Assert.True(vc.IsConnected);
+                Assert.Equal(afterItsOwnRestart ? 1 : 0, Volatile.Read(ref restarts));
+                Assert.Equal(afterItsOwnRestart ? 3 : 2, Volatile.Read(ref creates));
+                Assert.Equal(1, Volatile.Read(ref waits));
+                Assert.Single(backend.Endpoints);
+                vc.Dispose();
+            }
+            finally
+            {
+                loaded.Set();
+                hang.Set();
+            }
+        }
+
+        /// <summary>Each service instance gets its own wait: a create that
+        /// waited for one instance to load its transports, then hung and
+        /// restarted the service, waits for the new instance too.</summary>
+        [Fact]
+        public void ACreateThatWaitedThenHung_WaitsForTheRestartedInstanceToo()
+        {
+            var hang = new ManualResetEventSlim(false);
+            var loaded = new ManualResetEventSlim(false);
+            try
+            {
+                var backend = Use(new FakeBackend(MidiApiKind.AppSdk));
+                int creates = 0, restarts = 0, waits = 0;
+                backend.OnCreate = (name, uid, pad) =>
+                {
+                    int n = Interlocked.Increment(ref creates);
+                    if (n == 2) hang.Wait(30_000);
+                    else if (!loaded.IsSet) throw new InvalidOperationException("Failed to create virtual MIDI device.");
+                    var ep = new FakeEndpoint(name, uid, pad);
+                    lock (backend.Endpoints) backend.Endpoints.Add(ep);
+                    return ep;
+                };
+                Assert.True(MidiVirtualController.IsAvailable());
+                MidiServiceRecovery.CooldownMs = FarOff;
+                MidiServiceRecovery.ResetCooldownForTest();
+                MidiServiceRecovery.RecoverSeam = () => { Interlocked.Increment(ref restarts); loaded.Reset(); return true; };
+                MidiServiceRecovery.TransportsLoadedSeam = ms =>
+                {
+                    if (ms > 0)
+                    {
+                        Interlocked.Increment(ref waits);
+                        loaded.Set();
+                    }
+                    return loaded.IsSet;
+                };
+                ProbeBounds(200, restartAtMs: 1_000);
+
+                var vc = new MidiVirtualController(0, 0, 1);
+                vc.Connect();
+
+                Assert.True(vc.IsConnected);
+                Assert.Equal(1, Volatile.Read(ref restarts));
+                Assert.Equal(4, Volatile.Read(ref creates));
+                Assert.Equal(2, Volatile.Read(ref waits));
+                vc.Dispose();
+            }
+            finally
+            {
+                loaded.Set();
+                hang.Set();
+            }
+        }
+
+        /// <summary>A create that fails once the service has loaded its
+        /// transports, or on a service with no such signal, fails at once,
+        /// as it did: nothing waits, and nothing runs it again.</summary>
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void ACreateThatFailsWhileTheServiceIsNotLoading_FailsAtOnce(bool serviceHasTheSignal)
+        {
+            var backend = Use(new FakeBackend(MidiApiKind.AppSdk));
+            int creates = 0, waits = 0;
+            backend.OnCreate = (_, _, _) =>
+            {
+                Interlocked.Increment(ref creates);
+                throw new InvalidOperationException("Failed to create virtual MIDI device.");
+            };
+            MidiServiceRecovery.TransportsLoadedSeam = ms =>
+            {
+                if (ms > 0) Interlocked.Increment(ref waits);
+                return serviceHasTheSignal ? true : null;
+            };
+            Assert.True(MidiVirtualController.IsAvailable());
+
+            var vc = new MidiVirtualController(0, 0, 1);
+            Assert.Throws<InvalidOperationException>(() => vc.Connect());
+            Assert.False(vc.IsConnected);
+            Assert.Equal(1, Volatile.Read(ref creates));
+            Assert.Equal(0, Volatile.Read(ref waits));
         }
 
         /// <summary>Every backend teardown starts a new generation, and a
@@ -889,6 +1095,130 @@ namespace PadForge.Tests
             }
             finally
             {
+                vcs?[pad]?.Dispose();
+                SettingsManager.UserSettings = savedSettings;
+                SettingsManager.UserDevices = savedDevices;
+                Array.Copy(savedCreated, SettingsManager.SlotCreated, savedCreated.Length);
+                Array.Copy(savedEnabled, SettingsManager.SlotEnabled, savedEnabled.Length);
+            }
+        }
+
+        /// <summary>A MIDI create that failed for want of an API retries once
+        /// the probe answers, even when the answer came between the failure
+        /// and its latch. A probe on a new service instance answers in about
+        /// the time an ask waits for it, so the answer came a few
+        /// milliseconds after the create gave up, the latch stamped the API
+        /// that had just started and the generation it started in, and
+        /// nothing that failed ever changed again: the slot stayed failed
+        /// with MIDI running (bench 2026-10-28). One row fails at the
+        /// create's own ask. The other fails after the create hung and
+        /// restarted the service, with the new instance's probe still pending
+        /// at the create's bound.</summary>
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void AMidiCreateThatFoundNoApi_RetriesOnceTheProbeAnswers_EvenBeforeItsLatch(bool createHungFirst)
+        {
+            const int pad = 3;
+            var deviceGuid = new Guid("8a4f0c27-3d91-4b6e-9e25-61c7d0b4a3f8");
+            var savedSettings = SettingsManager.UserSettings;
+            var savedDevices = SettingsManager.UserDevices;
+            var savedCreated = (bool[])SettingsManager.SlotCreated.Clone();
+            var savedEnabled = (bool[])SettingsManager.SlotEnabled.Clone();
+            IVirtualController[] vcs = null;
+            var hang = new ManualResetEventSlim(false);
+            var slowProbe = new ManualResetEventSlim(false);
+            using var orders = new SlotOrdersScope(midi: new[] { pad });
+            try
+            {
+                var backend = Use(new FakeBackend(MidiApiKind.AppSdk));
+                int creates = 0;
+                backend.OnCreate = (name, uid, p) =>
+                {
+                    if (Interlocked.Increment(ref creates) == 1 && createHungFirst) hang.Wait(30_000);
+                    var ep = new FakeEndpoint(name, uid, p);
+                    lock (backend.Endpoints) backend.Endpoints.Add(ep);
+                    return ep;
+                };
+                MidiServiceRecovery.CooldownMs = FarOff;
+                MidiServiceRecovery.ResetCooldownForTest();
+                if (createHungFirst)
+                {
+                    // The probe made before the slot answers. The create
+                    // hangs, and the probe on the restarted instance holds
+                    // past the create's bound.
+                    Assert.True(MidiVirtualController.IsAvailable());
+                    MidiServiceRecovery.RecoverSeam = () => { backend.StartGate = slowProbe; return true; };
+                    ProbeBounds(200, restartAtMs: 1_000);
+                }
+                else
+                {
+                    // The slot's create makes the first probe, which holds
+                    // past the ask's bound. Nothing is restarted.
+                    backend.StartGate = slowProbe;
+                    MidiServiceRecovery.RecoverSeam = () => true;
+                    ProbeBounds(200, restartAtMs: FarOff);
+                }
+
+                SettingsManager.UserDevices = new DeviceCollection();
+                SettingsManager.UserSettings = new SettingsCollection();
+                Array.Clear(SettingsManager.SlotCreated, 0, SettingsManager.SlotCreated.Length);
+                for (int i = 0; i < SettingsManager.SlotEnabled.Length; i++) SettingsManager.SlotEnabled[i] = true;
+                SettingsManager.SlotCreated[pad] = true;
+                var ud = new UserDevice { InstanceGuid = deviceGuid, ProductName = "MIDI Pad", IsOnline = true, InputState = new CustomInputState() };
+                lock (SettingsManager.UserDevices.SyncRoot) SettingsManager.UserDevices.Items.Add(ud);
+                lock (SettingsManager.UserSettings.SyncRoot) SettingsManager.UserSettings.Items.Add(new UserSetting { InstanceGuid = deviceGuid, MapTo = pad });
+
+                var im = new InputManager();
+                im.SlotControllerTypes[pad] = VirtualControllerType.Midi;
+                im._midiConfigs[pad] = new MidiSlotConfig { Channel = 1, StartCc = 1, CcCount = 1, StartNote = 60, NoteCount = 1, Velocity = 100 };
+                vcs = (IVirtualController[])typeof(InputManager)
+                    .GetField("_virtualControllers", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(im);
+                var raised = new List<string>();
+                var resolved = new List<string>();
+                // The failure is decided, then the probe answers, then the
+                // create worker latches: the order the bench showed.
+                im.ErrorOccurred += (_, e) =>
+                {
+                    lock (raised) raised.Add(e.Message);
+                    slowProbe.Set();
+                    SpinWait.SpinUntil(() => MidiVirtualController.ActiveApi == MidiApiKind.AppSdk, 10_000);
+                };
+                im.ErrorResolved += (_, m) => { lock (resolved) resolved.Add(m); };
+                T Field<T>(string name) => (T)typeof(InputManager).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).GetValue(im);
+                var step5 = typeof(InputManager).GetMethod("UpdateVirtualDevices", BindingFlags.Instance | BindingFlags.NonPublic);
+                bool StepUntil(Func<bool> done)
+                {
+                    for (int i = 0; i < 20 && !done(); i++)
+                    {
+                        step5.Invoke(im, null);
+                        Assert.True(SpinWait.SpinUntil(() =>
+                        {
+                            var connect = Field<System.Threading.Tasks.Task[]>("_pendingConnectTask")[pad];
+                            var dispose = Field<System.Threading.Tasks.Task[]>("_pendingDisposeTask")[pad];
+                            return (connect == null || connect.IsCompleted) && (dispose == null || dispose.IsCompleted);
+                        }, 10_000), "a Step 5 worker did not finish");
+                    }
+                    return done();
+                }
+
+                Assert.True(StepUntil(() => Field<bool[]>("_createFailed")[pad]));
+                string line;
+                lock (raised) line = Assert.Single(raised);
+                var strings = PadForge.Resources.Strings.Strings.Instance;
+                Assert.Equal(string.Format(strings.Status_MidiNotRunning_Format,
+                    string.Format(strings.Main_VirtualController_Format, 1)), line);
+                Assert.Equal(MidiApiKind.AppSdk, MidiVirtualController.ActiveApi);
+
+                // MIDI is running, so the slot tries again and runs.
+                Assert.True(StepUntil(() => vcs[pad] is MidiVirtualController { IsConnected: true }));
+                lock (resolved) Assert.Equal(new[] { line }, resolved);
+                lock (raised) Assert.Single(raised);
+            }
+            finally
+            {
+                slowProbe.Set();
+                hang.Set();
                 vcs?[pad]?.Dispose();
                 SettingsManager.UserSettings = savedSettings;
                 SettingsManager.UserDevices = savedDevices;
