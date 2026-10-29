@@ -38,6 +38,7 @@ namespace PadForge.Common.Input
         private static readonly AutoResetEvent Wake = new(false);
         private static Thread _worker;
         private static int _enabled;
+        private static int _outputIntervalMs = MinimumWriteIntervalMs;
         private static Motors _desired;
         private static Motors _sent;
         private static bool _everSent;
@@ -59,6 +60,16 @@ namespace PadForge.Common.Input
             => vid == VendorId && pid == ProductId;
 
         internal static bool Enabled => Volatile.Read(ref _enabled) != 0;
+
+        /// <summary>10..60 ms, default 30 ms. Sub-30-ms operation is
+        /// experimental and must be validated on the connected firmware.</summary>
+        internal static int OutputIntervalMs => Volatile.Read(ref _outputIntervalMs);
+
+        internal static void SetOutputIntervalMs(int milliseconds)
+        {
+            Volatile.Write(ref _outputIntervalMs, Math.Clamp(milliseconds, 10, 60));
+            Wake.Set();
+        }
 
         /// <summary>Enabled only by an explicit settings toggle; default off.</summary>
         internal static void SetEnabled(bool enabled)
@@ -216,9 +227,10 @@ namespace PadForge.Common.Input
         internal static bool IsFresh(long now, long lastInput)
             => lastInput > 0 && now >= lastInput && now - lastInput <= StaleInputMs;
 
-        internal static bool MaySend(long now, long lastWrite, bool hasSent)
+        internal static bool MaySend(long now, long lastWrite, bool hasSent,
+            int intervalMs = MinimumWriteIntervalMs)
             => !hasSent || now < lastWrite
-                || now - lastWrite >= MinimumWriteIntervalMs;
+                || now - lastWrite >= Math.Clamp(intervalMs, 10, 60);
 
         /// <summary>Strict VID/PID + vendor usage; never guess at a device.</summary>
         internal static string SelectUniqueControlPath(IReadOnlyList<VendorHidCollection> devices)
@@ -244,7 +256,7 @@ namespace PadForge.Common.Input
             {
                 // A 1 kHz game can change the desired state at any point.
                 // Coalesce updates; NEVER write HID from the input thread.
-                Wake.WaitOne(MinimumWriteIntervalMs);
+                Wake.WaitOne(OutputIntervalMs);
                 // Always close a stale handle before probing a replacement.
                 // IoGate prevents overlap with the previous HID write.
                 lock (IoGate)
@@ -301,7 +313,7 @@ namespace PadForge.Common.Input
                         lastWrite = _lastWriteAt;
                         if (_everSent && alreadySent && (next.Silent || Clock() - lastWrite < KeepAliveMs))
                             continue;
-                        if (!MaySend(Clock(), lastWrite, _everSent)) continue;
+                        if (!MaySend(Clock(), lastWrite, _everSent, OutputIntervalMs)) continue;
                     }
                     bool ok;
                     try { ok = WriteReport(path, BuildReport(next)); }
