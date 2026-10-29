@@ -282,6 +282,13 @@
                                   IsChecked="{Binding FlydigiEnhancedProtocol}"/>
                         <reset:SettingResetButton Command="{Binding ResetSettingCommand}" CommandParameter="FlydigiEnhancedProtocol" SettingLabel="{Binding Settings_FlydigiEnhanced, Source={x:Static strings:Strings.Instance}}" AutomationProperties.AutomationId="Reset_SettingsViewModel_FlydigiEnhancedProtocol_158"/>
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <CheckBox VerticalAlignment="Center"
+                                  Content="Experimental: Vader 5 Pro native four-motor rumble"
+                                  Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                  ToolTip="Direct 37D7:2401 vendor HID output; independently controls two grip and two trigger motors. Supports one pad only. Disable when Flydigi Space Station holds exclusive access."
+                                  IsChecked="{Binding FlydigiVader5ProFourMotorEnabled}"/>
+                    </StackPanel>
                     <!-- Logitech G-keys (#454), the Flydigi row's shape: a
                          vendor input path this engine can read, off until
                          asked for. -->
