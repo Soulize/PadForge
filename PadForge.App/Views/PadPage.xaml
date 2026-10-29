@@ -4590,6 +4590,13 @@
                                 </Setter>
                                 <Setter Property="Foreground"
                                         Value="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                <!-- Each row is a Tab stop for keyboard and screen
+                                     reader users. WPF makes a DataGridRow unfocusable,
+                                     and a compact row hides the cells that could take
+                                     focus, so Tab skipped the whole table. On a row the
+                                     keys a slot maps do nothing (#61), and a click leaves
+                                     focus to the window, which clears it. -->
+                                <Setter Property="Focusable" Value="True"/>
                                 <!-- Compact rows (trivial + collapsed fan-in) have
                                      their cells collapsed, so a click never reaches a
                                      DataGridCell and WPF's own selection logic won't

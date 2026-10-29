@@ -4002,22 +4002,46 @@ namespace PadForge.Views
             // resolve it so an Alt-modified arrow is still seen as an arrow.
             Key k = e.Key == Key.System ? e.SystemKey : e.Key;
 
-            bool isNav =
-                k is Key.Up or Key.Down or Key.Left or Key.Right
-                  or Key.PageUp or Key.PageDown or Key.Home or Key.End;
-
-            // Type-ahead: WPF ComboBox jumps to the first item whose text
-            // starts with the typed character. Letters and digits cover every
-            // Combine-mode label ("Strongest", "Average", …) and input label
-            // ("A", "Button 0", "Left Stick X", …), which is all a user maps.
-            bool isTypeAhead =
-                (k >= Key.A && k <= Key.Z)
-                || (k >= Key.D0 && k <= Key.D9)
-                || (k >= Key.NumPad0 && k <= Key.NumPad9);
-
-            if (isNav || isTypeAhead)
+            if (KeyStaysOutOfMappings(k))
                 e.Handled = true;
         }
+
+        /// <summary>The keys a keyboard-mapped slot uses that the Mappings
+        /// tab keeps from its closed pickers and its rows (#61): the arrows,
+        /// Page Up and Down, Home and End, which move a selection, and the
+        /// letters and digits, which a closed ComboBox takes as type-ahead.
+        /// Letters and digits cover every Combine-mode label ("Strongest",
+        /// "Average", …) and input label ("A", "Button 0", "Left Stick X",
+        /// …), which is all a user maps. Enter, Space, F4, Tab and Escape stay
+        /// live, since they open a picker or a row and move focus.</summary>
+        internal static bool KeyStaysOutOfMappings(Key k)
+            => k is Key.Up or Key.Down or Key.Left or Key.Right
+                    or Key.PageUp or Key.PageDown or Key.Home or Key.End
+               || (k >= Key.A && k <= Key.Z)
+               || (k >= Key.D0 && k <= Key.D9)
+               || (k >= Key.NumPad0 && k <= Key.NumPad9);
+
+        /// <summary>What a key does on a focused Mappings row.</summary>
+        internal enum MappingRowKeyAction
+        {
+            /// <summary>Goes on to the table and the window: Tab and Escape
+            /// move focus.</summary>
+            PassOn,
+
+            /// <summary>Opens the row, or closes it when it is open.</summary>
+            Toggle,
+
+            /// <summary>Does nothing (<see cref="KeyStaysOutOfMappings"/>).</summary>
+            Ignore,
+        }
+
+        /// <summary>What <paramref name="k"/> does on a focused Mappings row:
+        /// Enter and Space open and close it, the keys a slot maps do
+        /// nothing, and the rest pass on.</summary>
+        internal static MappingRowKeyAction RowKeyAction(Key k)
+            => k is Key.Enter or Key.Space ? MappingRowKeyAction.Toggle
+               : KeyStaysOutOfMappings(k) ? MappingRowKeyAction.Ignore
+               : MappingRowKeyAction.PassOn;
 
         private void ExtendedCustomValue_Changed(object sender, RoutedEventArgs e)
         {
@@ -5094,9 +5118,11 @@ namespace PadForge.Views
         /// clicked full row (details strip opens via the
         /// VisibleWhenSelected path). Trivial rows additionally need the
         /// expansion override; fan-in rows expand on selection alone.
-        /// Focus moves to the row so Enter/Space can toggle it afterwards.
-        /// Clicks on already-expanded rows fall through to normal cell
-        /// handling.</summary>
+        /// The click leaves keyboard focus where the window's click handler
+        /// put it, which is nowhere for a row, so a key the slot maps,
+        /// pressed to test the mapping, never reaches the table. Tab reaches
+        /// the row from the keyboard. Clicks on already-expanded rows fall
+        /// through to normal cell handling.</summary>
         private void MappingRow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (sender is not DataGridRow row || row.DataContext is not MappingItem mi) return;
@@ -5105,23 +5131,31 @@ namespace PadForge.Views
             {
                 mi.IsExpandedOverride = true;
                 MappingDataGrid.SelectedItem = mi;
-                row.Focus();
             }
             else if (mi.HasExtraSources)
             {
                 MappingDataGrid.SelectedItem = mi;
-                row.Focus();
             }
         }
 
         /// <summary>Enter/Space on a focused row toggles it open and
-        /// closed (#175 phase two item 10). Gated on the row itself being
-        /// the original source so the same keys keep their stock meaning
-        /// inside the editor's TextBoxes / ComboBoxes / CheckBoxes.</summary>
+        /// closed (#175 phase two item 10), and the keys a slot maps do
+        /// nothing there (<see cref="RowKeyAction"/>), as on the tab's closed
+        /// pickers (#61). Tab reaches each row, which the row style makes a
+        /// Tab stop. Gated on the row itself being the original source so the
+        /// same keys keep their stock meaning inside the editor's TextBoxes /
+        /// ComboBoxes / CheckBoxes.</summary>
         private void MappingRow_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key != Key.Enter && e.Key != Key.Space) return;
             if (e.OriginalSource is not DataGridRow) return;
+            // An Alt arrow is still an arrow, as on the pickers. Alt+Space is
+            // not Space: it opens the window menu.
+            if (KeyStaysOutOfMappings(e.Key == Key.System ? e.SystemKey : e.Key))
+            {
+                e.Handled = true;
+                return;
+            }
+            if (RowKeyAction(e.Key) != MappingRowKeyAction.Toggle) return;
             if (sender is not DataGridRow row || row.DataContext is not MappingItem mi) return;
             if (MappingDataGrid == null) return;
             if (row.IsSelected)
