@@ -2420,6 +2420,10 @@ namespace PadForge.Common.Input
 
         private void StopAllForceFeedback()
         {
+            // Vader 5 Pro's proprietary motor command is latched. Send an
+            // explicit zero before device cleanup even on abnormal exits.
+            try { FlydigiVader5ProHidWriter.StopAllNow(); }
+            catch { /* best effort on a failing or disconnected USB device */ }
             // Peripheral haptics (#494) stop with every level at zero: their
             // workers play nothing from the next tick on, and the crash path
             // waits for the GameSense and Razer Sensa workers' next tick
