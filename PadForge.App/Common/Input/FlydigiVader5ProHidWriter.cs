@@ -289,8 +289,12 @@ namespace PadForge.Common.Input
                 if (d == null || !IsDevice(d.VendorId, d.ProductId)
                     || d.UsagePage != ControlUsagePage || d.Usage != ControlUsage
                     || string.IsNullOrWhiteSpace(d.Path)) continue;
-                if (chosen != null && !string.Equals(chosen, d.Path, StringComparison.OrdinalIgnoreCase))
-                    return null;
+                if (chosen != null)
+                {
+                    if (!string.Equals(chosen, d.Path, StringComparison.OrdinalIgnoreCase))
+                        return null;
+                    continue; // same interface with different case: keep first canonical path
+                }
                 chosen = d.Path;
             }
             return chosen;
