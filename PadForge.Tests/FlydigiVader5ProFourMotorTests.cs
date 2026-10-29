@@ -134,13 +134,43 @@ namespace PadForge.Tests
             Assert.True(FlydigiVader5ProHidWriter.StaleInputMs + FlydigiVader5ProHidWriter.MinimumWriteIntervalMs <= 300);
         }
 
+        [Theory]
+        [InlineData(10, 9, false)]
+        [InlineData(10, 10, true)]
+        [InlineData(20, 19, false)]
+        [InlineData(20, 20, true)]
+        [InlineData(60, 59, false)]
+        [InlineData(60, 60, true)]
+        public void Timing_CustomIntervalIsApplied(int interval, long elapsed, bool expected)
+        {
+            Assert.Equal(expected,
+                FlydigiVader5ProHidWriter.MaySend(1000 + elapsed, 1000, true, interval));
+        }
+
+        [Fact]
+        public void Timing_IntervalSettingClampsToSafeUiRange()
+        {
+            try
+            {
+                FlydigiVader5ProHidWriter.SetOutputIntervalMs(-1);
+                Assert.Equal(10, FlydigiVader5ProHidWriter.OutputIntervalMs);
+                FlydigiVader5ProHidWriter.SetOutputIntervalMs(100);
+                Assert.Equal(60, FlydigiVader5ProHidWriter.OutputIntervalMs);
+                FlydigiVader5ProHidWriter.SetOutputIntervalMs(30);
+                Assert.Equal(30, FlydigiVader5ProHidWriter.OutputIntervalMs);
+            }
+            finally { FlydigiVader5ProHidWriter.SetOutputIntervalMs(30); }
+        }
+
         [Fact]
         public void AppSetting_IsOptInAndRoundTripsWithoutTouchingFlydigiEnhanced()
         {
             var initial = new AppSettingsData();
             Assert.False(initial.FlydigiVader5ProFourMotorEnabled);
             Assert.True(initial.FlydigiEnhancedProtocol);
+            Assert.Equal(30, initial.FlydigiVader5ProOutputIntervalMs);
             initial.FlydigiVader5ProFourMotorEnabled = true;
+            initial.FlydigiVader5ProOutputIntervalMs = 45;
             var serializer = new XmlSerializer(typeof(AppSettingsData));
             using var text = new System.IO.StringWriter();
             serializer.Serialize(text, initial);
@@ -148,6 +178,7 @@ namespace PadForge.Tests
             var restored = (AppSettingsData)serializer.Deserialize(source);
             Assert.True(restored.FlydigiVader5ProFourMotorEnabled);
             Assert.True(restored.FlydigiEnhancedProtocol);
+            Assert.Equal(45, restored.FlydigiVader5ProOutputIntervalMs);
         }
 
         [Fact]
