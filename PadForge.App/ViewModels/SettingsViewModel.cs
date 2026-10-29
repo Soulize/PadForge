@@ -1323,6 +1323,21 @@ namespace PadForge.ViewModels
             set => SetProperty(ref _flydigiEnhancedProtocol, value);
         }
 
+        private bool _flydigiVader5ProFourMotorEnabled;
+
+        /// <summary>Opt-in direct four-channel 0x12 HID rumble for Vader 5 Pro.
+        /// Disabled by default until the physical controller is validated.
+        /// Turning it off also schedules a zero report to stop its motors.</summary>
+        public bool FlydigiVader5ProFourMotorEnabled
+        {
+            get => _flydigiVader5ProFourMotorEnabled;
+            set
+            {
+                if (SetProperty(ref _flydigiVader5ProFourMotorEnabled, value))
+                    PadForge.Common.Input.FlydigiVader5ProHidWriter.SetEnabled(value);
+            }
+        }
+
         private bool _gKeysEnabled;
 
         /// <summary>Logitech G-keys through the G-key SDK (issue #454), the
