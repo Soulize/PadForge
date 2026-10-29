@@ -1321,6 +1321,9 @@ namespace PadForge.Common.Input
             // entry whose handle is still valid writes to the wrong pad
             // without ever failing into the self-heal path.
             XboxImpulseHidWriter.InvalidateCachedTargets();
+            // The Flydigi 0xFFA0 interface can be re-used after USB/dongle
+            // re-enumeration; retire the cached raw HID handle on its worker.
+            FlydigiVader5ProHidWriter.InvalidateDevices();
         }
 
         /// <summary>Clears runtime state and neutralizes the device's per-slot
