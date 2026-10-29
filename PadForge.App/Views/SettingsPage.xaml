@@ -289,6 +289,17 @@
                                   ToolTip="Direct 37D7:2401 vendor HID output; independently controls two grip and two trigger motors. Supports one pad only. Disable when Flydigi Space Station holds exclusive access."
                                   IsChecked="{Binding FlydigiVader5ProFourMotorEnabled}"/>
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,12">
+                        <TextBlock Text="Motor output interval" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   Margin="0,0,8,0"/>
+                        <Slider Width="160" Minimum="10" Maximum="60"
+                                TickFrequency="5" IsSnapToTickEnabled="True"
+                                Value="{Binding FlydigiVader5ProOutputIntervalMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                ToolTip="30 ms recommended; below 30 ms is experimental and can overwhelm the receiver firmware."/>
+                        <TextBlock Text="{Binding FlydigiVader5ProOutputIntervalMs, StringFormat={}{0} ms}"
+                                   VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </StackPanel>
                     <!-- Logitech G-keys (#454), the Flydigi row's shape: a
                          vendor input path this engine can read, off until
                          asked for. -->
