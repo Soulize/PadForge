@@ -29,10 +29,13 @@ refresh limit fidelity.
    exclusively, quit it for testing; consider turning **Flydigi enhanced
    protocol** off to prevent competing HID writers. Do not change Bluetooth
    or Switch mode to test NewXInput.
-5. In PadForge's impulse-trigger page, enable
+5. The adjacent **Motor output interval** slider defaults to 30 ms.
+   The range is 10–60 ms. **Below 30 ms is experimental**: it may overrun
+   the firmware queue and must not be treated as hardware-validated.
+6. In PadForge's impulse-trigger page, enable
    **Translate Adaptive Trigger Vibrations** if the game uses supported
    DualSense vibration-type trigger programs.
-6. Disable the new toggle to revert to PadForge's original SDL output path.
+7. Disable the new toggle to revert to PadForge's original SDL output path.
 
 A game's PC version must implement real DualSense haptic feedback. Merely
 creating a virtual DualSense cannot add data absent from the game.
@@ -67,14 +70,14 @@ the actual firmware revision.
 | Hardware match | Exact VID/PID and usage page/usage |
 | Single-pad safety | No output when vendor interface discovery is ambiguous |
 | High-frequency polling | No Windows HID I/O on PadForge's input tick |
-| Output command rate | Maximum 1 write per 30 ms (~33.3 Hz) |
+| Output command rate | Configurable 10–60 ms, default 30 ms (~33.3 Hz) |
 | Lost-input watchdog | Stop demand after 250 ms of no fresh tick |
 | Controller disconnect | Invalidate cached HID path before re-probe |
 | Unassignment / app shutdown | Queue/synchronously write all-zero motor command |
 | Feature compatibility | Opt-in and XML-persisted, off for prior installations |
 | Automated verification | Packet, checksum, motor isolation, selection, timing and XML tests |
 
-**Timing target is conservative** rather than measured: a 30 ms inter-report
+**The default timing target is conservative** rather than measured: a 30 ms inter-report
 interval was discussed in Linux driver work. The HID controller's true
 capacity, minimum sustained pulse and queue behavior are **unverified**
 until USB traces and physical measurements are available.
@@ -94,8 +97,9 @@ Flydigi Space Station process status and (optionally) a USBPcap trace.
   reach the trigger fields where enabled.
 - Unassign and shut down PadForge during nonzero vibration. Every motor
   should stop. Unplug/replug to verify path re-discovery.
-- Compare 30 ms cadence against 20 ms and 10 ms **only in an isolated
-  experimental build with trace logging**. Never label the input polling rate
+- Compare 30 ms cadence against 20 ms and 10 ms **only with USB trace
+  logging and a controlled test**. Changing the slider below 30 ms
+  is an explicit experimental override. Never label the input polling rate
   as the motor report rate.
 
 Unsupported: automatic association of multiple simultaneous Vader 5 Pro
