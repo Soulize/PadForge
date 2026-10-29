@@ -300,6 +300,12 @@
                         <TextBlock Text="{Binding FlydigiVader5ProOutputIntervalMs, StringFormat={}{0} ms}"
                                    VerticalAlignment="Center" Margin="8,0,0,0"/>
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,12">
+                        <Button Content="Test left grip" Command="{Binding TestVader5ProLeftGripCommand}" Margin="0,0,8,0"/>
+                        <Button Content="Test right grip" Command="{Binding TestVader5ProRightGripCommand}" Margin="0,0,8,0"/>
+                        <Button Content="Test left trigger" Command="{Binding TestVader5ProLeftTriggerCommand}" Margin="0,0,8,0"/>
+                        <Button Content="Test right trigger" Command="{Binding TestVader5ProRightTriggerCommand}"/>
+                    </StackPanel>
                     <!-- Logitech G-keys (#454), the Flydigi row's shape: a
                          vendor input path this engine can read, off until
                          asked for. -->

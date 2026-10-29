@@ -41,6 +41,8 @@ namespace PadForge.Common.Input
         private static int _outputIntervalMs = MinimumWriteIntervalMs;
         private static Motors _desired;
         private static Motors _sent;
+        private static Motors _testMotors;
+        private static long _testUntilAt;
         private static bool _everSent;
         private static Guid _owner;
         private static bool _ambiguousOwner;
@@ -83,6 +85,7 @@ namespace PadForge.Common.Input
                     _owner = Guid.Empty;
                     _ambiguousOwner = false;
                     _lastInputAt = 0;
+                    _testUntilAt = 0;
                     // Do not discard the output handle here: the worker owes
                     // the device a ZERO after the last nonzero motor command.
                 }
@@ -149,6 +152,7 @@ namespace PadForge.Common.Input
                 _lastInputAt = Clock();
                 _owner = Guid.Empty;
                 _ambiguousOwner = false;
+                _testUntilAt = 0;
             }
             Wake.Set();
         }
@@ -167,6 +171,7 @@ namespace PadForge.Common.Input
                 _desired = default;
                 _owner = Guid.Empty;
                 _ambiguousOwner = false;
+                _testUntilAt = 0;
                 _everSent = false;
                 _lastWriteAt = 0;
             }
@@ -184,6 +189,7 @@ namespace PadForge.Common.Input
                     _desired = default;
                     _owner = Guid.Empty;
                     _ambiguousOwner = false;
+                    _testUntilAt = 0;
                     path = _controlPath;
                 }
                 if (path != null)
@@ -223,6 +229,32 @@ namespace PadForge.Common.Input
 
         internal static byte ToByte(ushort level)
             => (byte)(((uint)level * 255u + 32767u) / 65535u);
+
+        /// <summary>Four 400-ms bench pulses. These bypass the current
+        /// game's feedback only while the pulse is active. Uses the same
+        /// single-device HID discovery and safety checks as game rumble.</summary>
+        internal static Motors TestPattern(int channel, byte strength = 160)
+            => channel switch
+            {
+                0 => new Motors(strength, 0, 0, 0),
+                1 => new Motors(0, strength, 0, 0),
+                2 => new Motors(0, 0, strength, 0),
+                3 => new Motors(0, 0, 0, strength),
+                _ => default,
+            };
+
+        internal static bool PulseTestMotor(int channel)
+        {
+            if (!Enabled || channel < 0 || channel > 3) return false;
+            lock (StateGate)
+            {
+                if (!Enabled) return false;
+                _testMotors = TestPattern(channel);
+                _testUntilAt = Clock() + 400;
+            }
+            Wake.Set();
+            return true;
+        }
 
         internal static bool IsFresh(long now, long lastInput)
             => lastInput > 0 && now >= lastInput && now - lastInput <= StaleInputMs;
@@ -307,8 +339,10 @@ namespace PadForge.Common.Input
                     {
                         // A disable, stop or disconnect can race discovery.
                         if (_controlPath != path) continue;
-                        bool fresh = Enabled && !_ambiguousOwner && IsFresh(Clock(), _lastInputAt);
-                        next = fresh ? _desired : default;
+                        long sampleAt = Clock();
+                        bool testActive = Enabled && !_ambiguousOwner && sampleAt < _testUntilAt;
+                        bool fresh = Enabled && !_ambiguousOwner && IsFresh(sampleAt, _lastInputAt);
+                        next = testActive ? _testMotors : fresh ? _desired : default;
                         alreadySent = _everSent && next.Equals(_sent);
                         lastWrite = _lastWriteAt;
                         if (_everSent && alreadySent && (next.Silent || Clock() - lastWrite < KeepAliveMs))

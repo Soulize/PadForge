@@ -181,6 +181,30 @@ namespace PadForge.Tests
             Assert.Equal(45, restored.FlydigiVader5ProOutputIntervalMs);
         }
 
+        [Theory]
+        [InlineData(0, 160, 0, 0, 0)]
+        [InlineData(1, 0, 160, 0, 0)]
+        [InlineData(2, 0, 0, 160, 0)]
+        [InlineData(3, 0, 0, 0, 160)]
+        public void TestButtons_IndependentlyTargetOneMotor(
+            int motor, int gripLeft, int gripRight, int triggerLeft, int triggerRight)
+        {
+            var m = FlydigiVader5ProHidWriter.TestPattern(motor);
+            Assert.Equal(gripLeft, m.GripLeft);
+            Assert.Equal(gripRight, m.GripRight);
+            Assert.Equal(triggerLeft, m.TriggerLeft);
+            Assert.Equal(triggerRight, m.TriggerRight);
+        }
+
+        [Fact]
+        public void TestPulse_RejectsInvalidMotorIndex()
+        {
+            Assert.False(FlydigiVader5ProHidWriter.PulseTestMotor(-1));
+            Assert.False(FlydigiVader5ProHidWriter.PulseTestMotor(4));
+            Assert.True(FlydigiVader5ProHidWriter.TestPattern(-1).Silent);
+            Assert.True(FlydigiVader5ProHidWriter.TestPattern(4).Silent);
+        }
+
         [Fact]
         public void ZeroReport_StopsEveryMotor()
         {

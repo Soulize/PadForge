@@ -32,6 +32,8 @@ refresh limit fidelity.
 5. The adjacent **Motor output interval** slider defaults to 30 ms.
    The range is 10–60 ms. **Below 30 ms is experimental**: it may overrun
    the firmware queue and must not be treated as hardware-validated.
+   The four **Test** buttons below it each play a single 400 ms pulse
+   at strength 160/255. Test the left/right grips and triggers separately.
 6. In PadForge's impulse-trigger page, enable
    **Translate Adaptive Trigger Vibrations** if the game uses supported
    DualSense vibration-type trigger programs.

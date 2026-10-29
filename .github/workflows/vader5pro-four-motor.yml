@@ -20,6 +20,11 @@ on:
       - '.github/workflows/vader5pro-four-motor.yml'
   workflow_dispatch:
 
+# Superseded commits should not consume Windows build minutes.
+concurrency:
+  group: vader5pro-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 

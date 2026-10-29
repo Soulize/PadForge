@@ -1353,6 +1353,17 @@ namespace PadForge.ViewModels
             }
         }
 
+        // A single explicit channel at a time, 400ms at ~63% intensity.
+        // The worker refuses output if two physical pads are present.
+        public IRelayCommand TestVader5ProLeftGripCommand { get; } =
+            new RelayCommand(() => FlydigiVader5ProHidWriter.PulseTestMotor(0));
+        public IRelayCommand TestVader5ProRightGripCommand { get; } =
+            new RelayCommand(() => FlydigiVader5ProHidWriter.PulseTestMotor(1));
+        public IRelayCommand TestVader5ProLeftTriggerCommand { get; } =
+            new RelayCommand(() => FlydigiVader5ProHidWriter.PulseTestMotor(2));
+        public IRelayCommand TestVader5ProRightTriggerCommand { get; } =
+            new RelayCommand(() => FlydigiVader5ProHidWriter.PulseTestMotor(3));
+
         private bool _gKeysEnabled;
 
         /// <summary>Logitech G-keys through the G-key SDK (issue #454), the
