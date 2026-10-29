@@ -47,6 +47,7 @@ namespace PadForge.Common.Input
         private static long _lastWriteAt;
         private static long _nextScanAt;
         private static string _controlPath;
+        private static string _pendingResetPath;
 
         // Injected in tests; called only on the background thread in production.
         internal static Func<IReadOnlyList<VendorHidCollection>> EnumerateControls =
@@ -144,21 +145,19 @@ namespace PadForge.Common.Input
         /// <summary>Forget paths/owners after a confirmed PnP topology change.</summary>
         internal static void InvalidateDevices()
         {
-            lock (IoGate)
+            // PnP callbacks can run on the 1 kHz input thread. Never wait
+            // for an in-flight WriteFile here; retire its handle on the
+            // worker under IoGate, before any subsequent re-enumeration.
+            lock (StateGate)
             {
-                string oldPath;
-                lock (StateGate)
-                {
-                    oldPath = _controlPath;
-                    _controlPath = null;
-                    _nextScanAt = 0;
-                    _desired = default;
-                    _owner = Guid.Empty;
-                    _ambiguousOwner = false;
-                    _everSent = false;
-                    _lastWriteAt = 0;
-                }
-                if (oldPath != null) RawHidOutput.ResetDevice(oldPath);
+                _pendingResetPath = _controlPath ?? _pendingResetPath;
+                _controlPath = null;
+                _nextScanAt = 0;
+                _desired = default;
+                _owner = Guid.Empty;
+                _ambiguousOwner = false;
+                _everSent = false;
+                _lastWriteAt = 0;
             }
             Wake.Set();
         }
@@ -246,6 +245,18 @@ namespace PadForge.Common.Input
                 // A 1 kHz game can change the desired state at any point.
                 // Coalesce updates; NEVER write HID from the input thread.
                 Wake.WaitOne(MinimumWriteIntervalMs);
+                // Always close a stale handle before probing a replacement.
+                // IoGate prevents overlap with the previous HID write.
+                lock (IoGate)
+                {
+                    string stalePath;
+                    lock (StateGate)
+                    {
+                        stalePath = _pendingResetPath;
+                        _pendingResetPath = null;
+                    }
+                    if (stalePath != null) RawHidOutput.ResetDevice(stalePath);
+                }
                 long now = Clock();
                 bool enabled = Enabled;
                 string path;
