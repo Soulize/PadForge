@@ -2380,6 +2380,7 @@ namespace PadForge.Services
             vm.KeepHidHideCloaksBetweenLaunches = appSettings.KeepHidHideCloaksBetweenLaunches;
             vm.FlydigiEnhancedProtocol = appSettings.FlydigiEnhancedProtocol;
             vm.FlydigiVader5ProFourMotorEnabled = appSettings.FlydigiVader5ProFourMotorEnabled;
+            vm.FlydigiVader5ProOutputIntervalMs = appSettings.FlydigiVader5ProOutputIntervalMs;
             vm.GKeysEnabled = appSettings.GKeysEnabled;
             vm.AnalogKeyboardsEnabled = appSettings.AnalogKeyboardsEnabled;
             vm.BlissBoxEnabled = appSettings.BlissBoxEnabled;
@@ -5068,6 +5069,7 @@ namespace PadForge.Services
                 KeepHidHideCloaksBetweenLaunches = vm.KeepHidHideCloaksBetweenLaunches,
                 FlydigiEnhancedProtocol = vm.FlydigiEnhancedProtocol,
                 FlydigiVader5ProFourMotorEnabled = vm.FlydigiVader5ProFourMotorEnabled,
+                FlydigiVader5ProOutputIntervalMs = vm.FlydigiVader5ProOutputIntervalMs,
                 GKeysEnabled = vm.GKeysEnabled,
                 AnalogKeyboardsEnabled = vm.AnalogKeyboardsEnabled,
                 BlissBoxEnabled = vm.BlissBoxEnabled,
@@ -7182,6 +7184,11 @@ namespace PadForge.Services
         /// Off for all existing installations unless explicitly enabled.</summary>
         [XmlElement]
         public bool FlydigiVader5ProFourMotorEnabled { get; set; } = false;
+
+        /// <summary>Milliseconds between native 0x12 motor reports.
+        /// Default 30ms, constrained to 10..60ms by SettingsViewModel.</summary>
+        [XmlElement]
+        public int FlydigiVader5ProOutputIntervalMs { get; set; } = 30;
 
         /// <summary>
         /// User-specified application paths to whitelist in HidHide.
