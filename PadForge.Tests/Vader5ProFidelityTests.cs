@@ -238,7 +238,13 @@ namespace PadForge.Tests
             Assert.False(Vader5ProFidelityCalibrationFile.TryImport(
                 unsupported, out var badLut, out var badBand, out var badGain, out _));
             Assert.Null(badLut); Assert.Null(badBand); Assert.Null(badGain);
-            string descending = json.Replace("0,\n", "10,\n"); // First knot must remain zero.
+            // JSON pretty printing uses platform-specific newlines, so do
+            // not fabricate invalid data with a fragile text replacement.
+            // Mutate the parsed first knot and ensure the importer rejects
+            // an actually-invalid nonzero zero-intent motor command.
+            var invalid = System.Text.Json.Nodes.JsonNode.Parse(json)!;
+            invalid["motorLuts"]![0]![0] = 10;
+            string descending = invalid.ToJsonString();
             Assert.False(Vader5ProFidelityCalibrationFile.TryImport(
                 descending, out _, out _, out _, out _));
             Assert.False(Vader5ProFidelityCalibrationFile.TryImport(
