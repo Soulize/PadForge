@@ -44,6 +44,14 @@ namespace PadForge.Common.Input
         private static Thread _worker;
         private static int _enabled;
         private static int _outputIntervalMs = MinimumWriteIntervalMs;
+        private static int _enhancedHaptics = 1;
+        private static int _spectralTriggerAssist;
+        internal static bool EnhancedHapticsEnabled => Volatile.Read(ref _enhancedHaptics) != 0;
+        internal static bool SpectralTriggerAssistEnabled => Volatile.Read(ref _spectralTriggerAssist) != 0;
+        internal static void SetEnhancedHaptics(bool enabled)
+            => Volatile.Write(ref _enhancedHaptics, enabled ? 1 : 0);
+        internal static void SetSpectralTriggerAssist(bool enabled)
+            => Volatile.Write(ref _spectralTriggerAssist, enabled ? 1 : 0);
         private static Motors _desired;
         private static Motors _sent;
         private static Motors _testMotors;
@@ -152,8 +160,13 @@ namespace PadForge.Common.Input
         {
             if (!Enabled || device == null || device.Device == null
                 || !IsDevice(device.VendorId, device.ProdId)) return false;
-            var next = new Motors(ToByte(gripLeft), ToByte(gripRight),
-                ToByte(triggerLeft), ToByte(triggerRight));
+            // Atomic immutable calibration snapshot: all four channels of
+            // the same HID frame use the same user-selected motor curves.
+            var calibrated = Vader5ProMotorCalibration.Apply(
+                gripLeft, gripRight, triggerLeft, triggerRight,
+                Vader5ProMotorCalibration.Current);
+            var next = new Motors(calibrated.GripLeft, calibrated.GripRight,
+                calibrated.TriggerLeft, calibrated.TriggerRight);
             bool changed;
             lock (StateGate)
             {
@@ -312,19 +325,31 @@ namespace PadForge.Common.Input
                 || (sent.TriggerLeft != 0 && desired.TriggerLeft == 0)
                 || (sent.TriggerRight != 0 && desired.TriggerRight == 0);
 
+        internal static bool HasStartingMotor(Motors sent, Motors desired)
+            => (sent.GripLeft == 0 && desired.GripLeft != 0)
+                || (sent.GripRight == 0 && desired.GripRight != 0)
+                || (sent.TriggerLeft == 0 && desired.TriggerLeft != 0)
+                || (sent.TriggerRight == 0 && desired.TriggerRight != 0);
+
         /// <summary>Relative delay until the absolute report deadline.
         /// -1: no write needed for two matching zero reports. Other
         /// matching values refresh only at the 500 ms keepalive. An
         /// urgent zero edge uses a bounded 3 ms gap; all other changes
         /// obey the configured 10..60 ms cadence.</summary>
         internal static int DelayUntilReport(Motors lastSent, Motors desired,
-            long now, long lastWrite, bool hasSent, int intervalMs)
+            long now, long lastWrite, bool hasSent, int intervalMs,
+            bool urgentStarts = false)
         {
             if (!hasSent || now < lastWrite) return 0;
             long elapsed = now - lastWrite;
             if (lastSent.Equals(desired))
                 return desired.Silent ? -1 : (int)Math.Max(0L, KeepAliveMs - elapsed);
-            int gap = HasStoppingMotor(lastSent, desired)
+            // A short pulse that begins immediately after the last 30 ms
+            // report must not be swallowed by normal update coalescing.
+            // Only the start and stop edges bypass the ordinary cadence;
+            // steady nonzero amplitude changes remain rate-limited.
+            int gap = (HasStoppingMotor(lastSent, desired)
+                || (urgentStarts && HasStartingMotor(lastSent, desired)))
                 ? StopEdgeMinIntervalMs : Math.Clamp(intervalMs, 10, 60);
             return (int)Math.Max(0L, gap - elapsed);
         }
@@ -434,7 +459,8 @@ namespace PadForge.Common.Input
                         }
 
                         int dueIn = DelayUntilReport(
-                            _sent, next, sampleAt, _lastWriteAt, _everSent, OutputIntervalMs);
+                            _sent, next, sampleAt, _lastWriteAt, _everSent, OutputIntervalMs,
+                            urgentStarts: EnhancedHapticsEnabled);
                         if (dueIn < 0) continue;
                         if (dueIn > 0)
                         {
