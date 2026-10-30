@@ -1364,6 +1364,246 @@ namespace PadForge.ViewModels
             }
         }
 
+        private bool _flydigiVader5ProEnhancedHapticsEnabled = true;
+        public bool FlydigiVader5ProEnhancedHapticsEnabled
+        {
+            get => _flydigiVader5ProEnhancedHapticsEnabled;
+            set
+            {
+                if (SetProperty(ref _flydigiVader5ProEnhancedHapticsEnabled, value))
+                    FlydigiVader5ProHidWriter.SetEnhancedHaptics(value);
+            }
+        }
+
+        private bool _flydigiVader5ProSpectralTriggerAssist;
+        public bool FlydigiVader5ProSpectralTriggerAssist
+        {
+            get => _flydigiVader5ProSpectralTriggerAssist;
+            set
+            {
+                if (SetProperty(ref _flydigiVader5ProSpectralTriggerAssist, value))
+                    FlydigiVader5ProHidWriter.SetSpectralTriggerAssist(value);
+            }
+        }
+
+        /// <summary>Four independent motor gain/gamma/start-floor curves,
+        /// serialized as four invariant integer triplets in app settings.</summary>
+        public string FlydigiVader5ProMotorCalibrationCsv
+        {
+            get => Vader5ProMotorCalibration.ToCsv(Vader5ProMotorCalibration.Current);
+            set
+            {
+                var p = Vader5ProMotorCalibration.ParseCsv(value);
+                Vader5ProMotorCalibration.SetProfile(p);
+                OnPropertyChanged(nameof(FlydigiVader5ProMotorCalibrationCsv));
+                OnPropertyChanged(nameof(FlydigiVader5ProGripLeftGainPercent));
+                OnPropertyChanged(nameof(FlydigiVader5ProGripLeftGammaPercent));
+                OnPropertyChanged(nameof(FlydigiVader5ProGripLeftMinDrive));
+                OnPropertyChanged(nameof(FlydigiVader5ProGripRightGainPercent));
+                OnPropertyChanged(nameof(FlydigiVader5ProGripRightGammaPercent));
+                OnPropertyChanged(nameof(FlydigiVader5ProGripRightMinDrive));
+                OnPropertyChanged(nameof(FlydigiVader5ProTriggerLeftGainPercent));
+                OnPropertyChanged(nameof(FlydigiVader5ProTriggerLeftGammaPercent));
+                OnPropertyChanged(nameof(FlydigiVader5ProTriggerLeftMinDrive));
+                OnPropertyChanged(nameof(FlydigiVader5ProTriggerRightGainPercent));
+                OnPropertyChanged(nameof(FlydigiVader5ProTriggerRightGammaPercent));
+                OnPropertyChanged(nameof(FlydigiVader5ProTriggerRightMinDrive));
+            }
+        }
+
+        /// <summary>Left grip GainPercent; persisted with the native HID profile.</summary>
+        public int FlydigiVader5ProGripLeftGainPercent
+        {
+            get => Vader5ProMotorCalibration.Current.GripLeft.GainPercent;
+            set
+            {
+                var p = Vader5ProMotorCalibration.Current;
+                int v = Math.Clamp(value, 0, 200);
+                if (p.GripLeft.GainPercent == v) return;
+                Vader5ProMotorCalibration.SetProfile(p with {
+                    GripLeft = p.GripLeft with { GainPercent = v } });
+                OnPropertyChanged(nameof(FlydigiVader5ProGripLeftGainPercent));
+                OnPropertyChanged(nameof(FlydigiVader5ProMotorCalibrationCsv));
+            }
+        }
+
+        /// <summary>Left grip GammaPercent; persisted with the native HID profile.</summary>
+        public int FlydigiVader5ProGripLeftGammaPercent
+        {
+            get => Vader5ProMotorCalibration.Current.GripLeft.GammaPercent;
+            set
+            {
+                var p = Vader5ProMotorCalibration.Current;
+                int v = Math.Clamp(value, 50, 180);
+                if (p.GripLeft.GammaPercent == v) return;
+                Vader5ProMotorCalibration.SetProfile(p with {
+                    GripLeft = p.GripLeft with { GammaPercent = v } });
+                OnPropertyChanged(nameof(FlydigiVader5ProGripLeftGammaPercent));
+                OnPropertyChanged(nameof(FlydigiVader5ProMotorCalibrationCsv));
+            }
+        }
+
+        /// <summary>Left grip MinDrive; persisted with the native HID profile.</summary>
+        public int FlydigiVader5ProGripLeftMinDrive
+        {
+            get => Vader5ProMotorCalibration.Current.GripLeft.MinDrive;
+            set
+            {
+                var p = Vader5ProMotorCalibration.Current;
+                int v = Math.Clamp(value, 0, 64);
+                if (p.GripLeft.MinDrive == v) return;
+                Vader5ProMotorCalibration.SetProfile(p with {
+                    GripLeft = p.GripLeft with { MinDrive = v } });
+                OnPropertyChanged(nameof(FlydigiVader5ProGripLeftMinDrive));
+                OnPropertyChanged(nameof(FlydigiVader5ProMotorCalibrationCsv));
+            }
+        }
+
+        /// <summary>Right grip GainPercent; persisted with the native HID profile.</summary>
+        public int FlydigiVader5ProGripRightGainPercent
+        {
+            get => Vader5ProMotorCalibration.Current.GripRight.GainPercent;
+            set
+            {
+                var p = Vader5ProMotorCalibration.Current;
+                int v = Math.Clamp(value, 0, 200);
+                if (p.GripRight.GainPercent == v) return;
+                Vader5ProMotorCalibration.SetProfile(p with {
+                    GripRight = p.GripRight with { GainPercent = v } });
+                OnPropertyChanged(nameof(FlydigiVader5ProGripRightGainPercent));
+                OnPropertyChanged(nameof(FlydigiVader5ProMotorCalibrationCsv));
+            }
+        }
+
+        /// <summary>Right grip GammaPercent; persisted with the native HID profile.</summary>
+        public int FlydigiVader5ProGripRightGammaPercent
+        {
+            get => Vader5ProMotorCalibration.Current.GripRight.GammaPercent;
+            set
+            {
+                var p = Vader5ProMotorCalibration.Current;
+                int v = Math.Clamp(value, 50, 180);
+                if (p.GripRight.GammaPercent == v) return;
+                Vader5ProMotorCalibration.SetProfile(p with {
+                    GripRight = p.GripRight with { GammaPercent = v } });
+                OnPropertyChanged(nameof(FlydigiVader5ProGripRightGammaPercent));
+                OnPropertyChanged(nameof(FlydigiVader5ProMotorCalibrationCsv));
+            }
+        }
+
+        /// <summary>Right grip MinDrive; persisted with the native HID profile.</summary>
+        public int FlydigiVader5ProGripRightMinDrive
+        {
+            get => Vader5ProMotorCalibration.Current.GripRight.MinDrive;
+            set
+            {
+                var p = Vader5ProMotorCalibration.Current;
+                int v = Math.Clamp(value, 0, 64);
+                if (p.GripRight.MinDrive == v) return;
+                Vader5ProMotorCalibration.SetProfile(p with {
+                    GripRight = p.GripRight with { MinDrive = v } });
+                OnPropertyChanged(nameof(FlydigiVader5ProGripRightMinDrive));
+                OnPropertyChanged(nameof(FlydigiVader5ProMotorCalibrationCsv));
+            }
+        }
+
+        /// <summary>Left trigger GainPercent; persisted with the native HID profile.</summary>
+        public int FlydigiVader5ProTriggerLeftGainPercent
+        {
+            get => Vader5ProMotorCalibration.Current.TriggerLeft.GainPercent;
+            set
+            {
+                var p = Vader5ProMotorCalibration.Current;
+                int v = Math.Clamp(value, 0, 200);
+                if (p.TriggerLeft.GainPercent == v) return;
+                Vader5ProMotorCalibration.SetProfile(p with {
+                    TriggerLeft = p.TriggerLeft with { GainPercent = v } });
+                OnPropertyChanged(nameof(FlydigiVader5ProTriggerLeftGainPercent));
+                OnPropertyChanged(nameof(FlydigiVader5ProMotorCalibrationCsv));
+            }
+        }
+
+        /// <summary>Left trigger GammaPercent; persisted with the native HID profile.</summary>
+        public int FlydigiVader5ProTriggerLeftGammaPercent
+        {
+            get => Vader5ProMotorCalibration.Current.TriggerLeft.GammaPercent;
+            set
+            {
+                var p = Vader5ProMotorCalibration.Current;
+                int v = Math.Clamp(value, 50, 180);
+                if (p.TriggerLeft.GammaPercent == v) return;
+                Vader5ProMotorCalibration.SetProfile(p with {
+                    TriggerLeft = p.TriggerLeft with { GammaPercent = v } });
+                OnPropertyChanged(nameof(FlydigiVader5ProTriggerLeftGammaPercent));
+                OnPropertyChanged(nameof(FlydigiVader5ProMotorCalibrationCsv));
+            }
+        }
+
+        /// <summary>Left trigger MinDrive; persisted with the native HID profile.</summary>
+        public int FlydigiVader5ProTriggerLeftMinDrive
+        {
+            get => Vader5ProMotorCalibration.Current.TriggerLeft.MinDrive;
+            set
+            {
+                var p = Vader5ProMotorCalibration.Current;
+                int v = Math.Clamp(value, 0, 64);
+                if (p.TriggerLeft.MinDrive == v) return;
+                Vader5ProMotorCalibration.SetProfile(p with {
+                    TriggerLeft = p.TriggerLeft with { MinDrive = v } });
+                OnPropertyChanged(nameof(FlydigiVader5ProTriggerLeftMinDrive));
+                OnPropertyChanged(nameof(FlydigiVader5ProMotorCalibrationCsv));
+            }
+        }
+
+        /// <summary>Right trigger GainPercent; persisted with the native HID profile.</summary>
+        public int FlydigiVader5ProTriggerRightGainPercent
+        {
+            get => Vader5ProMotorCalibration.Current.TriggerRight.GainPercent;
+            set
+            {
+                var p = Vader5ProMotorCalibration.Current;
+                int v = Math.Clamp(value, 0, 200);
+                if (p.TriggerRight.GainPercent == v) return;
+                Vader5ProMotorCalibration.SetProfile(p with {
+                    TriggerRight = p.TriggerRight with { GainPercent = v } });
+                OnPropertyChanged(nameof(FlydigiVader5ProTriggerRightGainPercent));
+                OnPropertyChanged(nameof(FlydigiVader5ProMotorCalibrationCsv));
+            }
+        }
+
+        /// <summary>Right trigger GammaPercent; persisted with the native HID profile.</summary>
+        public int FlydigiVader5ProTriggerRightGammaPercent
+        {
+            get => Vader5ProMotorCalibration.Current.TriggerRight.GammaPercent;
+            set
+            {
+                var p = Vader5ProMotorCalibration.Current;
+                int v = Math.Clamp(value, 50, 180);
+                if (p.TriggerRight.GammaPercent == v) return;
+                Vader5ProMotorCalibration.SetProfile(p with {
+                    TriggerRight = p.TriggerRight with { GammaPercent = v } });
+                OnPropertyChanged(nameof(FlydigiVader5ProTriggerRightGammaPercent));
+                OnPropertyChanged(nameof(FlydigiVader5ProMotorCalibrationCsv));
+            }
+        }
+
+        /// <summary>Right trigger MinDrive; persisted with the native HID profile.</summary>
+        public int FlydigiVader5ProTriggerRightMinDrive
+        {
+            get => Vader5ProMotorCalibration.Current.TriggerRight.MinDrive;
+            set
+            {
+                var p = Vader5ProMotorCalibration.Current;
+                int v = Math.Clamp(value, 0, 64);
+                if (p.TriggerRight.MinDrive == v) return;
+                Vader5ProMotorCalibration.SetProfile(p with {
+                    TriggerRight = p.TriggerRight with { MinDrive = v } });
+                OnPropertyChanged(nameof(FlydigiVader5ProTriggerRightMinDrive));
+                OnPropertyChanged(nameof(FlydigiVader5ProMotorCalibrationCsv));
+            }
+        }
+
+
         public string FlydigiVader5ProStatus => FlydigiVader5ProHidWriter.Status;
 
         // A single explicit channel at a time, 400ms at ~63% intensity.
