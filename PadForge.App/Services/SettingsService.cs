@@ -2381,6 +2381,9 @@ namespace PadForge.Services
             vm.FlydigiEnhancedProtocol = appSettings.FlydigiEnhancedProtocol;
             vm.FlydigiVader5ProFourMotorEnabled = appSettings.FlydigiVader5ProFourMotorEnabled;
             vm.FlydigiVader5ProOutputIntervalMs = appSettings.FlydigiVader5ProOutputIntervalMs;
+            vm.FlydigiVader5ProEnhancedHapticsEnabled = appSettings.FlydigiVader5ProEnhancedHapticsEnabled;
+            vm.FlydigiVader5ProSpectralTriggerAssist = appSettings.FlydigiVader5ProSpectralTriggerAssist;
+            vm.FlydigiVader5ProMotorCalibrationCsv = appSettings.FlydigiVader5ProMotorCalibrationCsv;
             vm.GKeysEnabled = appSettings.GKeysEnabled;
             vm.AnalogKeyboardsEnabled = appSettings.AnalogKeyboardsEnabled;
             vm.BlissBoxEnabled = appSettings.BlissBoxEnabled;
@@ -5070,6 +5073,9 @@ namespace PadForge.Services
                 FlydigiEnhancedProtocol = vm.FlydigiEnhancedProtocol,
                 FlydigiVader5ProFourMotorEnabled = vm.FlydigiVader5ProFourMotorEnabled,
                 FlydigiVader5ProOutputIntervalMs = vm.FlydigiVader5ProOutputIntervalMs,
+                FlydigiVader5ProEnhancedHapticsEnabled = vm.FlydigiVader5ProEnhancedHapticsEnabled,
+                FlydigiVader5ProSpectralTriggerAssist = vm.FlydigiVader5ProSpectralTriggerAssist,
+                FlydigiVader5ProMotorCalibrationCsv = vm.FlydigiVader5ProMotorCalibrationCsv,
                 GKeysEnabled = vm.GKeysEnabled,
                 AnalogKeyboardsEnabled = vm.AnalogKeyboardsEnabled,
                 BlissBoxEnabled = vm.BlissBoxEnabled,
@@ -7189,6 +7195,21 @@ namespace PadForge.Services
         /// Default 30ms, constrained to 10..60ms by SettingsViewModel.</summary>
         [XmlElement]
         public int FlydigiVader5ProOutputIntervalMs { get; set; } = 30;
+
+        /// <summary>Fast Vader-only PCM renderer. Defaults on within the
+        /// opt-in vendor writer; the legacy 8ms RMS path stays selectable.</summary>
+        [XmlElement]
+        public bool FlydigiVader5ProEnhancedHapticsEnabled { get; set; } = true;
+
+        /// <summary>Supplement idle trigger motors with 35% of PCM high band.
+        /// Off by default: native/adaptive trigger semantics have priority.</summary>
+        [XmlElement]
+        public bool FlydigiVader5ProSpectralTriggerAssist { get; set; } = false;
+
+        /// <summary>GL;GR;TL;TR, each gain%,gamma%,minimum drive byte.
+        /// Empty or invalid strings restore four neutral curves.</summary>
+        [XmlElement]
+        public string FlydigiVader5ProMotorCalibrationCsv { get; set; } = "";
 
         /// <summary>
         /// User-specified application paths to whitelist in HidHide.
