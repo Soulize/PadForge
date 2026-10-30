@@ -45,10 +45,10 @@ jobs:
         with:
           dotnet-version: '10.x'
 
-      - name: Run Vader 5 Pro protocol and safety tests
+      - name: Run Vader 5 Pro, persona haptics and bass-shaker regression tests
         shell: pwsh
         run: |
-          dotnet test PadForge.Tests/PadForge.Tests.csproj -c Release --filter "FullyQualifiedName~FlydigiVader5ProFourMotorTests" --logger "trx;LogFileName=vader5pro-tests.trx" --results-directory TestResults
+          dotnet test PadForge.Tests/PadForge.Tests.csproj -c Release --filter "FullyQualifiedName~FlydigiVader5ProFourMotorTests|FullyQualifiedName~PersonaHapticRumbleTests|FullyQualifiedName~BassShakerPersonaHapticsTests" --logger "trx;LogFileName=vader5pro-tests.trx" --results-directory TestResults
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Publish PadForge for Windows x64

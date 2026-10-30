@@ -1882,7 +1882,9 @@ namespace PadForge.Common.Input
                     // The selected Vader 5 Pro's fast envelope must be the
                     // same as the actual motor output. Other devices keep
                     // the existing persona loudness follower unchanged.
-                    var onlineForMeter = FindOnlineDeviceByInstanceGuid(us.InstanceGuid);
+                    var onlineForMeter = (FlydigiVader5ProHidWriter.Enabled
+                        || devicePs?.SteeringAngleRumbleEnabled == "1")
+                        ? FindOnlineDeviceByInstanceGuid(us.InstanceGuid) : null;
                     bool fastVaderMeter = FlydigiVader5ProHidWriter.Enabled
                         && onlineForMeter != null
                         && FlydigiVader5ProHidWriter.IsDevice(
