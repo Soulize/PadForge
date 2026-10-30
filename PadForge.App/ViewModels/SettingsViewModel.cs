@@ -1604,6 +1604,163 @@ namespace PadForge.ViewModels
         }
 
 
+        // Fidelity estimates source intensity; a peak-boost is explicitly
+        // separate. Default false, including on upgrades from older XML.
+        private bool _flydigiVader5ProTransientEnhancement;
+        public bool FlydigiVader5ProTransientEnhancement
+        {
+            get => _flydigiVader5ProTransientEnhancement;
+            set
+            {
+                if (SetProperty(ref _flydigiVader5ProTransientEnhancement, value))
+                    Vader5ProFidelitySettings.SetTransientEnhancement(value);
+            }
+        }
+
+        /// <summary>Three attenuation-only spectral weights. Neutral 100/100/100
+        /// until measured frequency-response data is available.</summary>
+        public string FlydigiVader5ProBandWeightsCsv
+        {
+            get => Vader5ProFidelitySettings.ToCsv(Vader5ProFidelitySettings.CurrentBands);
+            set
+            {
+                Vader5ProFidelitySettings.SetBands(
+                    Vader5ProFidelitySettings.ParseCsv(value));
+                OnPropertyChanged(nameof(FlydigiVader5ProBandWeightsCsv));
+                OnPropertyChanged(nameof(FlydigiVader5ProLowBandPercent));
+                OnPropertyChanged(nameof(FlydigiVader5ProMidBandPercent));
+                OnPropertyChanged(nameof(FlydigiVader5ProHighBandPercent));
+            }
+        }
+
+        public int FlydigiVader5ProLowBandPercent
+        {
+            get => Vader5ProFidelitySettings.CurrentBands.LowPercent;
+            set
+            {
+                var p = Vader5ProFidelitySettings.CurrentBands;
+                Vader5ProFidelitySettings.SetBands(p with {
+                    LowPercent = Math.Clamp(value, 0, 100) });
+                OnPropertyChanged(nameof(FlydigiVader5ProLowBandPercent));
+                OnPropertyChanged(nameof(FlydigiVader5ProBandWeightsCsv));
+            }
+        }
+
+        public int FlydigiVader5ProMidBandPercent
+        {
+            get => Vader5ProFidelitySettings.CurrentBands.MidPercent;
+            set
+            {
+                var p = Vader5ProFidelitySettings.CurrentBands;
+                Vader5ProFidelitySettings.SetBands(p with {
+                    MidPercent = Math.Clamp(value, 0, 100) });
+                OnPropertyChanged(nameof(FlydigiVader5ProMidBandPercent));
+                OnPropertyChanged(nameof(FlydigiVader5ProBandWeightsCsv));
+            }
+        }
+
+        public int FlydigiVader5ProHighBandPercent
+        {
+            get => Vader5ProFidelitySettings.CurrentBands.HighPercent;
+            set
+            {
+                var p = Vader5ProFidelitySettings.CurrentBands;
+                Vader5ProFidelitySettings.SetBands(p with {
+                    HighPercent = Math.Clamp(value, 0, 100) });
+                OnPropertyChanged(nameof(FlydigiVader5ProHighBandPercent));
+                OnPropertyChanged(nameof(FlydigiVader5ProBandWeightsCsv));
+            }
+        }
+
+        /// <summary>Four monotone 9-point HID response LUTs; saved in app
+        /// settings. A failed or absent legacy value restores identity.</summary>
+        public string FlydigiVader5ProMotorLutCsv
+        {
+            get => Vader5ProMotorResponseLut.ToCsv(Vader5ProMotorResponseLut.Current);
+            set
+            {
+                Vader5ProMotorResponseLut.SetProfile(
+                    Vader5ProMotorResponseLut.ParseCsv(value));
+                OnPropertyChanged(nameof(FlydigiVader5ProMotorLutCsv));
+                OnPropertyChanged(nameof(FlydigiVader5ProGripLeftLut));
+                OnPropertyChanged(nameof(FlydigiVader5ProGripRightLut));
+                OnPropertyChanged(nameof(FlydigiVader5ProTriggerLeftLut));
+                OnPropertyChanged(nameof(FlydigiVader5ProTriggerRightLut));
+            }
+        }
+
+        public string FlydigiVader5ProGripLeftLut
+        {
+            get => Vader5ProMotorResponseLut.Current.GripLeft.ToCsv();
+            set
+            {
+                if (!Vader5ProMotorResponseLut.Curve.TryParse(value, out var curve))
+                {
+                    // Invalid partial edits never reach the native HID worker.
+                    OnPropertyChanged(nameof(FlydigiVader5ProGripLeftLut));
+                    return;
+                }
+                var p = Vader5ProMotorResponseLut.Current;
+                Vader5ProMotorResponseLut.SetProfile(p with { GripLeft = curve });
+                OnPropertyChanged(nameof(FlydigiVader5ProGripLeftLut));
+                OnPropertyChanged(nameof(FlydigiVader5ProMotorLutCsv));
+            }
+        }
+
+        public string FlydigiVader5ProGripRightLut
+        {
+            get => Vader5ProMotorResponseLut.Current.GripRight.ToCsv();
+            set
+            {
+                if (!Vader5ProMotorResponseLut.Curve.TryParse(value, out var curve))
+                {
+                    // Invalid partial edits never reach the native HID worker.
+                    OnPropertyChanged(nameof(FlydigiVader5ProGripRightLut));
+                    return;
+                }
+                var p = Vader5ProMotorResponseLut.Current;
+                Vader5ProMotorResponseLut.SetProfile(p with { GripRight = curve });
+                OnPropertyChanged(nameof(FlydigiVader5ProGripRightLut));
+                OnPropertyChanged(nameof(FlydigiVader5ProMotorLutCsv));
+            }
+        }
+
+        public string FlydigiVader5ProTriggerLeftLut
+        {
+            get => Vader5ProMotorResponseLut.Current.TriggerLeft.ToCsv();
+            set
+            {
+                if (!Vader5ProMotorResponseLut.Curve.TryParse(value, out var curve))
+                {
+                    // Invalid partial edits never reach the native HID worker.
+                    OnPropertyChanged(nameof(FlydigiVader5ProTriggerLeftLut));
+                    return;
+                }
+                var p = Vader5ProMotorResponseLut.Current;
+                Vader5ProMotorResponseLut.SetProfile(p with { TriggerLeft = curve });
+                OnPropertyChanged(nameof(FlydigiVader5ProTriggerLeftLut));
+                OnPropertyChanged(nameof(FlydigiVader5ProMotorLutCsv));
+            }
+        }
+
+        public string FlydigiVader5ProTriggerRightLut
+        {
+            get => Vader5ProMotorResponseLut.Current.TriggerRight.ToCsv();
+            set
+            {
+                if (!Vader5ProMotorResponseLut.Curve.TryParse(value, out var curve))
+                {
+                    // Invalid partial edits never reach the native HID worker.
+                    OnPropertyChanged(nameof(FlydigiVader5ProTriggerRightLut));
+                    return;
+                }
+                var p = Vader5ProMotorResponseLut.Current;
+                Vader5ProMotorResponseLut.SetProfile(p with { TriggerRight = curve });
+                OnPropertyChanged(nameof(FlydigiVader5ProTriggerRightLut));
+                OnPropertyChanged(nameof(FlydigiVader5ProMotorLutCsv));
+            }
+        }
+
         public string FlydigiVader5ProStatus => FlydigiVader5ProHidWriter.Status;
 
         // A single explicit channel at a time, 400ms at ~63% intensity.
