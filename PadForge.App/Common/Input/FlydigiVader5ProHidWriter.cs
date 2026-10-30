@@ -301,7 +301,13 @@ namespace PadForge.Common.Input
             lock (StateGate)
             {
                 if (!Enabled) return false;
-                _testMotors = TestPattern(channel);
+                var raw = TestPattern(channel);
+                var tuned = Vader5ProMotorCalibration.Apply(
+                    (ushort)(raw.GripLeft * 257), (ushort)(raw.GripRight * 257),
+                    (ushort)(raw.TriggerLeft * 257), (ushort)(raw.TriggerRight * 257),
+                    Vader5ProMotorCalibration.Current);
+                _testMotors = new Motors(tuned.GripLeft, tuned.GripRight,
+                    tuned.TriggerLeft, tuned.TriggerRight);
                 _testUntilAt = Clock() + 400;
             }
             Wake.Set();
