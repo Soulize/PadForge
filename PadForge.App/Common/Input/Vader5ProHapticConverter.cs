@@ -94,7 +94,10 @@ namespace PadForge.Common.Input
             bool idleL = _left.Envelope < OutputFloor;
             bool idleR = _right.Envelope < OutputFloor;
 
-            int firstL = -1, lastL = -1, firstR = -1, lastR = -1;
+            // Use active sample COUNT rather than first-to-last span:
+            // separate small taps in the same callback must not fill their
+            // intervening silence with an invented long motor command.
+            int activeL = 0, activeR = 0;
             for (int i = 0; i < frames; i++)
             {
                 int offset = i * stride;
@@ -105,16 +108,8 @@ namespace PadForge.Common.Input
                 double le = l * l, re = r * r;
                 energyL += le; energyR += re;
 
-                if (Math.Abs(l) > SilenceSampleFloor)
-                {
-                    if (firstL < 0) firstL = i;
-                    lastL = i;
-                }
-                if (Math.Abs(r) > SilenceSampleFloor)
-                {
-                    if (firstR < 0) firstR = i;
-                    lastR = i;
-                }
+                if (Math.Abs(l) > SilenceSampleFloor) activeL++;
+                if (Math.Abs(r) > SilenceSampleFloor) activeR++;
 
                 highEnergyL += Step(ref _left, l, alphaLow, alphaHigh,
                     silenceFrames, out double lowL, out double midL);
@@ -172,10 +167,10 @@ namespace PadForge.Common.Input
             // Do not synthesize a constant 10 ms "impact" from a brief cue.
             bool endedL = _left.SilentFrames >= silenceFrames;
             bool endedR = _right.SilentFrames >= silenceFrames;
-            bool pulseL = idleL && endedL && firstL >= 0 && levelL >= OutputFloor;
-            bool pulseR = idleR && endedR && firstR >= 0 && levelR >= OutputFloor;
-            byte pulseLeftMs = pulseL ? PulseDuration(firstL, lastL, rateHz) : (byte)0;
-            byte pulseRightMs = pulseR ? PulseDuration(firstR, lastR, rateHz) : (byte)0;
+            bool pulseL = idleL && endedL && activeL > 0 && levelL >= OutputFloor;
+            bool pulseR = idleR && endedR && activeR > 0 && levelR >= OutputFloor;
+            byte pulseLeftMs = pulseL ? PulseDuration(activeL, rateHz) : (byte)0;
+            byte pulseRightMs = pulseR ? PulseDuration(activeR, rateHz) : (byte)0;
 
             if (endedL) _left = default;
             else
@@ -204,9 +199,9 @@ namespace PadForge.Common.Input
                 pulseLeftMs, pulseRightMs);
         }
 
-        private static byte PulseDuration(int first, int last, int rateHz)
+        private static byte PulseDuration(int activeSamples, int rateHz)
         {
-            long duration = ((long)(last - first + 1) * 1000 + rateHz - 1) / rateHz;
+            long duration = ((long)activeSamples * 1000 + rateHz - 1) / rateHz;
             return (byte)Math.Clamp(duration,
                 FlydigiVader5ProHidWriter.StopEdgeMinIntervalMs, byte.MaxValue);
         }
