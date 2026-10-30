@@ -1775,14 +1775,22 @@ namespace PadForge.ViewModels
 
         // A single explicit channel at a time, 400ms at user-selected level.
         // The worker refuses output if two physical pads are present.
-        public IRelayCommand TestVader5ProLeftGripCommand { get; } =
-            new RelayCommand(() => FlydigiVader5ProHidWriter.PulseTestMotor(0, (byte)FlydigiVader5ProTestStrength));
-        public IRelayCommand TestVader5ProRightGripCommand { get; } =
-            new RelayCommand(() => FlydigiVader5ProHidWriter.PulseTestMotor(1, (byte)FlydigiVader5ProTestStrength));
-        public IRelayCommand TestVader5ProLeftTriggerCommand { get; } =
-            new RelayCommand(() => FlydigiVader5ProHidWriter.PulseTestMotor(2, (byte)FlydigiVader5ProTestStrength));
-        public IRelayCommand TestVader5ProRightTriggerCommand { get; } =
-            new RelayCommand(() => FlydigiVader5ProHidWriter.PulseTestMotor(3, (byte)FlydigiVader5ProTestStrength));
+        private IRelayCommand _TestVader5ProLeftGripCommand;
+        public IRelayCommand TestVader5ProLeftGripCommand =>
+            _TestVader5ProLeftGripCommand ??= new RelayCommand(() =>
+                FlydigiVader5ProHidWriter.PulseTestMotor(0, (byte)FlydigiVader5ProTestStrength));
+        private IRelayCommand _TestVader5ProRightGripCommand;
+        public IRelayCommand TestVader5ProRightGripCommand =>
+            _TestVader5ProRightGripCommand ??= new RelayCommand(() =>
+                FlydigiVader5ProHidWriter.PulseTestMotor(1, (byte)FlydigiVader5ProTestStrength));
+        private IRelayCommand _TestVader5ProLeftTriggerCommand;
+        public IRelayCommand TestVader5ProLeftTriggerCommand =>
+            _TestVader5ProLeftTriggerCommand ??= new RelayCommand(() =>
+                FlydigiVader5ProHidWriter.PulseTestMotor(2, (byte)FlydigiVader5ProTestStrength));
+        private IRelayCommand _TestVader5ProRightTriggerCommand;
+        public IRelayCommand TestVader5ProRightTriggerCommand =>
+            _TestVader5ProRightTriggerCommand ??= new RelayCommand(() =>
+                FlydigiVader5ProHidWriter.PulseTestMotor(3, (byte)FlydigiVader5ProTestStrength));
 
         private bool _gKeysEnabled;
 
