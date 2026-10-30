@@ -246,6 +246,30 @@ namespace PadForge.Tests
         }
 
         [Fact]
+        public void SeparatedTinyTextures_DoNotFillTheSilentGapWithMotorDrive()
+        {
+            var pcm = new byte[48000 * 20 / 1000 * 4];
+            var a = Tone(48000, 2, 500, 0.25);
+            Array.Copy(a, 0, pcm, 0, a.Length);
+            Array.Copy(a, 0, pcm, 48000 * 10 / 1000 * 4, a.Length);
+            var f = new Vader5ProHapticConverter().Process(
+                pcm, 4, 0, 2, 48000, 20);
+            Assert.InRange(f.PulseLeftMs, (byte)3, (byte)5);
+            Assert.True(f.PulseLeftMs < 10,
+                "Two short textures must not be stretched over their silent gap.");
+        }
+
+        [Fact]
+        public void SteppedPhysicalMotorTest_PreservesRequestedInputLevel()
+        {
+            var test = FlydigiVader5ProHidWriter.TestPattern(2, 32);
+            Assert.Equal((byte)32, test.TriggerLeft);
+            Assert.Equal((byte)0, test.GripLeft);
+            Assert.Equal((byte)0, test.GripRight);
+            Assert.Equal((byte)0, test.TriggerRight);
+        }
+
+        [Fact]
         public void XmlSettings_PersistFidelityAndFourLutsAcrossRestart()
         {
             var s = new PadForge.Services.AppSettingsData
@@ -255,7 +279,8 @@ namespace PadForge.Tests
                 FlydigiVader5ProBandWeightsCsv = "100,90,45",
                 FlydigiVader5ProMotorLutCsv =
                     Vader5ProMotorResponseLut.ToCsv(
-                        Vader5ProMotorResponseLut.Profile.Identity)
+                        Vader5ProMotorResponseLut.Profile.Identity),
+                FlydigiVader5ProTestStrength = 32
             };
             var serializer = new System.Xml.Serialization.XmlSerializer(
                 typeof(PadForge.Services.AppSettingsData));
@@ -269,6 +294,7 @@ namespace PadForge.Tests
                 restored.FlydigiVader5ProBandWeightsCsv);
             Assert.Equal(s.FlydigiVader5ProMotorLutCsv,
                 restored.FlydigiVader5ProMotorLutCsv);
+            Assert.Equal(32, restored.FlydigiVader5ProTestStrength);
         }
     }
 }
