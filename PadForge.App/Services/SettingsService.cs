@@ -2387,6 +2387,7 @@ namespace PadForge.Services
             vm.FlydigiVader5ProTransientEnhancement = appSettings.FlydigiVader5ProTransientEnhancement;
             vm.FlydigiVader5ProBandWeightsCsv = appSettings.FlydigiVader5ProBandWeightsCsv;
             vm.FlydigiVader5ProMotorLutCsv = appSettings.FlydigiVader5ProMotorLutCsv;
+            vm.FlydigiVader5ProTestStrength = appSettings.FlydigiVader5ProTestStrength;
             vm.GKeysEnabled = appSettings.GKeysEnabled;
             vm.AnalogKeyboardsEnabled = appSettings.AnalogKeyboardsEnabled;
             vm.BlissBoxEnabled = appSettings.BlissBoxEnabled;
@@ -5082,6 +5083,7 @@ namespace PadForge.Services
                 FlydigiVader5ProTransientEnhancement = vm.FlydigiVader5ProTransientEnhancement,
                 FlydigiVader5ProBandWeightsCsv = vm.FlydigiVader5ProBandWeightsCsv,
                 FlydigiVader5ProMotorLutCsv = vm.FlydigiVader5ProMotorLutCsv,
+                FlydigiVader5ProTestStrength = vm.FlydigiVader5ProTestStrength,
                 GKeysEnabled = vm.GKeysEnabled,
                 AnalogKeyboardsEnabled = vm.AnalogKeyboardsEnabled,
                 BlissBoxEnabled = vm.BlissBoxEnabled,
@@ -7231,6 +7233,11 @@ namespace PadForge.Services
         /// GL;GR;TL;TR, each in 0..255 HID units. Empty = identity.</summary>
         [XmlElement]
         public string FlydigiVader5ProMotorLutCsv { get; set; } = "";
+
+        /// <summary>Desired input intensity for stepped motor tests,
+        /// before application of per-motor response LUT. 0..255.</summary>
+        [XmlElement]
+        public int FlydigiVader5ProTestStrength { get; set; } = 160;
 
         /// <summary>
         /// User-specified application paths to whitelist in HidHide.
