@@ -2384,6 +2384,9 @@ namespace PadForge.Services
             vm.FlydigiVader5ProEnhancedHapticsEnabled = appSettings.FlydigiVader5ProEnhancedHapticsEnabled;
             vm.FlydigiVader5ProSpectralTriggerAssist = appSettings.FlydigiVader5ProSpectralTriggerAssist;
             vm.FlydigiVader5ProMotorCalibrationCsv = appSettings.FlydigiVader5ProMotorCalibrationCsv;
+            vm.FlydigiVader5ProTransientEnhancement = appSettings.FlydigiVader5ProTransientEnhancement;
+            vm.FlydigiVader5ProBandWeightsCsv = appSettings.FlydigiVader5ProBandWeightsCsv;
+            vm.FlydigiVader5ProMotorLutCsv = appSettings.FlydigiVader5ProMotorLutCsv;
             vm.GKeysEnabled = appSettings.GKeysEnabled;
             vm.AnalogKeyboardsEnabled = appSettings.AnalogKeyboardsEnabled;
             vm.BlissBoxEnabled = appSettings.BlissBoxEnabled;
@@ -5076,6 +5079,9 @@ namespace PadForge.Services
                 FlydigiVader5ProEnhancedHapticsEnabled = vm.FlydigiVader5ProEnhancedHapticsEnabled,
                 FlydigiVader5ProSpectralTriggerAssist = vm.FlydigiVader5ProSpectralTriggerAssist,
                 FlydigiVader5ProMotorCalibrationCsv = vm.FlydigiVader5ProMotorCalibrationCsv,
+                FlydigiVader5ProTransientEnhancement = vm.FlydigiVader5ProTransientEnhancement,
+                FlydigiVader5ProBandWeightsCsv = vm.FlydigiVader5ProBandWeightsCsv,
+                FlydigiVader5ProMotorLutCsv = vm.FlydigiVader5ProMotorLutCsv,
                 GKeysEnabled = vm.GKeysEnabled,
                 AnalogKeyboardsEnabled = vm.AnalogKeyboardsEnabled,
                 BlissBoxEnabled = vm.BlissBoxEnabled,
@@ -7210,6 +7216,21 @@ namespace PadForge.Services
         /// Empty or invalid strings restore four neutral curves.</summary>
         [XmlElement]
         public string FlydigiVader5ProMotorCalibrationCsv { get; set; } = "";
+
+        /// <summary>Opt-in subjective impact emphasis, never on in
+        /// default DualSense Fidelity. Independent from PCM fast-stop.</summary>
+        [XmlElement]
+        public bool FlydigiVader5ProTransientEnhancement { get; set; } = false;
+
+        /// <summary>Attenuation-only relative weights low/mid/high.
+        /// Empty on older installations loads neutral 100/100/100.</summary>
+        [XmlElement]
+        public string FlydigiVader5ProBandWeightsCsv { get; set; } = "";
+
+        /// <summary>Four independent monotonic 9-point response LUTs,
+        /// GL;GR;TL;TR, each in 0..255 HID units. Empty = identity.</summary>
+        [XmlElement]
+        public string FlydigiVader5ProMotorLutCsv { get; set; } = "";
 
         /// <summary>
         /// User-specified application paths to whitelist in HidHide.
