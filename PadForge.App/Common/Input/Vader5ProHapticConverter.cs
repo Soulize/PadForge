@@ -18,8 +18,10 @@ namespace PadForge.Common.Input
         private const double SilenceSampleFloor = 0.0015;
         private const double OutputFloor = 0.02;
 
+        internal const int TransientBurstHoldMs = 10;
         internal readonly record struct Frame(ushort Left, ushort Right,
-            ushort HighLeft, ushort HighRight, ushort LowLeft, ushort LowRight);
+            ushort HighLeft, ushort HighRight, ushort LowLeft, ushort LowRight,
+            byte BurstMask);
 
         private struct Channel
         {
@@ -77,6 +79,8 @@ namespace PadForge.Common.Input
             double lowEnergyL = 0, lowEnergyR = 0;
             double alpha = 1.0 - Math.Exp(-2.0 * Math.PI * SpectralCutoffHz / rateHz);
             int silenceFrames = Math.Max(1, rateHz * SilenceConfirmMs / 1000);
+            bool leftWasIdle = _left.Envelope < OutputFloor;
+            bool rightWasIdle = _right.Envelope < OutputFloor;
 
             for (int i = 0; i < frames; ++i)
             {
@@ -120,12 +124,25 @@ namespace PadForge.Common.Input
             double lowL = Math.Min(1.0, Math.Sqrt(lowEnergyL / frames) * 1.4);
             double lowR = Math.Min(1.0, Math.Sqrt(lowEnergyR / frames) * 1.4);
             double seconds = frames / (double)rateHz;
+            // A complete short pulse can begin AND end inside one host
+            // audio callback. A final silent run would otherwise erase it
+            // before any motor command existed. Publish one bounded 10ms
+            // pulse, with a reader-side expiry even if callbacks stop.
+            bool burstL = leftWasIdle && _left.SilentFrames >= silenceFrames
+                && immediateL >= OutputFloor;
+            bool burstR = rightWasIdle && _right.SilentFrames >= silenceFrames
+                && immediateR >= OutputFloor;
             UpdateEnvelope(ref _left, immediateL, highL, lowL, seconds, silenceFrames);
             UpdateEnvelope(ref _right, immediateR, highR, lowR, seconds, silenceFrames);
 
-            return new Frame(ToLevel(_left.Envelope), ToLevel(_right.Envelope),
-                ToLevel(_left.HighEnvelope), ToLevel(_right.HighEnvelope),
-                ToLevel(_left.LowEnvelope), ToLevel(_right.LowEnvelope));
+            return new Frame(
+                ToLevel(burstL ? immediateL : _left.Envelope),
+                ToLevel(burstR ? immediateR : _right.Envelope),
+                ToLevel(burstL ? highL : _left.HighEnvelope),
+                ToLevel(burstR ? highR : _right.HighEnvelope),
+                ToLevel(burstL ? lowL : _left.LowEnvelope),
+                ToLevel(burstR ? lowR : _right.LowEnvelope),
+                (byte)((burstL ? 1 : 0) | (burstR ? 2 : 0)));
         }
 
         private static double Step(ref Channel state, double value,
