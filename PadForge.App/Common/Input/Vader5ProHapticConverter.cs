@@ -94,10 +94,10 @@ namespace PadForge.Common.Input
                 bucketL += le; bucketR += re;
                 bucketCount++;
 
-                highEnergyL += Step(ref _left, l, alpha, silenceFrames, out double lowL);
-                highEnergyR += Step(ref _right, r, alpha, silenceFrames, out double lowR);
-                lowEnergyL += lowL;
-                lowEnergyR += lowR;
+                highEnergyL += Step(ref _left, l, alpha, silenceFrames, out double lowSampleL);
+                highEnergyR += Step(ref _right, r, alpha, silenceFrames, out double lowSampleR);
+                lowEnergyL += lowSampleL;
+                lowEnergyR += lowSampleR;
 
                 if (bucketCount >= bucketSize)
                 {
