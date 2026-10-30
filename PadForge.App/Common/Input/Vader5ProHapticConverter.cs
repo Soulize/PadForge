@@ -196,6 +196,34 @@ namespace PadForge.Common.Input
         internal static void SetProfile(Profile profile)
             => Volatile.Write(ref _profile, profile ?? Profile.Identity);
 
+        internal static string ToCsv(Profile profile)
+        {
+            profile ??= Profile.Identity;
+            static string Part(Curve c) => $"{c.GainPercent},{c.GammaPercent},{c.MinDrive}";
+            return string.Join(";", Part(profile.GripLeft), Part(profile.GripRight),
+                Part(profile.TriggerLeft), Part(profile.TriggerRight));
+        }
+
+        internal static Profile ParseCsv(string csv)
+        {
+            if (string.IsNullOrWhiteSpace(csv)) return Profile.Identity;
+            var parts = csv.Split(';');
+            if (parts.Length != 4) return Profile.Identity;
+            var curves = new Curve[4];
+            for (int i = 0; i < 4; i++)
+            {
+                var values = parts[i].Split(',');
+                if (values.Length != 3
+                    || !int.TryParse(values[0], out int gain)
+                    || !int.TryParse(values[1], out int gamma)
+                    || !int.TryParse(values[2], out int floor))
+                    return Profile.Identity;
+                curves[i] = new Curve(Math.Clamp(gain, 0, 200),
+                    Math.Clamp(gamma, 50, 180), Math.Clamp(floor, 0, 64));
+            }
+            return new Profile(curves[0], curves[1], curves[2], curves[3]);
+        }
+
         internal static byte Encode(ushort level, Curve curve)
         {
             if (level == 0 || curve.GainPercent <= 0) return 0;
