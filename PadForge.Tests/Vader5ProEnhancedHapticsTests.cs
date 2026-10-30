@@ -150,6 +150,25 @@ namespace PadForge.Tests
         }
 
         [Fact]
+        public void WholePulseInsideOneCallback_IsPublishedAndBounded()
+        {
+            var converter = new Vader5ProHapticConverter();
+            var hostChunk = new byte[48000 * 12 / 1000 * 4];
+            var impact = Tone(48000, 3, 500, 0.8, 0.0);
+            Array.Copy(impact, hostChunk, impact.Length);
+            var frame = converter.Process(hostChunk, 4, 0, 2, 48000, 12);
+            Assert.True(frame.Left > 20000,
+                "An impact followed by silence in the same callback must not vanish");
+            Assert.Equal(1, frame.BurstMask & 1);
+            Assert.Equal(0, frame.BurstMask & 2);
+            Assert.Equal(10, Vader5ProHapticConverter.TransientBurstHoldMs);
+            var quiet = converter.Process(new byte[48000 * 5 / 1000 * 4],
+                4, 0, 2, 48000, 17);
+            Assert.Equal((ushort)0, quiet.Left);
+            Assert.Equal(0, quiet.BurstMask);
+        }
+
+        [Fact]
         public void CalibrationCsv_RoundTripsAndRejectsCorruptProfiles()
         {
             var identity = Vader5ProMotorCalibration.Profile.Identity;
