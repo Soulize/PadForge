@@ -1659,6 +1659,10 @@ namespace PadForge.Common.Input
             // the original 20 ms follower unchanged.
             public readonly Vader5ProHapticConverter VaderConverter = new();
             public long HapticLevel, HapticFastLevel, HapticFastHighLevel, HapticLevelMs;
+            // Hard-expiring one-callback impulses: a short 5ms PCM pulse
+            // must not vanish inside a 20ms callback, nor vibrate for 50ms
+            // waiting for the normal stale-audio watchdog.
+            public long HapticFastBurstLeftUntilMs, HapticFastBurstRightUntilMs;
             // Speaker-out resampler state + scratch (pacing thread only).
             public double SpkPhase;
             public readonly float[] SpkCarry = new float[2];
@@ -2145,6 +2149,7 @@ namespace PadForge.Common.Input
                 ref feed.HapticMeanSquareL, ref feed.HapticMeanSquareR,
                 span, stride, feed.HapL * 2, feed.HapR * 2, feed.SrcRate);
             long fastLevel = 0L, highLevel = 0L;
+            long burstLeftUntil = 0, burstRightUntil = 0;
             if (FlydigiVader5ProHidWriter.Enabled)
             {
                 if (FlydigiVader5ProHidWriter.EnhancedHapticsEnabled)
@@ -2155,6 +2160,10 @@ namespace PadForge.Common.Input
                         frame.Left, frame.Right, 0, 0);
                     highLevel = PadForge.Engine.Common.LfeOutputState.Pack(
                         frame.HighLeft, frame.HighRight, 0, 0);
+                    if ((frame.BurstMask & 1) != 0)
+                        burstLeftUntil = nowMs + Vader5ProHapticConverter.TransientBurstHoldMs;
+                    if ((frame.BurstMask & 2) != 0)
+                        burstRightUntil = nowMs + Vader5ProHapticConverter.TransientBurstHoldMs;
                     feed.HapticFastMeanSquareL = 0;
                     feed.HapticFastMeanSquareR = 0;
                 }
@@ -2189,6 +2198,8 @@ namespace PadForge.Common.Input
             // Spectral and amplitude packs have one common freshness marker.
             System.Threading.Volatile.Write(ref feed.HapticLevelMs, nowMs);
             System.Threading.Volatile.Write(ref feed.HapticLevel, level);
+            System.Threading.Volatile.Write(ref feed.HapticFastBurstLeftUntilMs, burstLeftUntil);
+            System.Threading.Volatile.Write(ref feed.HapticFastBurstRightUntilMs, burstRightUntil);
             System.Threading.Volatile.Write(ref feed.HapticFastHighLevel, highLevel);
             System.Threading.Volatile.Write(ref feed.HapticFastLevel, fastLevel);
         }
