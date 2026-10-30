@@ -516,13 +516,15 @@ namespace PadForge.Tests
             string step2 = Source("Common", "Input", "InputManager.Step2.UpdateInputStates.cs");
             int aff = step2.IndexOf("private void ApplyForceFeedback(UserDevice ud)", StringComparison.Ordinal);
             int sonySkip = step2.IndexOf("|| ud.ProdId == 0x0BA0)) // DS4 wireless adapter", aff, StringComparison.Ordinal);
-            int layer = step2.IndexOf("raw = WithPersonaHaptics(padIndex, ud.InstanceGuid, raw, _personaHapticScratch, hapticNow);", aff, StringComparison.Ordinal);
+            // The Vader-only low-latency envelope is an optional trailing
+            // argument, but the haptic layer must still precede macro force.
+            int layer = step2.IndexOf("raw = WithPersonaHaptics(padIndex, ud.InstanceGuid, raw,", aff, StringComparison.Ordinal);
             int macro = step2.IndexOf("var withMacro = ResolveUserRumble(padIndex, devicePs, raw, _macroRumbleScratch,", aff, StringComparison.Ordinal);
             Assert.True(aff > 0 && sonySkip > aff && layer > sonySkip && macro > layer,
                 "ApplyForceFeedback layers the haptics on before the macro merge");
 
             int meter = step2.IndexOf("public void ComputeFinalVibrationStates()", StringComparison.Ordinal);
-            int rowLayer = step2.IndexOf("var rowRaw = WithPersonaHaptics(padIndex, us.InstanceGuid, raw, _personaHapticMeterScratch, meterNow);", meter, StringComparison.Ordinal);
+            int rowLayer = step2.IndexOf("var rowRaw = WithPersonaHaptics(padIndex, us.InstanceGuid,", meter, StringComparison.Ordinal);
             int rowMacro = step2.IndexOf("withMacro = ResolveUserRumble(padIndex, devicePs, rowRaw, _macroRumbleScratch,", meter, StringComparison.Ordinal);
             Assert.True(meter > 0 && rowLayer > meter && rowMacro > rowLayer, "the meter rows take the same layer first");
 

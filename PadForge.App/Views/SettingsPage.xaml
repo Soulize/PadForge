@@ -282,6 +282,34 @@
                                   IsChecked="{Binding FlydigiEnhancedProtocol}"/>
                         <reset:SettingResetButton Command="{Binding ResetSettingCommand}" CommandParameter="FlydigiEnhancedProtocol" SettingLabel="{Binding Settings_FlydigiEnhanced, Source={x:Static strings:Strings.Instance}}" AutomationProperties.AutomationId="Reset_SettingsViewModel_FlydigiEnhancedProtocol_158"/>
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <CheckBox VerticalAlignment="Center"
+                                  Content="Experimental: Vader 5 Pro native four-motor rumble"
+                                  Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                  ToolTip="Direct 37D7:2401 vendor HID output; independently controls two grip and two trigger motors. Supports one pad only. Disable when Flydigi Space Station holds exclusive access."
+                                  IsChecked="{Binding FlydigiVader5ProFourMotorEnabled}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,12">
+                        <TextBlock Text="Motor output interval" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   Margin="0,0,8,0"/>
+                        <Slider Width="160" Minimum="10" Maximum="60"
+                                TickFrequency="5" IsSnapToTickEnabled="True"
+                                Value="{Binding FlydigiVader5ProOutputIntervalMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                ToolTip="30 ms recommended; below 30 ms is experimental and can overwhelm the receiver firmware."/>
+                        <TextBlock Text="{Binding FlydigiVader5ProOutputIntervalMs, StringFormat={}{0} ms}"
+                                   VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,12">
+                        <Button Content="Test left grip" Command="{Binding TestVader5ProLeftGripCommand}" IsEnabled="{Binding FlydigiVader5ProFourMotorEnabled}" Margin="0,0,8,0"/>
+                        <Button Content="Test right grip" Command="{Binding TestVader5ProRightGripCommand}" IsEnabled="{Binding FlydigiVader5ProFourMotorEnabled}" Margin="0,0,8,0"/>
+                        <Button Content="Test left trigger" Command="{Binding TestVader5ProLeftTriggerCommand}" IsEnabled="{Binding FlydigiVader5ProFourMotorEnabled}" Margin="0,0,8,0"/>
+                        <Button Content="Test right trigger" Command="{Binding TestVader5ProRightTriggerCommand}" IsEnabled="{Binding FlydigiVader5ProFourMotorEnabled}"/>
+                    </StackPanel>
+                    <TextBlock Text="{Binding FlydigiVader5ProStatus}"
+                               common:LiveText.Polite="True" Margin="20,0,0,10"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               TextWrapping="Wrap"/>
                     <!-- Logitech G-keys (#454), the Flydigi row's shape: a
                          vendor input path this engine can read, off until
                          asked for. -->

@@ -8410,6 +8410,106 @@
                             </StackPanel>
                         </Border>
 
+                        <!-- Vader 5 Pro native LT/RT motors. These use the
+                             SAME per-device settings as the Impulse Triggers tab. -->
+                        <Border x:Name="FfbVaderFourMotorCard" Style="{StaticResource CardBorder}" Visibility="Collapsed">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                    <TextBlock Text="{Binding Pad_ImpulseTriggers_Header, Source={x:Static strings:Strings.Instance}}"
+                                               Style="{StaticResource CardTitle}"/>
+                                    <TextBlock Text="  • Vader 5 Pro native four-motor HID"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="Left and right grip motors use the controls above. These two trigger-motor gains and the adaptive-trigger vibration translation switch also appear on the Impulse Triggers tab."
+                                           Style="{StaticResource CardDescription}" TextWrapping="Wrap" Margin="0,0,0,12"/>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                    <TextBlock Text="{Binding Pad_OverallGain, Source={x:Static strings:Strings.Instance}}" Style="{StaticResource DzLabel}"/>
+                                    <Slider Value="{Binding ImpulseOverallGain, Mode=TwoWay}" Style="{StaticResource DzSlider}"/>
+                                    <TextBox Text="{Binding ImpulseOverallGain, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Style="{StaticResource DzValueEdit}"/>
+                                    <TextBlock Text="%" Style="{StaticResource DzPercent}"/>
+                                    <ui:Button Command="{Binding ResetImpulseOverallGainCommand}" Style="{StaticResource ResetButton}"
+                                               ToolTip="{Binding Pad_ResetImpulseOverallGain, Source={x:Static strings:Strings.Instance}}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                    <TextBlock Text="{Binding Pad_ImpulseTriggers_LeftTrigger, Source={x:Static strings:Strings.Instance}}" Style="{StaticResource DzLabel}"/>
+                                    <Slider Value="{Binding ImpulseLeftStrength, Mode=TwoWay}" Style="{StaticResource DzSlider}"/>
+                                    <TextBox Text="{Binding ImpulseLeftStrength, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Style="{StaticResource DzValueEdit}"/>
+                                    <TextBlock Text="%" Style="{StaticResource DzPercent}"/>
+                                    <ui:Button Command="{Binding ResetImpulseLeftCommand}" Style="{StaticResource ResetButton}"
+                                               ToolTip="{Binding Pad_ResetImpulseLeft, Source={x:Static strings:Strings.Instance}}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                    <TextBlock Text="{Binding Pad_ImpulseTriggers_RightTrigger, Source={x:Static strings:Strings.Instance}}" Style="{StaticResource DzLabel}"/>
+                                    <Slider Value="{Binding ImpulseRightStrength, Mode=TwoWay}" Style="{StaticResource DzSlider}"/>
+                                    <TextBox Text="{Binding ImpulseRightStrength, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Style="{StaticResource DzValueEdit}"/>
+                                    <TextBlock Text="%" Style="{StaticResource DzPercent}"/>
+                                    <ui:Button Command="{Binding ResetImpulseRightCommand}" Style="{StaticResource ResetButton}"
+                                               ToolTip="{Binding Pad_ResetImpulseRight, Source={x:Static strings:Strings.Instance}}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                    <CheckBox VerticalAlignment="Center"
+                                              Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                              Content="{Binding Pad_ImpulseTriggers_AtTranslate, Source={x:Static strings:Strings.Instance}}"
+                                              ToolTip="{Binding Pad_ImpulseTriggers_AtTranslate_Tooltip, Source={x:Static strings:Strings.Instance}}"
+                                              IsChecked="{Binding AtVibrationToImpulse, Mode=TwoWay}"/>
+                                    <reset:SettingResetButton Command="{Binding ResetSettingCommand}" CommandParameter="AtVibrationToImpulse"
+                                                              SettingLabel="{Binding Pad_ImpulseTriggers_AtTranslate, Source={x:Static strings:Strings.Instance}}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                    <Button Content="{Binding Pad_ImpulseTriggers_TestLeftTrigger, Source={x:Static strings:Strings.Instance}}"
+                                            Command="{Binding TestLeftImpulseTriggerCommand}" Padding="12,6" Margin="0,0,8,0"/>
+                                    <Button Content="{Binding Pad_ImpulseTriggers_TestRightTrigger, Source={x:Static strings:Strings.Instance}}"
+                                            Command="{Binding TestRightImpulseTriggerCommand}" Padding="12,6"/>
+                                </StackPanel>
+
+                                <Border Background="{DynamicResource ControlFillColorDefaultBrush}"
+                                        BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                        BorderThickness="1" CornerRadius="8" Padding="12">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Grid.ColumnSpan="3" Margin="0,0,0,10"
+                                                   Text="{Binding Pad_ImpulseTriggers_MotorActivity, Source={x:Static strings:Strings.Instance}}"
+                                                   FontWeight="SemiBold"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"
+                                                   Text="{Binding Pad_ImpulseTriggers_LeftTrigger, Source={x:Static strings:Strings.Instance}}"
+                                                   Style="{StaticResource DzLabel}"/>
+                                        <ProgressBar Grid.Row="1" Grid.Column="1" Margin="0,0,12,10"
+                                                     Value="{Binding DeviceLeftTriggerMotorDisplay, Mode=OneWay}"
+                                                     Minimum="0" Maximum="1" VerticalAlignment="Center"
+                                                     Style="{StaticResource InstrumentBarOut}"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="2" Margin="0,0,0,10"
+                                                   Text="{Binding DeviceLeftTriggerMotorDisplay, Mode=OneWay, StringFormat=P0}"
+                                                   FontFamily="{StaticResource TelemetryFontFamily}" FontSize="12"
+                                                   MinWidth="40" TextAlignment="Right" VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource EmberHotBrush}"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"
+                                                   Text="{Binding Pad_ImpulseTriggers_RightTrigger, Source={x:Static strings:Strings.Instance}}"
+                                                   Style="{StaticResource DzLabel}"/>
+                                        <ProgressBar Grid.Row="2" Grid.Column="1" Margin="0,0,12,0"
+                                                     Value="{Binding DeviceRightTriggerMotorDisplay, Mode=OneWay}"
+                                                     Minimum="0" Maximum="1" VerticalAlignment="Center"
+                                                     Style="{StaticResource InstrumentBarOut}"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="2"
+                                                   Text="{Binding DeviceRightTriggerMotorDisplay, Mode=OneWay, StringFormat=P0}"
+                                                   FontFamily="{StaticResource TelemetryFontFamily}" FontSize="12"
+                                                   MinWidth="40" TextAlignment="Right" VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource EmberHotBrush}"/>
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
                         <Border x:Name="SteeringAngleRumbleCard" Style="{StaticResource CardBorder}">
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
@@ -11430,9 +11530,9 @@
 
             <!-- ══════════════════════════════════════
                  TAB 9: IMPULSE TRIGGERS
-                 (visible when the selected mapped device exposes
-                 SDL_PROP_JOYSTICK_CAP_TRIGGER_RUMBLE_BOOLEAN —
-                 Xbox One / Elite / Series).
+                 (visible if SDL reports physical trigger rumble OR the
+                 opt-in Vader 5 Pro native four-motor HID output is enabled).
+                 Selection follows the mapped physical device, not VC type.
                  ══════════════════════════════════════ -->
             <TabItem>
                 <ScrollViewer AutomationProperties.Name="{Binding Pad_ImpulseTriggers, Source={x:Static strings:Strings.Instance}}" Padding="24,0" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">

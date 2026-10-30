@@ -728,7 +728,10 @@ namespace PadForge.Common.Input
                 // A Falcon (#521) reports no SDL rumble either: its haptic
                 // thread renders the force this pass hands it.
                 bool falconRow = ud.Device is PadForge.Common.Input.Falcon.FalconDevice;
-                if (ud.Device == null || (!falconRow && !PadForge.Common.Input.Peripherals.PeripheralOutputs.TakesHaptics(ud)))
+                bool vaderRow = FlydigiVader5ProHidWriter.Enabled
+                    && FlydigiVader5ProHidWriter.IsDevice(ud.VendorId, ud.ProdId);
+                if (ud.Device == null || (!falconRow && !vaderRow
+                    && !PadForge.Common.Input.Peripherals.PeripheralOutputs.TakesHaptics(ud)))
                     return;
                 if (!falconRow) PadForge.Common.Input.Peripherals.PeripheralOutputs.StopHaptics(ud.InstanceGuid);
                 ud.ForceFeedbackState = new ForceFeedbackState();
@@ -750,6 +753,8 @@ namespace PadForge.Common.Input
             // require ud.Device != null so we know the controller is
             // currently connected.
             bool isXboxImpulse = XboxControllerIdentity.IsImpulseTriggerDevice(ud.VendorId, ud.ProdId);
+            bool isVader = FlydigiVader5ProHidWriter.Enabled
+                && FlydigiVader5ProHidWriter.IsDevice(ud.VendorId, ud.ProdId);
             // Native vendor FFB (Logitech / Fanatec wheels + Fanatec pedals) is
             // written via a custom HID output report (RawHidOutput), bypassing
             // SDL. These devices don't necessarily advertise standard HID
@@ -783,12 +788,12 @@ namespace PadForge.Common.Input
             // passes the SDL gate with no SDL rumble of its own.
             var falcon = ud.Device as PadForge.Common.Input.Falcon.FalconDevice;
             bool isFalcon = falcon != null;
-            if (!isXboxImpulse && !isVendorFfb && !isPadixConverter && !isBlissBox && !isPeripheralHaptic)
+            if (!isVader && !isXboxImpulse && !isVendorFfb && !isPadixConverter && !isBlissBox && !isPeripheralHaptic)
             {
                 if (ud.Device == null || (!isFalcon && !ud.Device.HasRumble && !ud.Device.HasHaptic))
                     return;
             }
-            else if ((isXboxImpulse || isPadixConverter || isBlissBox || isPeripheralHaptic) && ud.Device == null)
+            else if ((isVader || isXboxImpulse || isPadixConverter || isBlissBox || isPeripheralHaptic) && ud.Device == null)
             {
                 return;
             }
@@ -876,7 +881,8 @@ namespace PadForge.Common.Input
                             ud.ForceFeedbackState.StopDeviceForces(web);
                     }
                 }
-                else if (!isVendorFfb && ud.Device != null && ud.ForceFeedbackState.IsActive
+                else if (!isVendorFfb && ud.Device != null
+                    && (ud.ForceFeedbackState.IsActive || isVader)
                     && System.Threading.Monitor.TryEnter(ud.OutputSync))
                 {
                     // A native rumble device also needs a final zero after its
@@ -887,7 +893,11 @@ namespace PadForge.Common.Input
                         if (!RemoteLinkOutputRouter.IsClaimedByPeer(ud.DevicePath)
                             && !RemoteLinkOutputRouter.PeerWroteLast(ud.DevicePath))
                         {
-                            if (isXboxImpulse)
+                            if (isVader)
+                            {
+                                FlydigiVader5ProHidWriter.StopDevice(ud);
+                            }
+                            else if (isXboxImpulse)
                             {
                                 XboxImpulseHidWriter.Write(ud, 0, 0, 0, 0, force: true);
                                 ud.ForceFeedbackState.TryRecordXboxImpulseSnapshot(0, 0, 0, 0);
@@ -980,7 +990,8 @@ namespace PadForge.Common.Input
                 // they play, and this device's gain, motor strengths and swap
                 // apply to them below.
                 if (_personaHapticScratch == null) _personaHapticScratch = new Vibration();
-                raw = WithPersonaHaptics(padIndex, ud.InstanceGuid, raw, _personaHapticScratch, hapticNow);
+                raw = WithPersonaHaptics(padIndex, ud.InstanceGuid, raw,
+                    _personaHapticScratch, hapticNow, lowLatency: isVader);
 
                 var devicePs = us.GetPadSetting();
 
@@ -1062,7 +1073,7 @@ namespace PadForge.Common.Input
                 // the slot's output trigger axes, scaled through the same
                 // per-device impulse chain as game trigger rumble, then
                 // max-combined like every other trigger source.
-                if (ud.Device != null && ud.Device.HasRumbleTriggers
+                if (ud.Device != null && (ud.Device.HasRumbleTriggers || isVader)
                     && devicePs != null && devicePs.AtVibrationToImpulseEnabled == "1"
                     && UserEffectsDispatcher.TryGetInboundTriggerEffects(padIndex, atLeftBlock, atRightBlock))
                 {
@@ -1256,6 +1267,18 @@ namespace PadForge.Common.Input
             if (RemoteLinkOutputRouter.IsClaimedByPeer(ud.DevicePath)) return;
             // Every write below is local: the last writer is no longer the peer.
             RemoteLinkOutputRouter.NoteLocalWrite(ud.DevicePath);
+
+            if (isVader)
+            {
+                // Four separate 16-bit channels arrive here, after the
+                // game's DualSense PCM envelope, macros, gain and adaptive
+                // trigger vibration have been merged. The dedicated worker
+                // coalesces them to 8-bit 0x12 HID packets at <=33 Hz; never
+                // run HID I/O on the 1 kHz input/poll thread.
+                FlydigiVader5ProHidWriter.Submit(
+                    ud, combinedL, combinedR, combinedLT, combinedRT);
+                return;
+            }
 
             if (isXboxImpulse)
             {
@@ -1856,14 +1879,23 @@ namespace PadForge.Common.Input
                     var us = _padIndexBuffer[i];
                     if (us == null) continue;
                     var devicePs = us.GetPadSetting();
-                    // The hardware path's persona haptics layer (discussion
-                    // #522), so the meters show what each device is sent.
-                    var rowRaw = WithPersonaHaptics(padIndex, us.InstanceGuid, raw, _personaHapticMeterScratch, meterNow);
+                    // The selected Vader 5 Pro's fast envelope must be the
+                    // same as the actual motor output. Other devices keep
+                    // the existing persona loudness follower unchanged.
+                    var onlineForMeter = (FlydigiVader5ProHidWriter.Enabled
+                        || devicePs?.SteeringAngleRumbleEnabled == "1")
+                        ? FindOnlineDeviceByInstanceGuid(us.InstanceGuid) : null;
+                    bool fastVaderMeter = FlydigiVader5ProHidWriter.Enabled
+                        && onlineForMeter != null
+                        && FlydigiVader5ProHidWriter.IsDevice(
+                            onlineForMeter.VendorId, onlineForMeter.ProdId);
+                    var rowRaw = WithPersonaHaptics(padIndex, us.InstanceGuid,
+                        raw, _personaHapticMeterScratch, meterNow, lowLatency: fastVaderMeter);
                     // Rebuild from the baseline for each device. The previous device
                     // can have a different axis, strength, or enabled state.
                     withMacro = ResolveUserRumble(padIndex, devicePs, rowRaw, _macroRumbleScratch,
                         devicePs?.SteeringAngleRumbleEnabled == "1"
-                        && SupportsSteeringAngleRumble(FindOnlineDeviceByInstanceGuid(us.InstanceGuid)));
+                        && SupportsSteeringAngleRumble(onlineForMeter));
 
                     if (_constantForceScratch == null) _constantForceScratch = new Vibration();
                     var effective = ConstantForceEvaluator.Resolve(withMacro, devicePs, _constantForceScratch);

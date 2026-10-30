@@ -1,0 +1,74 @@
+name: Vader 5 Pro four-motor - Windows verification
+
+on:
+  push:
+    branches:
+      - feat/vader5pro-four-motor-hid
+    paths:
+      - 'PadForge.App/**'
+      - 'PadForge.Engine/**'
+      - 'PadForge.Tests/**'
+      - 'docs/flydigi-vader5pro-four-motor.md'
+      - '.github/workflows/vader5pro-four-motor.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'PadForge.App/**'
+      - 'PadForge.Engine/**'
+      - 'PadForge.Tests/**'
+      - '.github/workflows/vader5pro-four-motor.yml'
+  workflow_dispatch:
+
+# Superseded commits should not consume Windows build minutes.
+concurrency:
+  group: vader5pro-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  four-motor:
+    name: Compile, test and package Windows x64
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install .NET 10 SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.x'
+
+      - name: Run Vader 5 Pro, persona haptics and bass-shaker regression tests
+        shell: pwsh
+        run: |
+          dotnet test PadForge.Tests/PadForge.Tests.csproj -c Release --filter "FullyQualifiedName~FlydigiVader5ProFourMotorTests|FullyQualifiedName~PersonaHapticRumbleTests|FullyQualifiedName~BassShakerPersonaHapticsTests" --logger "trx;LogFileName=vader5pro-tests.trx" --results-directory TestResults
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Publish PadForge for Windows x64
+        shell: pwsh
+        run: |
+          dotnet publish PadForge.App/PadForge.App.csproj -c Release -r win-x64
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Vader5Pro-test-results
+          path: TestResults/**/*.trx
+          if-no-files-found: warn
+
+      - name: Upload Windows x64 application
+        uses: actions/upload-artifact@v4
+        with:
+          name: PadForge-Vader5Pro-Windows-x64
+          path: PadForge.App/bin/Release/net10.0-windows10.0.26100.0/win-x64/publish/
+          if-no-files-found: error
+          retention-days: 14
