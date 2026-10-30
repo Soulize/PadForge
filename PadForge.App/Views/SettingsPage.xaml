@@ -306,10 +306,34 @@
                         <Button Content="Test left trigger" Command="{Binding TestVader5ProLeftTriggerCommand}" IsEnabled="{Binding FlydigiVader5ProFourMotorEnabled}" Margin="0,0,8,0"/>
                         <Button Content="Test right trigger" Command="{Binding TestVader5ProRightTriggerCommand}" IsEnabled="{Binding FlydigiVader5ProFourMotorEnabled}"/>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="20,0,0,8">
-                        <CheckBox Content="Enhanced DualSense PCM haptics (fast stop / impact)"
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,6">
+                        <CheckBox Content="DualSense Fidelity (fast PCM, no default peak boost)"
                                   IsChecked="{Binding FlydigiVader5ProEnhancedHapticsEnabled}"
-                                  ToolTip="Texture-aware PCM: quiet footstep/fabric cues preserve low amplitude; loud impacts retain fast rise and separate 10 ms hold. Disable for the legacy 8 ms RMS follower."/>
+                                  ToolTip="Preserves original PCM RMS and natural event durations. No 1.4x gain, artificial 6/10ms hit, or default peak expansion. Off uses the original 8ms RMS compatibility path."/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,12">
+                        <CheckBox Content="Optional transient impact boost (not faithful)"
+                                  IsChecked="{Binding FlydigiVader5ProTransientEnhancement}"
+                                  ToolTip="Extra 1ms peak emphasis for impacts; disabled by default because it may exceed DualSense-authored strength. Only applies in Fidelity mode."/>
+                    </StackPanel>
+                    <TextBlock Text="Frequency compensation (LOW &lt;120 Hz | MID 120-400 Hz | HIGH &gt;400 Hz)"
+                               FontWeight="SemiBold" Margin="20,0,0,6"/>
+                    <TextBlock Text="Three non-boosting band weights. Defaults 100% each = raw PCM RMS; attenuate only with measured reference data. These are not auto-calibrated DualSense coefficients."
+                               TextWrapping="Wrap" Margin="20,0,0,6"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,12">
+                        <TextBlock Text="Low" Width="38" VerticalAlignment="Center"/>
+                        <Slider Width="95" Minimum="0" Maximum="100" TickFrequency="5"
+                                IsSnapToTickEnabled="True" Value="{Binding FlydigiVader5ProLowBandPercent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding FlydigiVader5ProLowBandPercent, StringFormat={}{0}%}" Width="47" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Mid" Width="38" VerticalAlignment="Center"/>
+                        <Slider Width="95" Minimum="0" Maximum="100" TickFrequency="5"
+                                IsSnapToTickEnabled="True" Value="{Binding FlydigiVader5ProMidBandPercent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding FlydigiVader5ProMidBandPercent, StringFormat={}{0}%}" Width="47" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="High" Width="38" VerticalAlignment="Center"/>
+                        <Slider Width="95" Minimum="0" Maximum="100" TickFrequency="5"
+                                IsSnapToTickEnabled="True" Value="{Binding FlydigiVader5ProHighBandPercent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding FlydigiVader5ProHighBandPercent, StringFormat={}{0}%}" Width="47" Margin="5,0,0,0" VerticalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="20,0,0,12">
                         <CheckBox Content="Optional high-frequency PCM trigger assist"
@@ -386,9 +410,36 @@
                         <TextBlock Text="{Binding FlydigiVader5ProTriggerRightMinDrive, StringFormat={}{0}/255}"
                                    Width="53" Margin="5,0,0,0" VerticalAlignment="Center"/>
                     </StackPanel>
-                    <TextBlock Text="Motor curves are saved to application settings. Start with Gain 100%, Gamma 100%, Floor 0; calibrate each channel with the Test buttons."
+                    <TextBlock Text="For faithful intensity, keep Gain 100%, Gamma 100%, Floor 0. The sliders deliberately modify intensity; use the response LUT for measured motor compensation."
                                TextWrapping="Wrap" Margin="20,4,0,10"
                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                    <TextBlock Text="Measured actuator response LUTs (9 knots per motor)"
+                               FontWeight="SemiBold" Margin="20,4,0,6"/>
+                    <TextBlock Text="Each CSV lists native HID command levels at desired intensities 0%, 12.5%, ... 100%. Values must be monotone, 0-255, first value 0. Identity until physically measured."
+                               TextWrapping="Wrap" Margin="20,0,0,8"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,5">
+                        <TextBlock Text="Left grip" Width="90" VerticalAlignment="Center"/>
+                        <TextBox Width="400" Text="{Binding FlydigiVader5ProGripLeftLut, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,5">
+                        <TextBlock Text="Right grip" Width="90" VerticalAlignment="Center"/>
+                        <TextBox Width="400" Text="{Binding FlydigiVader5ProGripRightLut, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,5">
+                        <TextBlock Text="Left trigger" Width="90" VerticalAlignment="Center"/>
+                        <TextBox Width="400" Text="{Binding FlydigiVader5ProTriggerLeftLut, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,9">
+                        <TextBlock Text="Right trigger" Width="90" VerticalAlignment="Center"/>
+                        <TextBox Width="400" Text="{Binding FlydigiVader5ProTriggerRightLut, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,12">
+                        <Button Content="Import fidelity calibration JSON"
+                                Click="ImportVaderFidelity_Click" Margin="0,0,10,0"/>
+                        <Button Content="Export fidelity calibration JSON"
+                                Click="ExportVaderFidelity_Click"/>
+                    </StackPanel>
                     <TextBlock Text="{Binding FlydigiVader5ProStatus}"
                                common:LiveText.Polite="True" Margin="20,0,0,10"
                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
