@@ -94,6 +94,7 @@ namespace PadForge.Views
         private void PadPage_Loaded(object sender, RoutedEventArgs e)
         {
             ApplyViewMode();
+            SyncTabVisibility(); // native capabilities can change in Settings while this page was hidden
             SyncTabStripSelection();
             SyncExtendedConfigBar();
             SyncMidiConfigBar();
@@ -119,6 +120,8 @@ namespace PadForge.Views
             PadForge.Common.Input.Peripherals.PeripheralOutputs.StatusChanged += OnPeripheralOutputsChanged;
             PadForge.Common.Input.Peripherals.PeripheralOutputs.ClaimsChanged -= OnPeripheralOutputsChanged;
             PadForge.Common.Input.Peripherals.PeripheralOutputs.ClaimsChanged += OnPeripheralOutputsChanged;
+            FlydigiVader5ProHidWriter.EnabledChanged -= OnPeripheralOutputsChanged;
+            FlydigiVader5ProHidWriter.EnabledChanged += OnPeripheralOutputsChanged;
         }
 
         private void PadPage_Unloaded(object sender, RoutedEventArgs e)
@@ -129,6 +132,7 @@ namespace PadForge.Views
             PadForge.Common.Input.Peripherals.PeripheralOutputs.LinksChanged -= OnPeripheralOutputsChanged;
             PadForge.Common.Input.Peripherals.PeripheralOutputs.StatusChanged -= OnPeripheralOutputsChanged;
             PadForge.Common.Input.Peripherals.PeripheralOutputs.ClaimsChanged -= OnPeripheralOutputsChanged;
+            FlydigiVader5ProHidWriter.EnabledChanged -= OnPeripheralOutputsChanged;
         }
 
         /// <summary>Raised on the peripheral host's thread. One refresh per
@@ -511,6 +515,9 @@ namespace PadForge.Views
             bool hasMouse = false;
             bool hasIrPointer = false; // #146 Wii Remote IR camera -> Pointer tab
             bool hasImpulseTriggers = false;
+            // The Vader 5 Pro's four-motor vendor writer has LT/RT output
+            // independently of the SDL gamepad's reported trigger capability.
+            bool nativeVaderFourMotor = false;
             bool hasS2Mag = false;
             bool simulatesGyro = false; // #472: a gyro lacking axes the accelerometer can supply
             bool hasRumble = false;
@@ -564,7 +571,11 @@ namespace PadForge.Views
                         hasGyroRate = ud.HasGyro;
                         hasMouse = ud.IsMouse;
                         hasIrPointer = ud.HasIrCamera;
-                        hasImpulseTriggers = ud.HasRumbleTriggers;
+                        bool vaderNativeEnabled = FlydigiVader5ProHidWriter.Enabled;
+                        nativeVaderFourMotor = vaderNativeEnabled
+                            && FlydigiVader5ProHidWriter.IsDevice(ud.VendorId, ud.ProdId);
+                        hasImpulseTriggers = FlydigiVader5ProHidWriter.OffersImpulseTriggerOutput(
+                            ud.VendorId, ud.ProdId, ud.HasRumbleTriggers, vaderNativeEnabled);
                         // Compass UI follows the engine's magnetometer capability.
                         // Mouse and magnetometer axes are enabled independently.
                         hasS2Mag = ud.Device is PadForge.Engine.SdlDeviceWrapper s2w
@@ -758,6 +769,12 @@ namespace PadForge.Views
                 TabGyro.Visibility = hasGyro ? Visibility.Visible : Visibility.Collapsed;
             if (TabImpulseTriggers != null)
                 TabImpulseTriggers.Visibility = hasImpulseTriggers ? Visibility.Visible : Visibility.Collapsed;
+            // Only the selected native Vader has this extra Force Feedback
+            // card. Its controls bind the existing Impulse* properties, so
+            // edits made here and on the Impulse Triggers tab are identical.
+            if (FfbVaderFourMotorCard != null)
+                FfbVaderFourMotorCard.Visibility = nativeVaderFourMotor
+                    ? Visibility.Visible : Visibility.Collapsed;
             if (TabTouchpad != null)
                 TabTouchpad.Visibility = hasTouchpad ? Visibility.Visible : Visibility.Collapsed;
             if (TabAudio != null)
@@ -801,7 +818,9 @@ namespace PadForge.Views
             if (LockLightbarSection != null)
                 LockLightbarSection.Visibility = hasLightbar ? Visibility.Visible : Visibility.Collapsed;
             // Trigger fold (#271 item 2): only meaningful on a device with
-            // body rumble but no trigger motors. Those are the devices
+            // body rumble but no trigger motors. The Vader vendor writer is
+            // now counted by hasImpulseTriggers, so it must not fold LT/RT
+            // back into the grip motors. Those are the devices
             // whose sink drops the game's LT/RT channels. Xbox One+ pads
             // render the triggers natively, so the row hides there.
             if (FfbTriggerFoldChk != null)

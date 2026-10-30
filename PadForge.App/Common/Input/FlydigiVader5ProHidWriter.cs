@@ -54,6 +54,9 @@ namespace PadForge.Common.Input
         private static string _status = "Disabled";
 
         internal static event Action StatusChanged;
+        // The Pad page's hardware-capability tabs update immediately when
+        // the opt-in backend changes, without needing a device re-enumeration.
+        internal static event Action EnabledChanged;
         internal static string Status => Volatile.Read(ref _status);
 
         private static void SetStatus(string status)
@@ -74,6 +77,15 @@ namespace PadForge.Common.Input
         internal static bool IsDevice(ushort vid, ushort pid)
             => vid == VendorId && pid == ProductId;
 
+        /// <summary>
+        /// The native 0x12 backend has physical LT/RT motors even if SDL
+        /// reports only its traditional two-motor gamepad interface.
+        /// Preserve SDL's reported capabilities for every other device.
+        /// </summary>
+        internal static bool OffersImpulseTriggerOutput(
+            ushort vid, ushort pid, bool sdlHasTriggers, bool nativeEnabled)
+            => sdlHasTriggers || (nativeEnabled && IsDevice(vid, pid));
+
         internal static bool Enabled => Volatile.Read(ref _enabled) != 0;
 
         /// <summary>10..60 ms, default 30 ms. Sub-30-ms operation is
@@ -89,8 +101,10 @@ namespace PadForge.Common.Input
         /// <summary>Enabled only by an explicit settings toggle; default off.</summary>
         internal static void SetEnabled(bool enabled)
         {
+            bool changed;
             lock (StateGate)
             {
+                changed = (Volatile.Read(ref _enabled) != 0) != enabled;
                 Volatile.Write(ref _enabled, enabled ? 1 : 0);
                 if (!enabled)
                 {
@@ -115,6 +129,12 @@ namespace PadForge.Common.Input
             }
             Wake.Set();
             SetStatus(enabled ? "Searching for 37D7:2401 vendor HID interface" : "Disabled");
+            if (changed)
+            {
+                // Never dispatch a WPF event while holding StateGate.
+                try { EnabledChanged?.Invoke(); }
+                catch { /* a page listener must not break HID output */ }
+            }
         }
 
         /// <summary>

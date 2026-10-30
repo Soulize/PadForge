@@ -34,10 +34,19 @@ refresh limit fidelity.
    the firmware queue and must not be treated as hardware-validated.
    The four **Test** buttons below it each play a single 400 ms pulse
    at strength 160/255. Test the left/right grips and triggers separately.
-6. In PadForge's impulse-trigger page, enable
-   **Translate Adaptive Trigger Vibrations** if the game uses supported
-   DualSense vibration-type trigger programs.
-7. Disable the new toggle to revert to PadForge's original SDL output path.
+6. Select the physical **Vader 5 Pro** in the Pad slot's mapped-device
+   dropdown. The **Force Feedback** tab now shows a separate left/right
+   trigger-motor section, with overall trigger gain, test buttons and output
+   meters. The **Impulse Triggers** tab is also visible even if SDL reports
+   no trigger motors: the native HID writer exposes those motors directly.
+   Both tabs edit the **same** settings.
+7. Turn on **Translate Adaptive Trigger Vibrations** to convert supported
+   DualSense vibration-type trigger programs into the two trigger motors.
+   DualSense resistance-only programs are deliberately not mapped to rumble.
+   The virtual DualSense haptic audio envelope primarily drives the grip
+   rumble path; it does not imply that both trigger motors must vibrate in
+   every game.
+8. Disable the new toggle to revert to PadForge's original SDL output path.
 
 A game's PC version must implement real DualSense haptic feedback. Merely
 creating a virtual DualSense cannot add data absent from the game.
@@ -77,6 +86,7 @@ the actual firmware revision.
 | Controller disconnect | Invalidate cached HID path before re-probe |
 | Unassignment / app shutdown | Queue/synchronously write all-zero motor command |
 | Feature compatibility | Opt-in and XML-persisted, off for prior installations |
+| Trigger UI | Force Feedback has separate LT/RT controls and meters; Impulse Triggers tab available on native Vader even when SDL trigger capability is false |
 | Automated verification | Packet, checksum, motor isolation, selection, timing and XML tests |
 
 **The default timing target is conservative** rather than measured: a 30 ms inter-report

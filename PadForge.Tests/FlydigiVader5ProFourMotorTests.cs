@@ -205,6 +205,76 @@ namespace PadForge.Tests
             Assert.True(FlydigiVader5ProHidWriter.TestPattern(4).Silent);
         }
 
+        [Theory]
+        [InlineData(0x37D7, 0x2401, false, true, true)]
+        [InlineData(0x37D7, 0x2401, false, false, false)]
+        [InlineData(0x37D7, 0x2401, true, false, true)]
+        [InlineData(0x37D7, 0x2402, false, true, false)]
+        [InlineData(0x045E, 0x2401, false, true, false)]
+        [InlineData(0x045E, 0x02EA, true, false, true)]
+        [InlineData(0x054C, 0x0CE6, false, false, false)]
+        public void UiCapability_RecognizesNativeTriggerMotorsWithoutChangingOtherPads(
+            int vid, int pid, bool sdlTriggers, bool nativeEnabled, bool expected)
+        {
+            Assert.Equal(expected, FlydigiVader5ProHidWriter.OffersImpulseTriggerOutput(
+                (ushort)vid, (ushort)pid, sdlTriggers, nativeEnabled));
+        }
+
+        private static string ReadPadPageSource(string fileName)
+        {
+            var directory = new System.IO.DirectoryInfo(AppContext.BaseDirectory);
+            while (directory != null && !System.IO.File.Exists(
+                       System.IO.Path.Combine(directory.FullName, "PadForge.sln")))
+                directory = directory.Parent;
+            Assert.NotNull(directory);
+            return System.IO.File.ReadAllText(
+                System.IO.Path.Combine(directory.FullName, "PadForge.App", "Views", fileName));
+        }
+
+        [Fact]
+        public void UiForceFeedbackCard_ControlsIndependentTriggersUsingExistingSettings()
+        {
+            var xaml = ReadPadPageSource("PadPage.xaml");
+            const string marker = "x:Name=\"FfbVaderFourMotorCard\"";
+            int start = xaml.IndexOf(marker, StringComparison.Ordinal);
+            Assert.True(start > 0);
+            int end = xaml.IndexOf(
+                "<Border x:Name=\"SteeringAngleRumbleCard\"", start, StringComparison.Ordinal);
+            Assert.True(end > start);
+            string card = xaml.Substring(start, end - start);
+
+            foreach (string setting in new[]
+            {
+                "ImpulseOverallGain", "ImpulseLeftStrength", "ImpulseRightStrength",
+                "AtVibrationToImpulse", "TestLeftImpulseTriggerCommand",
+                "TestRightImpulseTriggerCommand", "DeviceLeftTriggerMotorDisplay",
+                "DeviceRightTriggerMotorDisplay",
+            })
+                Assert.Contains(setting, card, StringComparison.Ordinal);
+
+            // The native card must not add new per-device gain fields:
+            // it mirrors the regular Impulse Triggers tab's VM and XML values.
+            Assert.Contains("Visibility=\"Collapsed\"", card, StringComparison.Ordinal);
+            Assert.Contains("Pad_ImpulseTriggers_LeftTrigger", card, StringComparison.Ordinal);
+            Assert.Contains("Pad_ImpulseTriggers_RightTrigger", card, StringComparison.Ordinal);
+        }
+
+        [Fact]
+        public void UiSelectionAndToggle_RecomputePhysicalRumbleCapabilities()
+        {
+            var code = ReadPadPageSource("PadPage.xaml.cs");
+            Assert.Contains("hasImpulseTriggers = FlydigiVader5ProHidWriter.OffersImpulseTriggerOutput(",
+                code, StringComparison.Ordinal);
+            Assert.Contains("FfbVaderFourMotorCard.Visibility = nativeVaderFourMotor",
+                code, StringComparison.Ordinal);
+            Assert.Contains("FlydigiVader5ProHidWriter.EnabledChanged += OnPeripheralOutputsChanged;",
+                code, StringComparison.Ordinal);
+            Assert.Contains("FlydigiVader5ProHidWriter.EnabledChanged -= OnPeripheralOutputsChanged;",
+                code, StringComparison.Ordinal);
+            Assert.Contains("SyncTabVisibility(); // native capabilities can change in Settings",
+                code, StringComparison.Ordinal);
+        }
+
         [Fact]
         public void ZeroReport_StopsEveryMotor()
         {
