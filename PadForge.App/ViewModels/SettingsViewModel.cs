@@ -1763,16 +1763,26 @@ namespace PadForge.ViewModels
 
         public string FlydigiVader5ProStatus => FlydigiVader5ProHidWriter.Status;
 
-        // A single explicit channel at a time, 400ms at ~63% intensity.
+        // The test level is the desired input before four-motor LUT
+        // compensation. Set identity LUT first to measure raw motor response.
+        private int _flydigiVader5ProTestStrength = 160;
+        public int FlydigiVader5ProTestStrength
+        {
+            get => _flydigiVader5ProTestStrength;
+            set => SetProperty(ref _flydigiVader5ProTestStrength,
+                Math.Clamp(value, 0, 255));
+        }
+
+        // A single explicit channel at a time, 400ms at user-selected level.
         // The worker refuses output if two physical pads are present.
         public IRelayCommand TestVader5ProLeftGripCommand { get; } =
-            new RelayCommand(() => FlydigiVader5ProHidWriter.PulseTestMotor(0));
+            new RelayCommand(() => FlydigiVader5ProHidWriter.PulseTestMotor(0, (byte)FlydigiVader5ProTestStrength));
         public IRelayCommand TestVader5ProRightGripCommand { get; } =
-            new RelayCommand(() => FlydigiVader5ProHidWriter.PulseTestMotor(1));
+            new RelayCommand(() => FlydigiVader5ProHidWriter.PulseTestMotor(1, (byte)FlydigiVader5ProTestStrength));
         public IRelayCommand TestVader5ProLeftTriggerCommand { get; } =
-            new RelayCommand(() => FlydigiVader5ProHidWriter.PulseTestMotor(2));
+            new RelayCommand(() => FlydigiVader5ProHidWriter.PulseTestMotor(2, (byte)FlydigiVader5ProTestStrength));
         public IRelayCommand TestVader5ProRightTriggerCommand { get; } =
-            new RelayCommand(() => FlydigiVader5ProHidWriter.PulseTestMotor(3));
+            new RelayCommand(() => FlydigiVader5ProHidWriter.PulseTestMotor(3, (byte)FlydigiVader5ProTestStrength));
 
         private bool _gKeysEnabled;
 
