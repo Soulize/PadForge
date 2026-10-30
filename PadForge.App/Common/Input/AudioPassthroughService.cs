@@ -1654,7 +1654,11 @@ namespace PadForge.Common.Input
             // controllers and bass shakers keep their original 20ms
             // smoothing and 100ms stale timeout.
             public double HapticFastMeanSquareL, HapticFastMeanSquareR;
-            public long HapticLevel, HapticFastLevel, HapticLevelMs;
+            // Independent, allocation-free Vader-only DSP with explicit gap,
+            // format-change and silent-channel reset. Other consumers use
+            // the original 20 ms follower unchanged.
+            public readonly Vader5ProHapticConverter VaderConverter = new();
+            public long HapticLevel, HapticFastLevel, HapticFastHighLevel, HapticLevelMs;
             // Speaker-out resampler state + scratch (pacing thread only).
             public double SpkPhase;
             public readonly float[] SpkCarry = new float[2];
@@ -2140,24 +2144,52 @@ namespace PadForge.Common.Input
             long level = PersonaHapticRumble.Follow(
                 ref feed.HapticMeanSquareL, ref feed.HapticMeanSquareR,
                 span, stride, feed.HapL * 2, feed.HapR * 2, feed.SrcRate);
-            long fastLevel = 0L;
+            long fastLevel = 0L, highLevel = 0L;
             if (FlydigiVader5ProHidWriter.Enabled)
             {
-                fastLevel = PersonaHapticRumble.Follow(
-                    ref feed.HapticFastMeanSquareL, ref feed.HapticFastMeanSquareR,
-                    span, stride, feed.HapL * 2, feed.HapR * 2, feed.SrcRate,
-                    PersonaHapticRumble.LowLatencyTimeConstant);
+                if (FlydigiVader5ProHidWriter.EnhancedHapticsEnabled)
+                {
+                    var frame = feed.VaderConverter.Process(span, stride,
+                        feed.HapL * 2, feed.HapR * 2, feed.SrcRate, nowMs);
+                    fastLevel = PadForge.Engine.Common.LfeOutputState.Pack(
+                        frame.Left, frame.Right, 0, 0);
+                    highLevel = PadForge.Engine.Common.LfeOutputState.Pack(
+                        frame.HighLeft, frame.HighRight, 0, 0);
+                    feed.HapticFastMeanSquareL = 0;
+                    feed.HapticFastMeanSquareR = 0;
+                }
+                else
+                {
+                    // Compatibility switch: the previous 8 ms RMS follower.
+                    feed.VaderConverter.Reset();
+                    fastLevel = PersonaHapticRumble.Follow(
+                        ref feed.HapticFastMeanSquareL, ref feed.HapticFastMeanSquareR,
+                        span, stride, feed.HapL * 2, feed.HapR * 2, feed.SrcRate,
+                        PersonaHapticRumble.LowLatencyTimeConstant);
+                }
             }
             else
             {
-                // Prevent stale fast levels from reappearing across a
-                // Settings toggle or when the haptic stream stops.
+                feed.VaderConverter.Reset();
                 feed.HapticFastMeanSquareL = 0;
                 feed.HapticFastMeanSquareR = 0;
             }
-            if (nowMs - feed.HapticLevelMs < PersonaHapticRumble.PublishIntervalMs) return;
+            // Bypass the 10 ms normal publication cadence on the START or
+            // STOP of either channel. The HID worker prioritizes each motor
+            // zero edge; a stale smoothed value must not delay that edge.
+            long previous = System.Threading.Volatile.Read(ref feed.HapticFastLevel);
+            ushort oldL = PadForge.Engine.Common.LfeOutputState.Low(previous);
+            ushort oldR = PadForge.Engine.Common.LfeOutputState.High(previous);
+            ushort newL = PadForge.Engine.Common.LfeOutputState.Low(fastLevel);
+            ushort newR = PadForge.Engine.Common.LfeOutputState.High(fastLevel);
+            bool edge = (oldL == 0) != (newL == 0)
+                || (oldR == 0) != (newR == 0);
+            if (!edge && nowMs - feed.HapticLevelMs < PersonaHapticRumble.PublishIntervalMs)
+                return;
+            // Spectral and amplitude packs have one common freshness marker.
             System.Threading.Volatile.Write(ref feed.HapticLevelMs, nowMs);
             System.Threading.Volatile.Write(ref feed.HapticLevel, level);
+            System.Threading.Volatile.Write(ref feed.HapticFastHighLevel, highLevel);
             System.Threading.Volatile.Write(ref feed.HapticFastLevel, fastLevel);
         }
 
