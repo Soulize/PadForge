@@ -298,13 +298,13 @@ namespace PadForge.Common.Input
                 _ => default,
             };
 
-        internal static bool PulseTestMotor(int channel)
+        internal static bool PulseTestMotor(int channel, byte strength = 160)
         {
             if (!Enabled || channel < 0 || channel > 3) return false;
             lock (StateGate)
             {
                 if (!Enabled) return false;
-                var raw = TestPattern(channel);
+                var raw = TestPattern(channel, strength);
                 var tuned = Vader5ProMotorCalibration.Apply(
                     (ushort)(raw.GripLeft * 257), (ushort)(raw.GripRight * 257),
                     (ushort)(raw.TriggerLeft * 257), (ushort)(raw.TriggerRight * 257),
