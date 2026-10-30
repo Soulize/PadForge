@@ -157,16 +157,13 @@ namespace PadForge.Tests
             var impact = Tone(48000, 3, 500, 0.8, 0.0);
             Array.Copy(impact, hostChunk, impact.Length);
             var frame = converter.Process(hostChunk, 4, 0, 2, 48000, 12);
-            Assert.True(frame.Left > 20000,
-                "An impact followed by silence in the same callback must not vanish");
-            Assert.Equal(1, frame.BurstMask & 1);
-            Assert.Equal(0, frame.BurstMask & 2);
-            Assert.Equal((byte)0, frame.TextureMask);
-            Assert.Equal(10, Vader5ProHapticConverter.TransientBurstHoldMs);
+            Assert.InRange(frame.Left, (ushort)16000, (ushort)22000);
+            Assert.Equal(3, frame.PulseLeftMs); // Actual 3 ms duration.
+            Assert.Equal(0, frame.PulseRightMs);
             var quiet = converter.Process(new byte[48000 * 5 / 1000 * 4],
                 4, 0, 2, 48000, 17);
             Assert.Equal((ushort)0, quiet.Left);
-            Assert.Equal(0, quiet.BurstMask);
+            Assert.Equal(0, quiet.PulseLeftMs);
         }
 
         [Theory]
@@ -182,13 +179,12 @@ namespace PadForge.Tests
             var frame = converter.Process(hostChunk, 4, 0, 2, 48000, 12);
             Assert.True(frame.Left > 0, "Soft texture must not disappear");
             Assert.True(frame.Left < 6500, "A gentle cue must not become a hard kick");
-            Assert.Equal((byte)0, frame.BurstMask);
-            Assert.Equal(1, frame.TextureMask & 1);
-            Assert.Equal(0, frame.TextureMask & 2);
+            Assert.Equal(3, frame.PulseLeftMs);
+            Assert.Equal(0, frame.PulseRightMs);
             var motor = Vader5ProMotorCalibration.Encode(frame.Left,
                 Vader5ProMotorCalibration.Profile.Identity.GripLeft);
             Assert.InRange(motor, (byte)1, (byte)25);
-            Assert.Equal(6, Vader5ProHapticConverter.TextureHoldMs);
+            Assert.InRange(frame.Left, (ushort)1, (ushort)6500);
         }
 
         [Fact]
@@ -202,23 +198,22 @@ namespace PadForge.Tests
                 Array.Copy(gentle, hostChunk, gentle.Length);
                 var frame = converter.Process(hostChunk, 4, 0, 2, 48000, 12L * i);
                 Assert.InRange(frame.Left, (ushort)1, (ushort)6000);
-                Assert.Equal((byte)0, frame.BurstMask);
-                Assert.Equal(1, frame.TextureMask & 1);
+                Assert.Equal(3, frame.PulseLeftMs); // 2 ms source, 3 ms HID edge limit.
+                Assert.Equal(0, frame.PulseRightMs);
             }
         }
 
         [Fact]
-        public void StrongImpulseStillGetsRapidPeakAndTenMsHold()
+        public void StrongImpulseStaysProportionalAndUsesMeasuredPulseLength()
         {
             var converter = new Vader5ProHapticConverter();
             var hostChunk = new byte[48000 * 12 / 1000 * 4];
             Array.Copy(Tone(48000, 3, 500, 0.8, 0.0),
                 hostChunk, 48000 * 3 / 1000 * 4);
             var frame = converter.Process(hostChunk, 4, 0, 2, 48000, 12);
-            Assert.True(frame.Left > 20000);
-            Assert.Equal(1, frame.BurstMask & 1);
-            Assert.Equal((byte)0, frame.TextureMask);
-            Assert.Equal(10, Vader5ProHapticConverter.TransientBurstHoldMs);
+            Assert.InRange(frame.Left, (ushort)16000, (ushort)22000);
+            Assert.Equal(3, frame.PulseLeftMs);
+            Assert.Equal(0, frame.PulseRightMs);
         }
 
         [Fact]
