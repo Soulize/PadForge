@@ -193,7 +193,9 @@ physical feedback are checked.
 - Max **1 ms bucket RMS** and ordinary window RMS are combined for impact
   detection. A **1.5 ms attack / 8 ms non-silent release** gives rapid rise
   without generating a lengthy intentional tail. Left/right state is
-  independent.
+  independent. If an entire short impact begins and ends in one host PCM
+  callback, publish a **10 ms bounded impulse** and force its channel to
+  zero by reader-side expiry even if the audio stream stops sending data.
 - A PCM channel starting or stopping bypasses the usual **10 ms publication**
   gate. The writer prioritizes individual motor starts and stops using the
   existing **3 ms minimum inter-report gap**, while ongoing nonzero changes
