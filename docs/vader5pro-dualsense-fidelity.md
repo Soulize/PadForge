@@ -14,7 +14,7 @@ OpenVader documents native command 0x12 as four independent 8-bit *amplitude* by
 - **PCM RMS per side** is the default output level. No blanket gain, default peak boost, amplitude-dependent attack, decaying envelope or arbitrary fixed 6/10ms "impact".
 - Streaming two-pole IIR crossovers at approximately **120Hz and 400Hz** estimate low, mid, high band energies. The grip level is raw RMS multiplied by the square root of a normalized, weighted band-energy ratio. This makes **weights 100/100/100 exactly neutral** and guarantees a non-boosting band transform for 0..100% attenuation weights. Band weighting is active in grip estimation but cannot be claimed a calibrated psychophysical weighting until compared to reference measurements.
 - Per-side continuous **3ms silence detection** triggers explicit stop without interpreting isolated sine zero crossings as silence. Stream gaps >30ms, format changes and channel routing changes reset the filter.
-- A short signal that starts and ends inside a single host PCM callback is emitted at its proportional callback RMS for its *detected active span*. The only minimum is the 3ms native HID start/stop edge interval. No fixed 6ms or 10ms pulse is added; if the motor physically cannot reproduce a tiny cue, fidelity favors a weak/missed texture over a fabricated hard kick.
+- A short signal that starts and ends inside a single host PCM callback is emitted at its proportional callback RMS for its *counted non-silent samples* (so two separate taps do not turn their intervening silent gap into vibration). The only minimum is the 3ms native HID start/stop edge interval. No fixed 6ms or 10ms pulse is added; if the motor physically cannot reproduce a tiny cue, fidelity favors a weak/missed texture over a fabricated hard kick.
 - **Optional transient impact boost** (off by default) re-enables the earlier gated 1ms peak emphasis without changing the measured pulse duration.
 - High-frequency supplemental trigger routing remains off by default, because it may invent trigger effects absent from source game design. Native/author-trigger rumble retains priority.
 
@@ -30,7 +30,7 @@ Neutral identity curve:
 0,32,64,96,128,159,191,223,255
 ~~~
 
-These are **unmeasured defaults**, not magic DualSense coefficients. LUTs apply to native HID reports and individual motor test pulses, after Gain/Gamma/Floor. Nonneutral legacy sliders can still introduce intentional distortion.
+These are **unmeasured defaults**, not magic DualSense coefficients. LUTs apply to native HID reports and individual motor test pulses, after Gain/Gamma/Floor. The motor-test level slider is independently adjustable from **0 to 255**; set the LUT to identity before measuring raw actuator strength at each level, then enter the inverse nine-knot lookup and retest. Nonneutral legacy sliders can still introduce intentional distortion.
 
 All four curves and the three band weights persist in AppSettingsData XML. Settings → Input engine offers an **Export/Import fidelity calibration JSON** button pair. The versioned JSON file includes LUTs, band weights, and the four Gain/Gamma/Floor triplets. It rejects malformed, descending, out-of-range or incompatible presets *before* changing live settings.
 
