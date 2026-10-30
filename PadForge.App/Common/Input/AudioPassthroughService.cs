@@ -1649,7 +1649,12 @@ namespace PadForge.Common.Input
             // Bass Shakers merge. The follower's state is the pacing
             // thread's alone. The readers take the level and its time.
             public double HapticMeanSquareL, HapticMeanSquareR;
-            public long HapticLevel, HapticLevelMs;
+            // Separate fast envelope is computed ONLY when the Vader 5
+            // Pro native four-motor backend is enabled. Other physical
+            // controllers and bass shakers keep their original 20ms
+            // smoothing and 100ms stale timeout.
+            public double HapticFastMeanSquareL, HapticFastMeanSquareR;
+            public long HapticLevel, HapticFastLevel, HapticLevelMs;
             // Speaker-out resampler state + scratch (pacing thread only).
             public double SpkPhase;
             public readonly float[] SpkCarry = new float[2];
@@ -2135,9 +2140,25 @@ namespace PadForge.Common.Input
             long level = PersonaHapticRumble.Follow(
                 ref feed.HapticMeanSquareL, ref feed.HapticMeanSquareR,
                 span, stride, feed.HapL * 2, feed.HapR * 2, feed.SrcRate);
+            long fastLevel = 0L;
+            if (FlydigiVader5ProHidWriter.Enabled)
+            {
+                fastLevel = PersonaHapticRumble.Follow(
+                    ref feed.HapticFastMeanSquareL, ref feed.HapticFastMeanSquareR,
+                    span, stride, feed.HapL * 2, feed.HapR * 2, feed.SrcRate,
+                    PersonaHapticRumble.LowLatencyTimeConstant);
+            }
+            else
+            {
+                // Prevent stale fast levels from reappearing across a
+                // Settings toggle or when the haptic stream stops.
+                feed.HapticFastMeanSquareL = 0;
+                feed.HapticFastMeanSquareR = 0;
+            }
             if (nowMs - feed.HapticLevelMs < PersonaHapticRumble.PublishIntervalMs) return;
             System.Threading.Volatile.Write(ref feed.HapticLevelMs, nowMs);
             System.Threading.Volatile.Write(ref feed.HapticLevel, level);
+            System.Threading.Volatile.Write(ref feed.HapticFastLevel, fastLevel);
         }
 
         /// <summary>How long after its last poll a device's persona haptic

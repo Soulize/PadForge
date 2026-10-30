@@ -81,15 +81,17 @@ the actual firmware revision.
 | Hardware match | Exact VID/PID and usage page/usage |
 | Single-pad safety | No output when vendor interface discovery is ambiguous |
 | High-frequency polling | No Windows HID I/O on PadForge's input tick |
-| Output command rate | Configurable 10–60 ms, default 30 ms (~33.3 Hz) |
-| Lost-input watchdog | Stop demand after 250 ms of no fresh tick |
+| Output command rate | Nonzero transitions: configurable 10–60 ms, default 30 ms; individual motor zero edges can use a 3 ms priority gate |
+| Lost-input watchdog | Stop demand after 100 ms of no fresh input tick |
 | Controller disconnect | Invalidate cached HID path before re-probe |
 | Unassignment / app shutdown | Queue/synchronously write all-zero motor command |
 | Feature compatibility | Opt-in and XML-persisted, off for prior installations |
+| Report scheduler | Absolute last-write deadline, no extra full interval after premature wakeup |
+| DualSense haptic PCM envelope | Vader-specific 8 ms RMS follower (other controllers retain 20 ms), 50 ms stale audio level for Vader (other controllers retain 100 ms) |
 | Trigger UI | Force Feedback has separate LT/RT controls and meters; Impulse Triggers tab available on native Vader even when SDL trigger capability is false |
 | Automated verification | Packet, checksum, motor isolation, selection, timing and XML tests |
 
-**The default timing target is conservative** rather than measured: a 30 ms inter-report
+**The default normal-update interval is conservative** rather than measured: a 30 ms inter-report
 interval was discussed in Linux driver work. The HID controller's true
 capacity, minimum sustained pulse and queue behavior are **unverified**
 until USB traces and physical measurements are available.
@@ -117,3 +119,54 @@ Flydigi Space Station process status and (optionally) a USBPcap trace.
 Unsupported: automatic association of multiple simultaneous Vader 5 Pro
 controllers, byte-perfect DualSense LRA waveform reproduction, and physical
 validation in CI.
+
+
+## Latency / rumble-tail investigation (2026-10-30)
+
+The first firmware-working build reproduced several software causes for a
+noticeable delay relative to a genuine PS5 DualSense:
+
+1. The normal 30 ms output rate was applied to **stop commands** too.
+   Stopping just after the last nonzero update could wait until the next
+   nonzero-report deadline. One trigger stopping while the other kept
+   vibrating also waited.
+2. The worker used a fresh `WaitOne(OutputIntervalMs)` on each
+   early wake. If the 1 kHz input changed before the report deadline,
+   that restarted an entire 30 ms wait instead of sleeping for the
+   **remaining** time.
+3. No input for 250 ms was required to force zero. When a game/audio
+   source disappeared without a final stop, that left old amplitudes in
+   the controller.
+4. The DualSense audio-to-rumble envelope had a 20 ms mean-square
+   follower; even after the PCM samples turned zero, its RMS envelope
+   could linger for ~160 ms from a strong cue to the 2% floor.
+
+The subsequent fix uses absolute report deadlines, a 3 ms gap for motor
+**zero edges**, a 100 ms input-watchdog, and a separate **8 ms** follower
+and **50 ms** stale timeout for the opt-in Vader native motor sink. Other
+devices retain the previous audio-envelope behavior.
+
+The 3 ms priority gate is **only for an actual motor reaching zero**.
+It is not a claim that the receiver can sustain 333 Hz nonzero feedback.
+The normal 10–60 ms slider (30 ms default) still regulates ordinary
+nonzero changes.
+
+### Acceptance and interpretation
+
+- Test a short left-grip pulse, a short right-trigger pulse and all
+  motors together in a game and in the Pad page.
+- In a synthetic 20 ms strong PCM + 80 ms silence test, the native Vader
+  8 ms follower must reach zero while the unchanged 20 ms follower has
+  not. The 100 ms lost-input and precise scheduler deadlines have
+  deterministic unit tests.
+- If the controller still feels late with **USB-C wired**, try **15 ms**
+  then **10 ms** normal output cadence, checking for disconnects,
+  dropped inputs and buzzing. **Do not assume 10 ms is safe** for every
+  firmware and receiver.
+- With a 2.4 GHz dongle, USB scheduling and dongle/firmware buffering
+  can add delay or consume the entire backlog; none of this is measured
+  by software-only CI.
+- Four conventional amplitude-controlled motors have mechanical
+  spin-up and spin-down time. They cannot instantly reproduce the
+  native DualSense's voice-coil actuator waveform. The software may
+  send the zero immediately and the physical motor may still coast.

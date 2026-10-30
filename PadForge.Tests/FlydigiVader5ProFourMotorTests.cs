@@ -114,12 +114,13 @@ namespace PadForge.Tests
         }
 
         [Fact]
-        public void Safety_InputBecomesStaleAfter250Ms()
+        public void Safety_InputBecomesStaleAfter100Ms()
         {
+            Assert.Equal(100, FlydigiVader5ProHidWriter.StaleInputMs);
             Assert.False(FlydigiVader5ProHidWriter.IsFresh(0, 0));
             Assert.False(FlydigiVader5ProHidWriter.IsFresh(100, 0));
-            Assert.True(FlydigiVader5ProHidWriter.IsFresh(251, 1));
-            Assert.False(FlydigiVader5ProHidWriter.IsFresh(252, 1));
+            Assert.True(FlydigiVader5ProHidWriter.IsFresh(101, 1));
+            Assert.False(FlydigiVader5ProHidWriter.IsFresh(102, 1));
             Assert.False(FlydigiVader5ProHidWriter.IsFresh(1, 200));
         }
 
@@ -160,6 +161,160 @@ namespace PadForge.Tests
                 Assert.Equal(30, FlydigiVader5ProHidWriter.OutputIntervalMs);
             }
             finally { FlydigiVader5ProHidWriter.SetOutputIntervalMs(30); }
+        }
+
+        [Fact]
+        public void Scheduler_NonzeroFramesRetryAtExactAbsoluteDeadline()
+        {
+            var oldValue = Motors(180, 120, 30, 50);
+            var next = Motors(181, 120, 30, 50);
+            var driver = typeof(FlydigiVader5ProHidWriter);
+            Assert.Equal(29, FlydigiVader5ProHidWriter.DelayUntilReport(
+                oldValue, next, 1001, 1000, true, 30));
+            Assert.Equal(1, FlydigiVader5ProHidWriter.DelayUntilReport(
+                oldValue, next, 1029, 1000, true, 30));
+            Assert.Equal(0, FlydigiVader5ProHidWriter.DelayUntilReport(
+                oldValue, next, 1030, 1000, true, 30));
+            // An early wake at 1029 must NOT restart a new 30ms timer.
+            Assert.Equal(0, FlydigiVader5ProHidWriter.DelayUntilReport(
+                oldValue, next, 1030, 1000, true, 30));
+            Assert.Equal(0, FlydigiVader5ProHidWriter.DelayUntilReport(
+                oldValue, next, 1000, 1000, false, 30));
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        [InlineData(3)]
+        public void Scheduler_EachIndividualMotorStopGetsPriority(int channel)
+        {
+            var wasOn = Motors(120, 120, 120, 120);
+            var now = channel switch
+            {
+                0 => Motors(0, 120, 120, 120),
+                1 => Motors(120, 0, 120, 120),
+                2 => Motors(120, 120, 0, 120),
+                _ => Motors(120, 120, 120, 0),
+            };
+            Assert.True(FlydigiVader5ProHidWriter.HasStoppingMotor(wasOn, now));
+            Assert.Equal(3, FlydigiVader5ProHidWriter.DelayUntilReport(
+                wasOn, now, 1000, 1000, true, 30));
+            Assert.Equal(1, FlydigiVader5ProHidWriter.DelayUntilReport(
+                wasOn, now, 1002, 1000, true, 30));
+            Assert.Equal(0, FlydigiVader5ProHidWriter.DelayUntilReport(
+                wasOn, now, 1003, 1000, true, 30));
+        }
+
+        [Fact]
+        public void Scheduler_AllMotorsOffBypassNormalCadenceButDoNotSpam()
+        {
+            var wasOn = Motors(20, 40, 60, 80);
+            Assert.True(FlydigiVader5ProHidWriter.HasStoppingMotor(wasOn, default));
+            Assert.Equal(0, FlydigiVader5ProHidWriter.DelayUntilReport(
+                wasOn, default, 1004, 1000, true, 30));
+            Assert.Equal(-1, FlydigiVader5ProHidWriter.DelayUntilReport(
+                default, default, 1200, 1004, true, 30));
+            // Prevent a 1 kHz input poll from causing rapid ON reasserts.
+            Assert.False(FlydigiVader5ProHidWriter.HasStoppingMotor(
+                default, wasOn));
+            Assert.Equal(28, FlydigiVader5ProHidWriter.DelayUntilReport(
+                default, wasOn, 1002, 1000, true, 30));
+            Assert.Equal(3, FlydigiVader5ProHidWriter.StopEdgeMinIntervalMs);
+        }
+
+        [Fact]
+        public void Scheduler_SustainedCommandRetains500MsKeepAlive()
+        {
+            var on = Motors(200, 200, 0, 0);
+            Assert.Equal(1, FlydigiVader5ProHidWriter.DelayUntilReport(
+                on, on, 1499, 1000, true, 30));
+            Assert.Equal(0, FlydigiVader5ProHidWriter.DelayUntilReport(
+                on, on, 1500, 1000, true, 30));
+            Assert.Equal(-1, FlydigiVader5ProHidWriter.DelayUntilReport(
+                default, default, 1600, 1000, true, 30));
+        }
+
+        [Fact]
+        public void NativeHapticEnvelope_StopsAfterShortSilenceWithoutChangingStockFollower()
+        {
+            // 20 ms of strong two-channel DualSense PCM followed by
+            // 80 ms of complete silence. The 20ms mean-square follower
+            // still has a perceptible tail; the Vader-only 8ms follower
+            // must reach the 2% silence floor within that time.
+            const int frames = 960; // 20ms at 48 kHz
+            var strong = new byte[frames * 4];
+            var silent = new byte[frames * 4];
+            for (int i = 0; i < strong.Length; i += 4)
+            {
+                strong[i] = 0x00; strong[i + 1] = 0x70;
+                strong[i + 2] = 0x00; strong[i + 3] = 0x70;
+            }
+
+            double normalLeft = 0, normalRight = 0;
+            double fastLeft = 0, fastRight = 0;
+            long normal = PersonaHapticRumble.Follow(
+                ref normalLeft, ref normalRight, strong, 4, 0, 2, 48000);
+            long fast = PersonaHapticRumble.Follow(
+                ref fastLeft, ref fastRight, strong, 4, 0, 2, 48000,
+                PersonaHapticRumble.LowLatencyTimeConstant);
+            Assert.NotEqual(0L, normal);
+            Assert.NotEqual(0L, fast);
+
+            for (int n = 0; n < 4; n++)
+            {
+                normal = PersonaHapticRumble.Follow(
+                    ref normalLeft, ref normalRight, silent, 4, 0, 2, 48000);
+                fast = PersonaHapticRumble.Follow(
+                    ref fastLeft, ref fastRight, silent, 4, 0, 2, 48000,
+                    PersonaHapticRumble.LowLatencyTimeConstant);
+            }
+            Assert.Equal(0L, fast);
+            Assert.NotEqual(0L, normal);
+        }
+
+        [Fact]
+        public void NativeHaptics_StaleAfter50MsButOrdinaryHapticsKeep100Ms()
+        {
+            const long level = 123456789L;
+            Assert.Equal(50, PersonaHapticRumble.LowLatencyStaleMs);
+            Assert.Equal(level, PersonaHapticRumble.Fresh(
+                level, 1000, 1050, PersonaHapticRumble.LowLatencyStaleMs));
+            Assert.Equal(0L, PersonaHapticRumble.Fresh(
+                level, 1000, 1051, PersonaHapticRumble.LowLatencyStaleMs));
+            Assert.Equal(level, PersonaHapticRumble.Fresh(level, 1000, 1051));
+            Assert.Equal(0L, PersonaHapticRumble.Fresh(level, 1000, 1101));
+        }
+
+        [Fact]
+        public void NativeHaptics_UsesDedicatedFastFeedOnlyOnVader()
+        {
+            var audio = System.IO.File.ReadAllText(
+                System.IO.Path.Combine(FindRepositoryRoot(), "PadForge.App",
+                    "Common", "Input", "AudioPassthroughService.cs"));
+            var input = System.IO.File.ReadAllText(
+                System.IO.Path.Combine(FindRepositoryRoot(), "PadForge.App",
+                    "Common", "Input", "InputManager.Step2.UpdateInputStates.cs"));
+            var virtuals = System.IO.File.ReadAllText(
+                System.IO.Path.Combine(FindRepositoryRoot(), "PadForge.App",
+                    "Common", "Input", "InputManager.Step5.VirtualDevices.cs"));
+            Assert.Contains("HapticFastMeanSquareL", audio, StringComparison.Ordinal);
+            Assert.Contains("HapticFastLevel", audio, StringComparison.Ordinal);
+            Assert.Contains("PersonaHapticRumble.LowLatencyTimeConstant", audio, StringComparison.Ordinal);
+            Assert.Contains("lowLatency: isVader", input, StringComparison.Ordinal);
+            Assert.Contains("lowLatency: fastVaderMeter", input, StringComparison.Ordinal);
+            Assert.Contains("bool fast = lowLatency && FlydigiVader5ProHidWriter.Enabled;",
+                virtuals, StringComparison.Ordinal);
+        }
+
+        private static string FindRepositoryRoot()
+        {
+            var directory = new System.IO.DirectoryInfo(AppContext.BaseDirectory);
+            while (directory != null && !System.IO.File.Exists(
+                       System.IO.Path.Combine(directory.FullName, "PadForge.sln")))
+                directory = directory.Parent;
+            Assert.NotNull(directory);
+            return directory.FullName;
         }
 
         [Fact]

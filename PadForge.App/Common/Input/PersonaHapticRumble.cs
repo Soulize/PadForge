@@ -37,6 +37,14 @@ namespace PadForge.Common.Input
         /// <summary>The loudness follower's time constant, in seconds.</summary>
         internal const double TimeConstant = 0.020;
 
+        /// <summary>For the Vader 5 Pro's amplitude-controlled motors
+        /// only. The stock 20 ms mean-square follower can take ~160 ms to
+        /// fall from full power to the 2% silence floor; 8 ms reduces
+        /// that trailing envelope to ~64 ms without making audio haptics
+        /// played by real voice-coil actuators change behavior.</summary>
+        internal const double LowLatencyTimeConstant = 0.008;
+        internal const long LowLatencyStaleMs = 50;
+
         /// <summary>A level older than this is not merged: the host closed
         /// the stream or the persona went away.</summary>
         internal const long StaleMs = 100;
@@ -58,12 +66,14 @@ namespace PadForge.Common.Input
         /// RMS times 1.4, so a full-scale sine reads full, and nothing below
         /// its silence floor. Pure over its arguments.</summary>
         internal static long Follow(ref double meanSquareLeft, ref double meanSquareRight,
-            ReadOnlySpan<byte> pcm, int stride, int leftOffset, int rightOffset, int rateHz)
+            ReadOnlySpan<byte> pcm, int stride, int leftOffset, int rightOffset, int rateHz,
+            double timeConstant = TimeConstant)
         {
             if (stride <= 0 || rateHz <= 0 || leftOffset < 0 || rightOffset < 0
-                || Math.Max(leftOffset, rightOffset) + 2 > stride)
+                || Math.Max(leftOffset, rightOffset) + 2 > stride
+                || timeConstant <= 0 || double.IsNaN(timeConstant))
                 return 0L;
-            double a = 1.0 - Math.Exp(-1.0 / (TimeConstant * rateHz));
+            double a = 1.0 - Math.Exp(-1.0 / (timeConstant * rateHz));
             double l = meanSquareLeft, r = meanSquareRight;
             for (int i = 0; i + stride <= pcm.Length; i += stride)
             {
@@ -85,8 +95,9 @@ namespace PadForge.Common.Input
 
         /// <summary><paramref name="level"/>, or 0 once it is more than
         /// <see cref="StaleMs"/> old. Pure.</summary>
-        internal static long Fresh(long level, long levelMs, long nowMs)
-            => level == 0L || nowMs - levelMs > StaleMs ? 0L : level;
+        internal static long Fresh(long level, long levelMs, long nowMs,
+            long staleAfterMs = StaleMs)
+            => level == 0L || nowMs - levelMs > staleAfterMs ? 0L : level;
 
         /// <summary>Layers a level onto <paramref name="raw"/>'s two body
         /// motors under max(). Returns <paramref name="raw"/> unchanged when

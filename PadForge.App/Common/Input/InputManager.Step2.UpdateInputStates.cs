@@ -990,7 +990,8 @@ namespace PadForge.Common.Input
                 // they play, and this device's gain, motor strengths and swap
                 // apply to them below.
                 if (_personaHapticScratch == null) _personaHapticScratch = new Vibration();
-                raw = WithPersonaHaptics(padIndex, ud.InstanceGuid, raw, _personaHapticScratch, hapticNow);
+                raw = WithPersonaHaptics(padIndex, ud.InstanceGuid, raw,
+                    _personaHapticScratch, hapticNow, lowLatency: isVader);
 
                 var devicePs = us.GetPadSetting();
 
@@ -1878,14 +1879,21 @@ namespace PadForge.Common.Input
                     var us = _padIndexBuffer[i];
                     if (us == null) continue;
                     var devicePs = us.GetPadSetting();
-                    // The hardware path's persona haptics layer (discussion
-                    // #522), so the meters show what each device is sent.
-                    var rowRaw = WithPersonaHaptics(padIndex, us.InstanceGuid, raw, _personaHapticMeterScratch, meterNow);
+                    // The selected Vader 5 Pro's fast envelope must be the
+                    // same as the actual motor output. Other devices keep
+                    // the existing persona loudness follower unchanged.
+                    var onlineForMeter = FindOnlineDeviceByInstanceGuid(us.InstanceGuid);
+                    bool fastVaderMeter = FlydigiVader5ProHidWriter.Enabled
+                        && onlineForMeter != null
+                        && FlydigiVader5ProHidWriter.IsDevice(
+                            onlineForMeter.VendorId, onlineForMeter.ProdId);
+                    var rowRaw = WithPersonaHaptics(padIndex, us.InstanceGuid,
+                        raw, _personaHapticMeterScratch, meterNow, lowLatency: fastVaderMeter);
                     // Rebuild from the baseline for each device. The previous device
                     // can have a different axis, strength, or enabled state.
                     withMacro = ResolveUserRumble(padIndex, devicePs, rowRaw, _macroRumbleScratch,
                         devicePs?.SteeringAngleRumbleEnabled == "1"
-                        && SupportsSteeringAngleRumble(FindOnlineDeviceByInstanceGuid(us.InstanceGuid)));
+                        && SupportsSteeringAngleRumble(onlineForMeter));
 
                     if (_constantForceScratch == null) _constantForceScratch = new Vibration();
                     var effective = ConstantForceEvaluator.Resolve(withMacro, devicePs, _constantForceScratch);

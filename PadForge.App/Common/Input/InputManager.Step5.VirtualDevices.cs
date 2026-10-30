@@ -3116,14 +3116,21 @@ namespace PadForge.Common.Input
         /// the CURRENT feed position, which a reorder moves with its
         /// controller. The level is read before its time, the reverse of the
         /// pacing thread's writes. Any thread.</summary>
-        internal long PersonaHapticLevel(int slot, long nowMs)
+        internal long PersonaHapticLevel(int slot, long nowMs, bool lowLatency = false)
         {
             if ((uint)slot >= MaxPads) return 0L;
             var feed = Volatile.Read(ref _personaAudioFeeds[slot]);
             if (feed == null) return 0L;
-            long level = Volatile.Read(ref feed.HapticLevel);
+            // Only the opt-in Vader four-motor path reads the fast
+            // 8ms envelope and 50ms stale timeout. All other haptic
+            // consumers preserve the original 20ms/100ms behavior.
+            bool fast = lowLatency && FlydigiVader5ProHidWriter.Enabled;
+            long level = fast
+                ? Volatile.Read(ref feed.HapticFastLevel)
+                : Volatile.Read(ref feed.HapticLevel);
             long levelMs = Volatile.Read(ref feed.HapticLevelMs);
-            return PersonaHapticRumble.Fresh(level, levelMs, nowMs);
+            return PersonaHapticRumble.Fresh(level, levelMs, nowMs,
+                fast ? PersonaHapticRumble.LowLatencyStaleMs : PersonaHapticRumble.StaleMs);
         }
 
         /// <summary><paramref name="raw"/> with the slot's persona haptics
@@ -3133,9 +3140,10 @@ namespace PadForge.Common.Input
         /// the device takes it (<see cref="PersonaHapticRumble.TakesRumble"/>),
         /// else <paramref name="scratch"/>. Any thread, with a scratch of the
         /// caller's own.</summary>
-        internal Vibration WithPersonaHaptics(int slot, Guid device, Vibration raw, Vibration scratch, long nowMs)
+        internal Vibration WithPersonaHaptics(int slot, Guid device, Vibration raw, Vibration scratch,
+            long nowMs, bool lowLatency = false)
         {
-            long level = PersonaHapticLevel(slot, nowMs);
+            long level = PersonaHapticLevel(slot, nowMs, lowLatency);
             if (level == 0L || !PersonaHapticRumble.TakesRumble(slot, device, nowMs)) return raw;
             return PersonaHapticRumble.Merge(raw, level, scratch);
         }

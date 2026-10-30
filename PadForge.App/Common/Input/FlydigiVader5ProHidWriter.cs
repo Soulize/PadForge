@@ -24,7 +24,12 @@ namespace PadForge.Common.Input
         internal const ushort ControlUsage = 1;
         internal const int MinimumWriteIntervalMs = 30;
         internal const int RetryIntervalMs = 1000;
-        internal const int StaleInputMs = 250;
+        // Old 250 ms watchdog was noticeable as a lingering vibration.
+        // With a normally-running 1 kHz PadForge poll, 100 ms allows
+        // plenty of missed polls but zeroes a stalled source promptly.
+        internal const int StaleInputMs = 100;
+        internal const int StopEdgeMinIntervalMs = 3;
+        internal const int MaxIdleWaitMs = 100;
         internal const int KeepAliveMs = 500;
 
         internal readonly record struct Motors(byte GripLeft, byte GripRight,
@@ -122,7 +127,7 @@ namespace PadForge.Common.Input
                     {
                         IsBackground = true,
                         Name = "PadForge.FlydigiVader5ProRumble",
-                        Priority = ThreadPriority.BelowNormal,
+                        Priority = ThreadPriority.Normal,
                     };
                     _worker.Start();
                 }
@@ -298,6 +303,32 @@ namespace PadForge.Common.Input
             => !hasSent || now < lastWrite
                 || now - lastWrite >= Math.Clamp(intervalMs, 10, 60);
 
+        /// <summary>One zero transition on any physical motor must not
+        /// queue behind the full 30 ms rumble cadence. This also detects
+        /// just one trigger stopping while the other motors keep going.</summary>
+        internal static bool HasStoppingMotor(Motors sent, Motors desired)
+            => (sent.GripLeft != 0 && desired.GripLeft == 0)
+                || (sent.GripRight != 0 && desired.GripRight == 0)
+                || (sent.TriggerLeft != 0 && desired.TriggerLeft == 0)
+                || (sent.TriggerRight != 0 && desired.TriggerRight == 0);
+
+        /// <summary>Relative delay until the absolute report deadline.
+        /// -1: no write needed for two matching zero reports. Other
+        /// matching values refresh only at the 500 ms keepalive. An
+        /// urgent zero edge uses a bounded 3 ms gap; all other changes
+        /// obey the configured 10..60 ms cadence.</summary>
+        internal static int DelayUntilReport(Motors lastSent, Motors desired,
+            long now, long lastWrite, bool hasSent, int intervalMs)
+        {
+            if (!hasSent || now < lastWrite) return 0;
+            long elapsed = now - lastWrite;
+            if (lastSent.Equals(desired))
+                return desired.Silent ? -1 : (int)Math.Max(0L, KeepAliveMs - elapsed);
+            int gap = HasStoppingMotor(lastSent, desired)
+                ? StopEdgeMinIntervalMs : Math.Clamp(intervalMs, 10, 60);
+            return (int)Math.Max(0L, gap - elapsed);
+        }
+
         /// <summary>Strict VID/PID + vendor usage; never guess at a device.</summary>
         internal static string SelectUniqueControlPath(IReadOnlyList<VendorHidCollection> devices)
         {
@@ -322,11 +353,15 @@ namespace PadForge.Common.Input
 
         private static void WorkerLoop()
         {
+            // Drive by absolute due times, not repeated full-period sleeps.
+            // Fast input events can wake the worker before a report is due:
+            // the old code then slept another entire interval, adding
+            // up to ~30 ms on top of the original 30 ms report budget.
+            int waitMs = 0;
             while (true)
             {
-                // A 1 kHz game can change the desired state at any point.
-                // Coalesce updates; NEVER write HID from the input thread.
-                Wake.WaitOne(OutputIntervalMs);
+                Wake.WaitOne(waitMs);
+                waitMs = MaxIdleWaitMs;
                 // Always close a stale handle before probing a replacement.
                 // IoGate prevents overlap with the previous HID write.
                 lock (IoGate)
@@ -374,8 +409,6 @@ namespace PadForge.Common.Input
                 lock (IoGate)
                 {
                     Motors next;
-                    bool alreadySent;
-                    long lastWrite;
                     lock (StateGate)
                     {
                         // A disable, stop or disconnect can race discovery.
@@ -384,11 +417,32 @@ namespace PadForge.Common.Input
                         bool testActive = Enabled && !_ambiguousOwner && sampleAt < _testUntilAt;
                         bool fresh = Enabled && !_ambiguousOwner && IsFresh(sampleAt, _lastInputAt);
                         next = testActive ? _testMotors : fresh ? _desired : default;
-                        alreadySent = _everSent && next.Equals(_sent);
-                        lastWrite = _lastWriteAt;
-                        if (_everSent && alreadySent && (next.Silent || Clock() - lastWrite < KeepAliveMs))
+                        // A static motor command must stop when either a
+                        // 400 ms test pulse expires or the input pump stalls.
+                        // Otherwise a 500 ms keepalive could delay the ZERO.
+                        if (testActive)
+                        {
+                            long untilTestEnd = _testUntilAt - sampleAt;
+                            waitMs = Math.Min(waitMs,
+                                (int)Math.Clamp(untilTestEnd, 1L, MaxIdleWaitMs));
+                        }
+                        else if (fresh && !next.Silent)
+                        {
+                            long untilStale = _lastInputAt + StaleInputMs + 1 - sampleAt;
+                            waitMs = Math.Min(waitMs,
+                                (int)Math.Clamp(untilStale, 1L, MaxIdleWaitMs));
+                        }
+
+                        int dueIn = DelayUntilReport(
+                            _sent, next, sampleAt, _lastWriteAt, _everSent, OutputIntervalMs);
+                        if (dueIn < 0) continue;
+                        if (dueIn > 0)
+                        {
+                            // Retry at the REMAINING deadline after an
+                            // early wake (rather than waiting 30 ms anew).
+                            waitMs = Math.Min(waitMs, dueIn);
                             continue;
-                        if (!MaySend(Clock(), lastWrite, _everSent, OutputIntervalMs)) continue;
+                        }
                     }
                     bool ok;
                     try { ok = WriteReport(path, BuildReport(next)); }
