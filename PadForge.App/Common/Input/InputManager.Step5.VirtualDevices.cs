@@ -3133,6 +3133,25 @@ namespace PadForge.Common.Input
                 fast ? PersonaHapticRumble.LowLatencyStaleMs : PersonaHapticRumble.StaleMs);
         }
 
+        /// <summary>Optional high-frequency content for Vader's supplemental
+        /// trigger-motor lane. The physical pad still receives original left/
+        /// right grip haptics, and the trigger lane is only used when no native
+        /// trigger or adaptive-trigger force has been requested.</summary>
+        internal long PersonaHapticHighBandLevel(int slot, long nowMs)
+        {
+            if ((uint)slot >= MaxPads
+                || !FlydigiVader5ProHidWriter.Enabled
+                || !FlydigiVader5ProHidWriter.EnhancedHapticsEnabled
+                || !FlydigiVader5ProHidWriter.SpectralTriggerAssistEnabled)
+                return 0L;
+            var feed = Volatile.Read(ref _personaAudioFeeds[slot]);
+            if (feed == null) return 0L;
+            long level = Volatile.Read(ref feed.HapticFastHighLevel);
+            long at = Volatile.Read(ref feed.HapticLevelMs);
+            return PersonaHapticRumble.Fresh(level, at, nowMs,
+                PersonaHapticRumble.LowLatencyStaleMs);
+        }
+
         /// <summary><paramref name="raw"/> with the slot's persona haptics
         /// layered on for one device, the step every reader of the slot's
         /// rumble takes before macro rumble and the device's settings:
