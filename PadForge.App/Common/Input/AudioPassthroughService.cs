@@ -2162,8 +2162,12 @@ namespace PadForge.Common.Input
                         frame.HighLeft, frame.HighRight, 0, 0);
                     if ((frame.BurstMask & 1) != 0)
                         burstLeftUntil = nowMs + Vader5ProHapticConverter.TransientBurstHoldMs;
+                    else if ((frame.TextureMask & 1) != 0)
+                        burstLeftUntil = nowMs + Vader5ProHapticConverter.TextureHoldMs;
                     if ((frame.BurstMask & 2) != 0)
                         burstRightUntil = nowMs + Vader5ProHapticConverter.TransientBurstHoldMs;
+                    else if ((frame.TextureMask & 2) != 0)
+                        burstRightUntil = nowMs + Vader5ProHapticConverter.TextureHoldMs;
                     feed.HapticFastMeanSquareL = 0;
                     feed.HapticFastMeanSquareR = 0;
                 }

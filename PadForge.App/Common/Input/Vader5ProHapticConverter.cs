@@ -16,12 +16,17 @@ namespace PadForge.Common.Input
         internal const int GapResetMs = 30;
         internal const int SpectralCutoffHz = 180;
         private const double SilenceSampleFloor = 0.0015;
-        private const double OutputFloor = 0.02;
+        // Keep soft authored details. The old 2% cut-off made almost-silent
+        // texture disappear and forced users to overboost Gamma/Floor.
+        private const double OutputFloor = 0.004;
+        private const double ImpactPeakThreshold = 0.18;
+        private const double ImpactAmplitudeThreshold = 0.10;
 
         internal const int TransientBurstHoldMs = 10;
+        internal const int TextureHoldMs = 6;
         internal readonly record struct Frame(ushort Left, ushort Right,
             ushort HighLeft, ushort HighRight, ushort LowLeft, ushort LowRight,
-            byte BurstMask);
+            byte BurstMask, byte TextureMask);
 
         private struct Channel
         {
@@ -113,36 +118,43 @@ namespace PadForge.Common.Input
                 peakR = Math.Max(peakR, Math.Sqrt(bucketR / bucketCount));
             }
 
-            // A 1-5 ms impact should survive a longer PCM callback window.
-            // Do not add attack smoothing to a newly arrived short impact.
-            double immediateL = Math.Min(1.0,
-                Math.Max(Math.Sqrt(energyL / frames), peakL * 0.85) * 1.4);
-            double immediateR = Math.Min(1.0,
-                Math.Max(Math.Sqrt(energyR / frames), peakR * 0.85) * 1.4);
-            double highL = Math.Min(1.0, Math.Sqrt(highEnergyL / frames) * 1.4);
-            double highR = Math.Min(1.0, Math.Sqrt(highEnergyR / frames) * 1.4);
-            double lowL = Math.Min(1.0, Math.Sqrt(lowEnergyL / frames) * 1.4);
-            double lowR = Math.Min(1.0, Math.Sqrt(lowEnergyR / frames) * 1.4);
+            // Quiet texture uses its actual whole-callback RMS. Formerly
+            // max(RMS, 0.85 * 1ms peak) * 1.4 promoted fine cloth/footstep
+            // taps to full transient bursts. Only a concentrated, sufficiently
+            // loud impact earns a smoothly gated peak contribution.
+            double immediateL = ShapeAmplitude(Math.Sqrt(energyL / frames), peakL);
+            double immediateR = ShapeAmplitude(Math.Sqrt(energyR / frames), peakR);
+            double highL = Math.Min(1.0, Math.Sqrt(highEnergyL / frames));
+            double highR = Math.Min(1.0, Math.Sqrt(highEnergyR / frames));
+            double lowL = Math.Min(1.0, Math.Sqrt(lowEnergyL / frames));
+            double lowR = Math.Min(1.0, Math.Sqrt(lowEnergyR / frames));
             double seconds = frames / (double)rateHz;
-            // A complete short pulse can begin AND end inside one host
-            // audio callback. A final silent run would otherwise erase it
-            // before any motor command existed. Publish one bounded 10ms
-            // pulse, with a reader-side expiry even if callbacks stop.
-            bool burstL = leftWasIdle && _left.SilentFrames >= silenceFrames
+            // A pulse can begin and end inside a single audio callback.
+            // Real impacts keep their existing fast 10ms hold. Quiet texture
+            // stays quiet: publish its proportional window RMS for at most
+            // 6ms rather than creating a 10ms hard kick on every footstep.
+            bool pulseL = leftWasIdle && _left.SilentFrames >= silenceFrames
                 && immediateL >= OutputFloor;
-            bool burstR = rightWasIdle && _right.SilentFrames >= silenceFrames
+            bool pulseR = rightWasIdle && _right.SilentFrames >= silenceFrames
                 && immediateR >= OutputFloor;
+            bool burstL = pulseL && peakL >= ImpactPeakThreshold
+                && immediateL >= ImpactAmplitudeThreshold;
+            bool burstR = pulseR && peakR >= ImpactPeakThreshold
+                && immediateR >= ImpactAmplitudeThreshold;
+            bool textureL = pulseL && !burstL;
+            bool textureR = pulseR && !burstR;
             UpdateEnvelope(ref _left, immediateL, highL, lowL, seconds, silenceFrames);
             UpdateEnvelope(ref _right, immediateR, highR, lowR, seconds, silenceFrames);
 
             return new Frame(
-                ToLevel(burstL ? immediateL : _left.Envelope),
-                ToLevel(burstR ? immediateR : _right.Envelope),
-                ToLevel(burstL ? highL : _left.HighEnvelope),
-                ToLevel(burstR ? highR : _right.HighEnvelope),
-                ToLevel(burstL ? lowL : _left.LowEnvelope),
-                ToLevel(burstR ? lowR : _right.LowEnvelope),
-                (byte)((burstL ? 1 : 0) | (burstR ? 2 : 0)));
+                ToLevel(pulseL ? immediateL : _left.Envelope),
+                ToLevel(pulseR ? immediateR : _right.Envelope),
+                ToLevel(pulseL ? highL : _left.HighEnvelope),
+                ToLevel(pulseR ? highR : _right.HighEnvelope),
+                ToLevel(pulseL ? lowL : _left.LowEnvelope),
+                ToLevel(pulseR ? lowR : _right.LowEnvelope),
+                (byte)((burstL ? 1 : 0) | (burstR ? 2 : 0)),
+                (byte)((textureL ? 1 : 0) | (textureR ? 2 : 0)));
         }
 
         private static double Step(ref Channel state, double value,
@@ -183,10 +195,34 @@ namespace PadForge.Common.Input
             state.LowEnvelope = Follow(state.LowEnvelope, lowTarget, seconds);
         }
 
+        /// <summary>Transient boost only for a genuine loud, concentrated
+        /// event. Zero gain for faint PCM irrespective of the crest factor.
+        /// Both gates are smooth to avoid a new audible/tactile step.</summary>
+        private static double ShapeAmplitude(double rms, double oneMsPeak)
+        {
+            double peakGate = SmoothStep(0.12, 0.35, oneMsPeak);
+            double crestGate = SmoothStep(1.25, 1.9,
+                oneMsPeak / (rms + 0.0001));
+            double impactContribution = Math.Max(0.0, oneMsPeak * 0.85 - rms)
+                * peakGate * crestGate;
+            return Math.Clamp(rms + impactContribution, 0.0, 1.0);
+        }
+
+        private static double SmoothStep(double min, double max, double value)
+        {
+            double x = Math.Clamp((value - min) / (max - min), 0.0, 1.0);
+            return x * x * (3.0 - 2.0 * x);
+        }
+
         private static double Follow(double current, double target, double seconds)
         {
-            const double attack = 0.0015; // 1.5 ms attack for short impacts
-            const double release = 0.008; // 8 ms non-silent down-ramp
+            // The old unconditional 1.5 ms attack accentuated each small
+            // fabric/footstep cue. Gentle haptics ramp without losing the
+            // rapid rise of high-energy impacts.
+            double attack = target <= 0.12 ? 0.012 :
+                target >= 0.30 ? 0.0015 :
+                0.012 - (target - 0.12) / 0.18 * 0.0105;
+            const double release = 0.008;
             double tau = target >= current ? attack : release;
             return Math.Clamp(current + (target - current)
                 * (1.0 - Math.Exp(-seconds / tau)), 0.0, 1.0);

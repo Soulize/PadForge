@@ -309,7 +309,7 @@
                     <StackPanel Orientation="Horizontal" Margin="20,0,0,8">
                         <CheckBox Content="Enhanced DualSense PCM haptics (fast stop / impact)"
                                   IsChecked="{Binding FlydigiVader5ProEnhancedHapticsEnabled}"
-                                  ToolTip="Vader-only short-window silence detection, fast attack and two-band DSP. Disable for the legacy 8 ms RMS follower."/>
+                                  ToolTip="Texture-aware PCM: quiet footstep/fabric cues preserve low amplitude; loud impacts retain fast rise and separate 10 ms hold. Disable for the legacy 8 ms RMS follower."/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="20,0,0,12">
                         <CheckBox Content="Optional high-frequency PCM trigger assist"

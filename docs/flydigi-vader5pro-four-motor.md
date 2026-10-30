@@ -271,3 +271,39 @@ targets as achieved physical latency. Qualify **10/15/20/30 ms** cadences
 on USB-C with USB tracing and physical response measurements before
 changing the conservative 30 ms normal-update default. Compare the same
 synthetic waveform through SDL/XInput and the native `0x12` path.
+
+
+## Quiet-texture fidelity adjustment (2026-10-30)
+
+A real-controller comparison found frequent gentle DualSense cues (footsteps,
+cloth/fabric movement) could emerge from Xbox-style amplitude motors as
+unpleasant hard, repeated kicks. The prior fast renderer used
+`max(full-window RMS, 0.85 * 1ms peak RMS) * 1.4` for **every** event,
+classified **every** callback-contained signal as a 10ms impact, and used
+1.5ms attack regardless of authored intensity. A low Gamma setting
+further magnifies quiet signals.
+
+This update separates the two signal classes **before** motor calibration:
+
+- **Quiet texture:** proportionate full-window RMS; no blanket 1.4x gain or
+  peak-RMS boost; no forceful 10ms impact hold. A genuine nonzero short
+  texture can receive a bounded 6ms soft pulse; a sustained weak cue has a
+  gentle ~12ms attack. Amplitude floor lowered to 0.4% to preserve low-level
+  detail without a high minimum motor command.
+- **Genuine impact:** optional smoothly gated 1ms peak contribution only
+  above a significant absolute peak and crest factor. A callback-contained
+  strong impact retains the previous 10ms bounded pulse and fast 1.5ms
+  attack. Per-channel 3ms confirmed silence, 30ms gap-reset and urgent
+  start/stop HID report rules remain unchanged.
+- **Calibration:** reset both grip Gamma sliders to **100-120%** and Floor
+  to 0 when assessing gentle texture. Gamma under 100% intentionally boosts
+  weak levels and may reintroduce forceful tactile starts. Compare the new
+  algorithm to the legacy follower with Enhanced PCM on/off. Do not rely on
+  10ms test pulses to infer actual mechanical stopping performance.
+
+Regression tests cover continuous low-amplitude tones, isolated 3ms weak
+textures and **30 repeated footsteps**, all with output strictly below 10%
+of maximum rumble, plus preserved strong impact and 10ms strong-event hold.
+No claim of DualSense LRA waveform equivalence is made: four conventional
+amplitude motors may have a physical start threshold and cannot reproduce
+fine voice-coil textures exactly.
