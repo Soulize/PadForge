@@ -959,6 +959,9 @@ namespace PadForge.Common.Input
             // has it (no sensible way to combine two polar directions).
             ushort combinedL = 0, combinedR = 0;
             ushort combinedLT = 0, combinedRT = 0;
+            // High-band PCM is a FALLBACK, never a substitute for a game's
+            // native trigger/macro/adaptive-trigger vibration instructions.
+            ushort spectralAssistLT = 0, spectralAssistRT = 0;
             Vibration directionalSource = null;
             PadSetting firstPadSetting = null;
             // The setting belonging to whichever device actually produced the
@@ -994,6 +997,25 @@ namespace PadForge.Common.Input
                     _personaHapticScratch, hapticNow, lowLatency: isVader);
 
                 var devicePs = us.GetPadSetting();
+
+                if (isVader && FlydigiVader5ProHidWriter.SpectralTriggerAssistEnabled
+                    && PersonaHapticRumble.TakesRumble(
+                        padIndex, ud.InstanceGuid, hapticNow))
+                {
+                    long bands = PersonaHapticHighBandLevel(padIndex, hapticNow);
+                    if (bands != 0)
+                    {
+                        // High-frequency texture supplements otherwise-idle
+                        // triggers at 35% of the detected PCM band amplitude.
+                        // Never remap the stereo grip content itself.
+                        ushort hL = (ushort)(PadForge.Engine.Common.LfeOutputState.Low(bands) * 35 / 100);
+                        ushort hR = (ushort)(PadForge.Engine.Common.LfeOutputState.High(bands) * 35 / 100);
+                        ScaleTriggerRumbleForDevice(hL, hR, devicePs,
+                            out ushort assistL, out ushort assistR);
+                        if (assistL > spectralAssistLT) spectralAssistLT = assistL;
+                        if (assistR > spectralAssistRT) spectralAssistRT = assistR;
+                    }
+                }
 
                 // Macro rumble layers on top of game force via max() so
                 // user-driven feedback is always felt even mid-game-rumble.
@@ -1275,8 +1297,13 @@ namespace PadForge.Common.Input
                 // trigger vibration have been merged. The dedicated worker
                 // coalesces them to 8-bit 0x12 HID packets at <=33 Hz; never
                 // run HID I/O on the 1 kHz input/poll thread.
-                FlydigiVader5ProHidWriter.Submit(
-                    ud, combinedL, combinedR, combinedLT, combinedRT);
+                var vaderMix = Vader5ProHapticMixer.Mix(
+                    combinedL, combinedR, combinedLT, combinedRT,
+                    spectralAssistLT, spectralAssistRT,
+                    FlydigiVader5ProHidWriter.SpectralTriggerAssistEnabled);
+                FlydigiVader5ProHidWriter.Submit(ud,
+                    vaderMix.GripLeft, vaderMix.GripRight,
+                    vaderMix.TriggerLeft, vaderMix.TriggerRight);
                 return;
             }
 

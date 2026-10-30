@@ -306,6 +306,89 @@
                         <Button Content="Test left trigger" Command="{Binding TestVader5ProLeftTriggerCommand}" IsEnabled="{Binding FlydigiVader5ProFourMotorEnabled}" Margin="0,0,8,0"/>
                         <Button Content="Test right trigger" Command="{Binding TestVader5ProRightTriggerCommand}" IsEnabled="{Binding FlydigiVader5ProFourMotorEnabled}"/>
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,8">
+                        <CheckBox Content="Enhanced DualSense PCM haptics (fast stop / impact)"
+                                  IsChecked="{Binding FlydigiVader5ProEnhancedHapticsEnabled}"
+                                  ToolTip="Texture-aware PCM: quiet footstep/fabric cues preserve low amplitude; loud impacts retain fast rise and separate 10 ms hold. Disable for the legacy 8 ms RMS follower."/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,12">
+                        <CheckBox Content="Optional high-frequency PCM trigger assist"
+                                  IsChecked="{Binding FlydigiVader5ProSpectralTriggerAssist}"
+                                  ToolTip="Only fills silent trigger channels. Native trigger rumble and adaptive-trigger effects always win."/>
+                    </StackPanel>
+                    <TextBlock Text="Vader 5 Pro: independent four-motor calibration"
+                               FontWeight="SemiBold" Margin="20,0,0,6"/>
+                    <TextBlock Text="Gain: 0-200%; Gamma: 100% = linear, lower values boost weak feedback; Floor: minimum drive while active. Zero always stops."
+                               TextWrapping="Wrap" Margin="20,0,0,8"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,6">
+                        <TextBlock Text="Left grip" Width="82" VerticalAlignment="Center"/>
+                        <TextBlock Text="Gain" Width="36" VerticalAlignment="Center"/>
+                        <Slider Width="90" Minimum="0" Maximum="200" TickFrequency="5"
+                                IsSnapToTickEnabled="True" Value="{Binding FlydigiVader5ProGripLeftGainPercent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding FlydigiVader5ProGripLeftGainPercent, StringFormat={}{0}%}" Width="47" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Gamma" Width="50" VerticalAlignment="Center"/>
+                        <Slider Width="90" Minimum="50" Maximum="180" TickFrequency="5"
+                                IsSnapToTickEnabled="True" Value="{Binding FlydigiVader5ProGripLeftGammaPercent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding FlydigiVader5ProGripLeftGammaPercent, StringFormat={}{0}%}" Width="47" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Floor" Width="36" VerticalAlignment="Center"/>
+                        <Slider Width="80" Minimum="0" Maximum="64" TickFrequency="1"
+                                IsSnapToTickEnabled="True" Value="{Binding FlydigiVader5ProGripLeftMinDrive, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding FlydigiVader5ProGripLeftMinDrive, StringFormat={}{0}/255}"
+                                   Width="53" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,6">
+                        <TextBlock Text="Right grip" Width="82" VerticalAlignment="Center"/>
+                        <TextBlock Text="Gain" Width="36" VerticalAlignment="Center"/>
+                        <Slider Width="90" Minimum="0" Maximum="200" TickFrequency="5"
+                                IsSnapToTickEnabled="True" Value="{Binding FlydigiVader5ProGripRightGainPercent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding FlydigiVader5ProGripRightGainPercent, StringFormat={}{0}%}" Width="47" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Gamma" Width="50" VerticalAlignment="Center"/>
+                        <Slider Width="90" Minimum="50" Maximum="180" TickFrequency="5"
+                                IsSnapToTickEnabled="True" Value="{Binding FlydigiVader5ProGripRightGammaPercent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding FlydigiVader5ProGripRightGammaPercent, StringFormat={}{0}%}" Width="47" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Floor" Width="36" VerticalAlignment="Center"/>
+                        <Slider Width="80" Minimum="0" Maximum="64" TickFrequency="1"
+                                IsSnapToTickEnabled="True" Value="{Binding FlydigiVader5ProGripRightMinDrive, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding FlydigiVader5ProGripRightMinDrive, StringFormat={}{0}/255}"
+                                   Width="53" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,6">
+                        <TextBlock Text="Left trigger" Width="82" VerticalAlignment="Center"/>
+                        <TextBlock Text="Gain" Width="36" VerticalAlignment="Center"/>
+                        <Slider Width="90" Minimum="0" Maximum="200" TickFrequency="5"
+                                IsSnapToTickEnabled="True" Value="{Binding FlydigiVader5ProTriggerLeftGainPercent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding FlydigiVader5ProTriggerLeftGainPercent, StringFormat={}{0}%}" Width="47" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Gamma" Width="50" VerticalAlignment="Center"/>
+                        <Slider Width="90" Minimum="50" Maximum="180" TickFrequency="5"
+                                IsSnapToTickEnabled="True" Value="{Binding FlydigiVader5ProTriggerLeftGammaPercent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding FlydigiVader5ProTriggerLeftGammaPercent, StringFormat={}{0}%}" Width="47" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Floor" Width="36" VerticalAlignment="Center"/>
+                        <Slider Width="80" Minimum="0" Maximum="64" TickFrequency="1"
+                                IsSnapToTickEnabled="True" Value="{Binding FlydigiVader5ProTriggerLeftMinDrive, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding FlydigiVader5ProTriggerLeftMinDrive, StringFormat={}{0}/255}"
+                                   Width="53" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,6">
+                        <TextBlock Text="Right trigger" Width="82" VerticalAlignment="Center"/>
+                        <TextBlock Text="Gain" Width="36" VerticalAlignment="Center"/>
+                        <Slider Width="90" Minimum="0" Maximum="200" TickFrequency="5"
+                                IsSnapToTickEnabled="True" Value="{Binding FlydigiVader5ProTriggerRightGainPercent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding FlydigiVader5ProTriggerRightGainPercent, StringFormat={}{0}%}" Width="47" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Gamma" Width="50" VerticalAlignment="Center"/>
+                        <Slider Width="90" Minimum="50" Maximum="180" TickFrequency="5"
+                                IsSnapToTickEnabled="True" Value="{Binding FlydigiVader5ProTriggerRightGammaPercent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding FlydigiVader5ProTriggerRightGammaPercent, StringFormat={}{0}%}" Width="47" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Floor" Width="36" VerticalAlignment="Center"/>
+                        <Slider Width="80" Minimum="0" Maximum="64" TickFrequency="1"
+                                IsSnapToTickEnabled="True" Value="{Binding FlydigiVader5ProTriggerRightMinDrive, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding FlydigiVader5ProTriggerRightMinDrive, StringFormat={}{0}/255}"
+                                   Width="53" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Text="Motor curves are saved to application settings. Start with Gain 100%, Gamma 100%, Floor 0; calibrate each channel with the Test buttons."
+                               TextWrapping="Wrap" Margin="20,4,0,10"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
                     <TextBlock Text="{Binding FlydigiVader5ProStatus}"
                                common:LiveText.Polite="True" Margin="20,0,0,10"
                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"

@@ -3129,8 +3129,45 @@ namespace PadForge.Common.Input
                 ? Volatile.Read(ref feed.HapticFastLevel)
                 : Volatile.Read(ref feed.HapticLevel);
             long levelMs = Volatile.Read(ref feed.HapticLevelMs);
+            if (fast && FlydigiVader5ProHidWriter.EnhancedHapticsEnabled)
+                level = ExpireVaderBurst(feed, level, nowMs);
             return PersonaHapticRumble.Fresh(level, levelMs, nowMs,
                 fast ? PersonaHapticRumble.LowLatencyStaleMs : PersonaHapticRumble.StaleMs);
+        }
+
+        private static long ExpireVaderBurst(AudioPassthroughService.PersonaFeed feed,
+            long pack, long nowMs)
+        {
+            long leftUntil = Volatile.Read(ref feed.HapticFastBurstLeftUntilMs);
+            long rightUntil = Volatile.Read(ref feed.HapticFastBurstRightUntilMs);
+            if ((leftUntil == 0 || nowMs < leftUntil)
+                && (rightUntil == 0 || nowMs < rightUntil))
+                return pack;
+            ushort left = PadForge.Engine.Common.LfeOutputState.Low(pack);
+            ushort right = PadForge.Engine.Common.LfeOutputState.High(pack);
+            if (leftUntil != 0 && nowMs >= leftUntil) left = 0;
+            if (rightUntil != 0 && nowMs >= rightUntil) right = 0;
+            return PadForge.Engine.Common.LfeOutputState.Pack(left, right, 0, 0);
+        }
+
+        /// <summary>Optional high-frequency content for Vader's supplemental
+        /// trigger-motor lane. The physical pad still receives original left/
+        /// right grip haptics, and the trigger lane is only used when no native
+        /// trigger or adaptive-trigger force has been requested.</summary>
+        internal long PersonaHapticHighBandLevel(int slot, long nowMs)
+        {
+            if ((uint)slot >= MaxPads
+                || !FlydigiVader5ProHidWriter.Enabled
+                || !FlydigiVader5ProHidWriter.EnhancedHapticsEnabled
+                || !FlydigiVader5ProHidWriter.SpectralTriggerAssistEnabled)
+                return 0L;
+            var feed = Volatile.Read(ref _personaAudioFeeds[slot]);
+            if (feed == null) return 0L;
+            long level = Volatile.Read(ref feed.HapticFastHighLevel);
+            long at = Volatile.Read(ref feed.HapticLevelMs);
+            level = ExpireVaderBurst(feed, level, nowMs);
+            return PersonaHapticRumble.Fresh(level, at, nowMs,
+                PersonaHapticRumble.LowLatencyStaleMs);
         }
 
         /// <summary><paramref name="raw"/> with the slot's persona haptics

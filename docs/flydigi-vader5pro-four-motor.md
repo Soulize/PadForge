@@ -170,3 +170,140 @@ nonzero changes.
   spin-up and spin-down time. They cannot instantly reproduce the
   native DualSense's voice-coil actuator waveform. The software may
   send the zero immediately and the physical motor may still coast.
+
+## P0/P1/P2 enhanced haptic pipeline (2026-10-30)
+
+Implementation branch: `feat/vader5pro-haptics-p0-p2`. This is intentionally
+independent of the original four-motor working branch until Windows CI and
+physical feedback are checked.
+
+### P0: stop accuracy and short impacts
+
+- **Enhanced DualSense PCM haptics** is enabled within the opt-in Vader
+  four-motor mode by default. Turn it off to restore the previous 8 ms
+  mean-square follower. Non-Vader controllers retain the original follower.
+- Detect **three continuous milliseconds** of samples below the
+  `0.0015` normalized PCM sample floor **per channel**, then discard both
+  amplitude and IIR history for that channel. This avoids treating individual
+  sinusoidal zero crossings as stop instructions. It also avoids the old
+  ~63 ms 8 ms RMS-release tail when the audio actually goes silent.
+- A gap of more than **30 ms** between processed PCM chunks, a nonmonotonic
+  source timestamp, or a sample format/channel-layout change resets the
+  filter state. Silent resumption cannot replay an old amplitude.
+- Max **1 ms bucket RMS** and ordinary window RMS are combined for impact
+  detection. A **1.5 ms attack / 8 ms non-silent release** gives rapid rise
+  without generating a lengthy intentional tail. Left/right state is
+  independent. If an entire short impact begins and ends in one host PCM
+  callback, publish a **10 ms bounded impulse** and force its channel to
+  zero by reader-side expiry even if the audio stream stops sending data.
+- A PCM channel starting or stopping bypasses the usual **10 ms publication**
+  gate. The writer prioritizes individual motor starts and stops using the
+  existing **3 ms minimum inter-report gap**, while ongoing nonzero changes
+  remain under the configurable **10-60 ms** rate control. This is a software
+  scheduling policy, not a promise of 3 ms end-to-end motor response.
+
+### P1: low/high bands and independent four-motor calibration
+
+- The converter computes low and high energies with a **two-pole 180 Hz IIR
+  splitter**, using bounded state and no per-frame heap allocations.
+  Ordinary grip vibration continues to use the complete original left/right
+  PCM envelope. High-band energy is exposed separately for optional
+  supplementation; no arbitrary stereo-to-frequency swap is made.
+- **Settings → Input engine** now contains a 4-row calibration table:
+  **left grip / right grip / left trigger / right trigger**. Every row has
+  its own **Gain (0-200%)**, **Gamma (50-180%, 100%=linear)** and
+  **Floor (0-64/255)** sliders.
+- Factory/default profile `100,100,0` per motor is **identity**: existing
+  motor strength is preserved. Reducing Gamma increases quiet effects;
+  increasing Floor helps motors with a hardware start deadzone, but can
+  make low events harsher. **A zero command is always zero** regardless of
+  Floor, and Gain=0 always silences a channel.
+- All 12 parameters are saved to the application's `AppSettingsData` XML
+  as `FlydigiVader5ProMotorCalibrationCsv`, a semicolon-separated sequence
+  of `gain,gamma,floor` triples in GL/GR/TL/TR order. Invalid data fails to
+  four identity curves; out-of-range integers are clamped.
+- Calibration also affects the Settings page's four separate motor **Test**
+  pulses, so each physical output can be tuned directly. Profile snapshots
+  are immutable on the 1 kHz producer; the HID writer never reads an
+  incompletely updated four-motor profile.
+
+### P2: multi-source arbitration with native-trigger priority
+
+- Game/native rumble, macros and constant force continue through the
+  existing per-device gain/priority stack, including grip max-combine.
+- Native impulse triggers, routed trigger feedback and translated
+  DualSense adaptive trigger vibration keep full priority.
+- **Optional high-frequency PCM trigger assist** is disabled by default.
+  When enabled, high-band energy contributes at **35%** through the existing
+  per-device trigger strength chain **only where that individual native
+  trigger channel is idle**. This assists texture on four amplitude
+  motors without overriding an authored trigger event. It never remaps
+  left PCM to right motors.
+- When the physical pad is not entitled to persona haptics (e.g. another
+  device renders them directly), the supplemental PCM route is also
+  suppressed. On firmware that cannot cleanly sustain the optional
+  spectral route, leave assist off.
+
+### Automated acceptance and hardware qualification
+
+The GitHub workflow `.github/workflows/vader5pro-four-motor.yml` builds
+Windows x64 and publishes a portable application artifact after
+`Vader5ProEnhancedHapticsTests` plus the old Vader, persona, bass-shaker,
+PCM-ownership and trigger-fold regression suites.
+
+| Software criterion | Test / expectation |
+|---|---|
+| 80 Hz sustained sine | Never stopped by individual zero crossings |
+| Per-channel stop | 5 ms all-zero PCM frame independently zeroes motor |
+| 5 ms impact | Detectable envelope above 25k/65535 |
+| Reopen after >30 ms gap | No stale phantom amplitude |
+| PCM sample-rate/layout change | Previous filter state cleared |
+| 80 Hz vs 700 Hz | Distinct low/high band-energy ordering |
+| Four motor calibration | Identity at defaults, monotone output, zero stays zero |
+| Mixed native + spectral triggers | Native force wins per channel; assist opt-in |
+| HID start/stop transitions | 3 ms priority gap; steady changes keep normal pacing |
+| XML persistence | Round-trip of toggles and 12 calibration numbers |
+
+**Not measurable in GitHub CI:** actual controller spin-up/spin-down
+latency, HID/receiver firmware queue capacity, 2.4 GHz jitter, and the
+mechanical onset or tail of the four motors. Do not label software timing
+targets as achieved physical latency. Qualify **10/15/20/30 ms** cadences
+on USB-C with USB tracing and physical response measurements before
+changing the conservative 30 ms normal-update default. Compare the same
+synthetic waveform through SDL/XInput and the native `0x12` path.
+
+
+## Quiet-texture fidelity adjustment (2026-10-30)
+
+A real-controller comparison found frequent gentle DualSense cues (footsteps,
+cloth/fabric movement) could emerge from Xbox-style amplitude motors as
+unpleasant hard, repeated kicks. The prior fast renderer used
+`max(full-window RMS, 0.85 * 1ms peak RMS) * 1.4` for **every** event,
+classified **every** callback-contained signal as a 10ms impact, and used
+1.5ms attack regardless of authored intensity. A low Gamma setting
+further magnifies quiet signals.
+
+This update separates the two signal classes **before** motor calibration:
+
+- **Quiet texture:** proportionate full-window RMS; no blanket 1.4x gain or
+  peak-RMS boost; no forceful 10ms impact hold. A genuine nonzero short
+  texture can receive a bounded 6ms soft pulse; a sustained weak cue has a
+  gentle ~12ms attack. Amplitude floor lowered to 0.4% to preserve low-level
+  detail without a high minimum motor command.
+- **Genuine impact:** optional smoothly gated 1ms peak contribution only
+  above a significant absolute peak and crest factor. A callback-contained
+  strong impact retains the previous 10ms bounded pulse and fast 1.5ms
+  attack. Per-channel 3ms confirmed silence, 30ms gap-reset and urgent
+  start/stop HID report rules remain unchanged.
+- **Calibration:** reset both grip Gamma sliders to **100-120%** and Floor
+  to 0 when assessing gentle texture. Gamma under 100% intentionally boosts
+  weak levels and may reintroduce forceful tactile starts. Compare the new
+  algorithm to the legacy follower with Enhanced PCM on/off. Do not rely on
+  10ms test pulses to infer actual mechanical stopping performance.
+
+Regression tests cover continuous low-amplitude tones, isolated 3ms weak
+textures and **30 repeated footsteps**, all with output strictly below 10%
+of maximum rumble, plus preserved strong impact and 10ms strong-event hold.
+No claim of DualSense LRA waveform equivalence is made: four conventional
+amplitude motors may have a physical start threshold and cannot reproduce
+fine voice-coil textures exactly.
