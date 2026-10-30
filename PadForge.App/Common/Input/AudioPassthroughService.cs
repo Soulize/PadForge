@@ -1659,10 +1659,10 @@ namespace PadForge.Common.Input
             // the original 20 ms follower unchanged.
             public readonly Vader5ProHapticConverter VaderConverter = new();
             public long HapticLevel, HapticFastLevel, HapticFastHighLevel, HapticLevelMs;
-            // Hard-expiring one-callback impulses: a short 5ms PCM pulse
-            // must not vanish inside a 20ms callback, nor vibrate for 50ms
-            // waiting for the normal stale-audio watchdog.
-            public long HapticFastBurstLeftUntilMs, HapticFastBurstRightUntilMs;
+            // Bounded PCM pulses wholly inside an audio callback expire
+            // after their observed duration; no synthetic strong kick/tail.
+            // The latest sample is still the only value sent to the HID worker.
+            public long HapticFastPulseLeftUntilMs, HapticFastPulseRightUntilMs;
             // Speaker-out resampler state + scratch (pacing thread only).
             public double SpkPhase;
             public readonly float[] SpkCarry = new float[2];
@@ -2149,7 +2149,7 @@ namespace PadForge.Common.Input
                 ref feed.HapticMeanSquareL, ref feed.HapticMeanSquareR,
                 span, stride, feed.HapL * 2, feed.HapR * 2, feed.SrcRate);
             long fastLevel = 0L, highLevel = 0L;
-            long burstLeftUntil = 0, burstRightUntil = 0;
+            long pulseLeftUntil = 0, pulseRightUntil = 0;
             if (FlydigiVader5ProHidWriter.Enabled)
             {
                 if (FlydigiVader5ProHidWriter.EnhancedHapticsEnabled)
@@ -2160,14 +2160,13 @@ namespace PadForge.Common.Input
                         frame.Left, frame.Right, 0, 0);
                     highLevel = PadForge.Engine.Common.LfeOutputState.Pack(
                         frame.HighLeft, frame.HighRight, 0, 0);
-                    if ((frame.BurstMask & 1) != 0)
-                        burstLeftUntil = nowMs + Vader5ProHapticConverter.TransientBurstHoldMs;
-                    else if ((frame.TextureMask & 1) != 0)
-                        burstLeftUntil = nowMs + Vader5ProHapticConverter.TextureHoldMs;
-                    if ((frame.BurstMask & 2) != 0)
-                        burstRightUntil = nowMs + Vader5ProHapticConverter.TransientBurstHoldMs;
-                    else if ((frame.TextureMask & 2) != 0)
-                        burstRightUntil = nowMs + Vader5ProHapticConverter.TextureHoldMs;
+                    // Only an impact that began and ended within this one
+                    // callback needs a replay deadline. Duration comes from
+                    // the *observed* non-silent span, not an artificial 6/10ms.
+                    if (frame.PulseLeftMs != 0)
+                        pulseLeftUntil = nowMs + frame.PulseLeftMs;
+                    if (frame.PulseRightMs != 0)
+                        pulseRightUntil = nowMs + frame.PulseRightMs;
                     feed.HapticFastMeanSquareL = 0;
                     feed.HapticFastMeanSquareR = 0;
                 }
@@ -2202,8 +2201,8 @@ namespace PadForge.Common.Input
             // Spectral and amplitude packs have one common freshness marker.
             System.Threading.Volatile.Write(ref feed.HapticLevelMs, nowMs);
             System.Threading.Volatile.Write(ref feed.HapticLevel, level);
-            System.Threading.Volatile.Write(ref feed.HapticFastBurstLeftUntilMs, burstLeftUntil);
-            System.Threading.Volatile.Write(ref feed.HapticFastBurstRightUntilMs, burstRightUntil);
+            System.Threading.Volatile.Write(ref feed.HapticFastPulseLeftUntilMs, pulseLeftUntil);
+            System.Threading.Volatile.Write(ref feed.HapticFastPulseRightUntilMs, pulseRightUntil);
             System.Threading.Volatile.Write(ref feed.HapticFastHighLevel, highLevel);
             System.Threading.Volatile.Write(ref feed.HapticFastLevel, fastLevel);
         }

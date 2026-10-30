@@ -77,5 +77,68 @@ namespace PadForge.Views
             if (dlg.ShowDialog() == true)
                 vm.SteamVrInstallDir = dlg.FolderName;
         }
+
+        // Portable actuator-response calibration, intentionally separate
+        // from game profiles and the global PadForge.xml settings backup.
+        private void ExportVaderFidelity_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (DataContext is not PadForge.ViewModels.SettingsViewModel) return;
+            var dlg = new Microsoft.Win32.SaveFileDialog
+            {
+                Title = "Export Vader 5 Pro Fidelity calibration",
+                FileName = "PadForge-Vader5Pro-Fidelity.json",
+                DefaultExt = ".json",
+                Filter = "Fidelity calibration (*.json)|*.json"
+            };
+            if (dlg.ShowDialog() != true) return;
+            try
+            {
+                string json = PadForge.Common.Input.Vader5ProFidelityCalibrationFile.Export(
+                    PadForge.Common.Input.Vader5ProMotorResponseLut.Current,
+                    PadForge.Common.Input.Vader5ProFidelitySettings.CurrentBands,
+                    PadForge.Common.Input.Vader5ProMotorCalibration.Current);
+                System.IO.File.WriteAllText(dlg.FileName, json);
+            }
+            catch (System.Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "Calibration export failed",
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
+        }
+
+        private void ImportVaderFidelity_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (DataContext is not PadForge.ViewModels.SettingsViewModel vm) return;
+            var dlg = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = "Import Vader 5 Pro Fidelity calibration",
+                Filter = "Fidelity calibration (*.json)|*.json|All files (*.*)|*.*",
+                CheckFileExists = true
+            };
+            if (dlg.ShowDialog() != true) return;
+            try
+            {
+                string json = System.IO.File.ReadAllText(dlg.FileName);
+                if (!PadForge.Common.Input.Vader5ProFidelityCalibrationFile.TryImport(
+                    json, out var luts, out var bands, out var gains, out string error))
+                {
+                    System.Windows.MessageBox.Show(error, "Invalid calibration",
+                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                    return;
+                }
+                // Apply only after the complete JSON document has validated.
+                vm.FlydigiVader5ProMotorCalibrationCsv =
+                    PadForge.Common.Input.Vader5ProMotorCalibration.ToCsv(gains);
+                vm.FlydigiVader5ProBandWeightsCsv =
+                    PadForge.Common.Input.Vader5ProFidelitySettings.ToCsv(bands);
+                vm.FlydigiVader5ProMotorLutCsv =
+                    PadForge.Common.Input.Vader5ProMotorResponseLut.ToCsv(luts);
+            }
+            catch (System.Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "Calibration import failed",
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
+        }
     }
 }

@@ -165,8 +165,11 @@ namespace PadForge.Common.Input
             var calibrated = Vader5ProMotorCalibration.Apply(
                 gripLeft, gripRight, triggerLeft, triggerRight,
                 Vader5ProMotorCalibration.Current);
-            var next = new Motors(calibrated.GripLeft, calibrated.GripRight,
-                calibrated.TriggerLeft, calibrated.TriggerRight);
+            // The profile LUT is the final actuator-response inversion:
+            // desired perceived intensity -> native HID drive byte. Identity
+            // until measured, so we never fabricate calibration values.
+            var next = Vader5ProMotorResponseLut.Apply(
+                calibrated, Vader5ProMotorResponseLut.Current);
             bool changed;
             lock (StateGate)
             {
@@ -295,19 +298,19 @@ namespace PadForge.Common.Input
                 _ => default,
             };
 
-        internal static bool PulseTestMotor(int channel)
+        internal static bool PulseTestMotor(int channel, byte strength = 160)
         {
             if (!Enabled || channel < 0 || channel > 3) return false;
             lock (StateGate)
             {
                 if (!Enabled) return false;
-                var raw = TestPattern(channel);
+                var raw = TestPattern(channel, strength);
                 var tuned = Vader5ProMotorCalibration.Apply(
                     (ushort)(raw.GripLeft * 257), (ushort)(raw.GripRight * 257),
                     (ushort)(raw.TriggerLeft * 257), (ushort)(raw.TriggerRight * 257),
                     Vader5ProMotorCalibration.Current);
-                _testMotors = new Motors(tuned.GripLeft, tuned.GripRight,
-                    tuned.TriggerLeft, tuned.TriggerRight);
+                _testMotors = Vader5ProMotorResponseLut.Apply(
+                    tuned, Vader5ProMotorResponseLut.Current);
                 _testUntilAt = Clock() + 400;
             }
             Wake.Set();
@@ -340,8 +343,9 @@ namespace PadForge.Common.Input
         /// <summary>Relative delay until the absolute report deadline.
         /// -1: no write needed for two matching zero reports. Other
         /// matching values refresh only at the 500 ms keepalive. An
-        /// urgent zero edge uses a bounded 3 ms gap; all other changes
-        /// obey the configured 10..60 ms cadence.</summary>
+        /// urgent stop/start edges use a bounded 3 ms report gap. A shorter
+        /// native report gap is a scheduler goal, not actuator stop latency;
+        /// the receiver firmware may still coalesce extremely brief pulses.</summary>
         internal static int DelayUntilReport(Motors lastSent, Motors desired,
             long now, long lastWrite, bool hasSent, int intervalMs,
             bool urgentStarts = false)

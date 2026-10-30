@@ -635,6 +635,19 @@ namespace PadForge
                      or nameof(SettingsViewModel.BatteryNotifyVibrate)
                      or nameof(SettingsViewModel.KeepHidHideCloaksBetweenLaunches)
                      or nameof(SettingsViewModel.FlydigiEnhancedProtocol)
+                     // The Vader settings intentionally live in SettingsVM,
+                     // not PadVM. Persist every real value (including CSV
+                     // proxies notified by each curve/LUT editor), otherwise
+                     // shutdown-only saves can silently drop user calibration.
+                     or nameof(SettingsViewModel.FlydigiVader5ProFourMotorEnabled)
+                     or nameof(SettingsViewModel.FlydigiVader5ProOutputIntervalMs)
+                     or nameof(SettingsViewModel.FlydigiVader5ProEnhancedHapticsEnabled)
+                     or nameof(SettingsViewModel.FlydigiVader5ProSpectralTriggerAssist)
+                     or nameof(SettingsViewModel.FlydigiVader5ProMotorCalibrationCsv)
+                     or nameof(SettingsViewModel.FlydigiVader5ProTransientEnhancement)
+                     or nameof(SettingsViewModel.FlydigiVader5ProBandWeightsCsv)
+                     or nameof(SettingsViewModel.FlydigiVader5ProMotorLutCsv)
+                     or nameof(SettingsViewModel.FlydigiVader5ProTestStrength)
                      or nameof(SettingsViewModel.GKeysEnabled)
                      or nameof(SettingsViewModel.AnalogKeyboardsEnabled)
                      or nameof(SettingsViewModel.BlissBoxEnabled)

@@ -4,37 +4,35 @@ using System.Threading;
 namespace PadForge.Common.Input
 {
     /// <summary>
-    /// Vader 5 Pro-only PCM to amplitude conversion. No haptic samples are
-    /// buffered for playback: each call reduces the current audio frame.
-    /// Stereo location is retained; spectral information is an optional
-    /// supplementary trigger source and never replaces native trigger data.
-    /// All state is owned by a single PersonaFeed callback gate.
+    /// DualSense Fidelity: source-faithful PCM amplitude estimation for the
+    /// Vader's amplitude-only motors. No default crest boost, arbitrary
+    /// 6/10-ms pulses, gamma expansion or nonzero release tail.
+    ///
+    /// This estimates an output motor command, NOT the physical DualSense
+    /// voice-coil displacement. Frequency response can only be corrected
+    /// after calibration with measured actuator responses.
     /// </summary>
     internal sealed class Vader5ProHapticConverter
     {
         internal const int SilenceConfirmMs = 3;
         internal const int GapResetMs = 30;
-        internal const int SpectralCutoffHz = 180;
+        internal const int LowBandHz = 120;
+        internal const int HighBandHz = 400;
         private const double SilenceSampleFloor = 0.0015;
-        // Keep soft authored details. The old 2% cut-off made almost-silent
-        // texture disappear and forced users to overboost Gamma/Floor.
         private const double OutputFloor = 0.004;
-        private const double ImpactPeakThreshold = 0.18;
-        private const double ImpactAmplitudeThreshold = 0.10;
 
-        internal const int TransientBurstHoldMs = 10;
-        internal const int TextureHoldMs = 6;
-        internal readonly record struct Frame(ushort Left, ushort Right,
-            ushort HighLeft, ushort HighRight, ushort LowLeft, ushort LowRight,
-            byte BurstMask, byte TextureMask);
+        internal readonly record struct Frame(
+            ushort Left, ushort Right, ushort HighLeft, ushort HighRight,
+            ushort LowLeft, ushort LowRight,
+            byte PulseLeftMs, byte PulseRightMs);
 
         private struct Channel
         {
             public double Envelope;
             public double HighEnvelope;
             public double LowEnvelope;
-            public double LowPass1;
-            public double LowPass2;
+            public double LowPole1, LowPole2;
+            public double MidPole1, MidPole2;
             public int SilentFrames;
         }
 
@@ -50,8 +48,12 @@ namespace PadForge.Common.Input
             _lastTimeMs = -1;
         }
 
+        /// <summary>Calls are serialized by the owning PersonaFeed callback.
+        /// Test overrides do not mutate process-wide calibration values.</summary>
         internal Frame Process(ReadOnlySpan<byte> pcm, int stride,
-            int leftOffset, int rightOffset, int rateHz, long nowMs)
+            int leftOffset, int rightOffset, int rateHz, long nowMs,
+            Vader5ProFidelitySettings.BandWeights weights = null,
+            bool? transientEnhancement = null)
         {
             if (stride < 4 || rateHz < 1000 || leftOffset < 0
                 || rightOffset < 0 || leftOffset + 2 > stride
@@ -61,8 +63,6 @@ namespace PadForge.Common.Input
                 return default;
             }
 
-            // State from a closed/reopened stream must not generate a phantom
-            // pulse. Format changes include channel routing, not just sample rate.
             if (_lastTimeMs >= 0 && (nowMs < _lastTimeMs
                 || nowMs - _lastTimeMs > GapResetMs
                 || rateHz != _rate || stride != _stride
@@ -77,17 +77,28 @@ namespace PadForge.Common.Input
 
             int frames = pcm.Length / stride;
             if (frames == 0) return default;
-            int bucketSize = Math.Max(1, rateHz / 1000); // 1 ms peak-RMS buckets
+            weights ??= Vader5ProFidelitySettings.CurrentBands;
+            bool boost = transientEnhancement
+                ?? Vader5ProFidelitySettings.TransientEnhancementEnabled;
+
+            int bucketSize = Math.Max(1, rateHz / 1000);
             int bucketCount = 0;
             double bucketL = 0, bucketR = 0, peakL = 0, peakR = 0;
-            double energyL = 0, energyR = 0, highEnergyL = 0, highEnergyR = 0;
+            double energyL = 0, energyR = 0;
             double lowEnergyL = 0, lowEnergyR = 0;
-            double alpha = 1.0 - Math.Exp(-2.0 * Math.PI * SpectralCutoffHz / rateHz);
+            double midEnergyL = 0, midEnergyR = 0;
+            double highEnergyL = 0, highEnergyR = 0;
+            double alphaLow = 1.0 - Math.Exp(-2.0 * Math.PI * LowBandHz / rateHz);
+            double alphaHigh = 1.0 - Math.Exp(-2.0 * Math.PI * HighBandHz / rateHz);
             int silenceFrames = Math.Max(1, rateHz * SilenceConfirmMs / 1000);
-            bool leftWasIdle = _left.Envelope < OutputFloor;
-            bool rightWasIdle = _right.Envelope < OutputFloor;
+            bool idleL = _left.Envelope < OutputFloor;
+            bool idleR = _right.Envelope < OutputFloor;
 
-            for (int i = 0; i < frames; ++i)
+            // Use active sample COUNT rather than first-to-last span:
+            // separate small taps in the same callback must not fill their
+            // intervening silence with an invented long motor command.
+            int activeL = 0, activeR = 0;
+            for (int i = 0; i < frames; i++)
             {
                 int offset = i * stride;
                 double l = (short)(pcm[offset + leftOffset]
@@ -96,148 +107,153 @@ namespace PadForge.Common.Input
                     | (pcm[offset + rightOffset + 1] << 8)) / 32768.0;
                 double le = l * l, re = r * r;
                 energyL += le; energyR += re;
-                bucketL += le; bucketR += re;
-                bucketCount++;
 
-                highEnergyL += Step(ref _left, l, alpha, silenceFrames, out double lowSampleL);
-                highEnergyR += Step(ref _right, r, alpha, silenceFrames, out double lowSampleR);
-                lowEnergyL += lowSampleL;
-                lowEnergyR += lowSampleR;
+                if (Math.Abs(l) > SilenceSampleFloor) activeL++;
+                if (Math.Abs(r) > SilenceSampleFloor) activeR++;
 
-                if (bucketCount >= bucketSize)
+                highEnergyL += Step(ref _left, l, alphaLow, alphaHigh,
+                    silenceFrames, out double lowL, out double midL);
+                highEnergyR += Step(ref _right, r, alphaLow, alphaHigh,
+                    silenceFrames, out double lowR, out double midR);
+                lowEnergyL += lowL; lowEnergyR += lowR;
+                midEnergyL += midL; midEnergyR += midR;
+
+                // Evaluate peak buckets only if explicitly opting in to
+                // extra impact emphasis; default Fidelity pays no peak cost.
+                if (boost)
                 {
-                    peakL = Math.Max(peakL, Math.Sqrt(bucketL / bucketCount));
-                    peakR = Math.Max(peakR, Math.Sqrt(bucketR / bucketCount));
-                    bucketL = bucketR = 0;
-                    bucketCount = 0;
+                    bucketL += le; bucketR += re; bucketCount++;
+                    if (bucketCount >= bucketSize)
+                    {
+                        peakL = Math.Max(peakL, Math.Sqrt(bucketL / bucketCount));
+                        peakR = Math.Max(peakR, Math.Sqrt(bucketR / bucketCount));
+                        bucketL = bucketR = 0;
+                        bucketCount = 0;
+                    }
                 }
             }
-            if (bucketCount >= Math.Max(1, bucketSize / 2))
+            if (boost && bucketCount >= Math.Max(1, bucketSize / 2))
             {
                 peakL = Math.Max(peakL, Math.Sqrt(bucketL / bucketCount));
                 peakR = Math.Max(peakR, Math.Sqrt(bucketR / bucketCount));
             }
 
-            // Quiet texture uses its actual whole-callback RMS. Formerly
-            // max(RMS, 0.85 * 1ms peak) * 1.4 promoted fine cloth/footstep
-            // taps to full transient bursts. Only a concentrated, sufficiently
-            // loud impact earns a smoothly gated peak contribution.
-            double immediateL = ShapeAmplitude(Math.Sqrt(energyL / frames), peakL);
-            double immediateR = ShapeAmplitude(Math.Sqrt(energyR / frames), peakR);
-            double highL = Math.Min(1.0, Math.Sqrt(highEnergyL / frames));
-            double highR = Math.Min(1.0, Math.Sqrt(highEnergyR / frames));
-            double lowL = Math.Min(1.0, Math.Sqrt(lowEnergyL / frames));
-            double lowR = Math.Min(1.0, Math.Sqrt(lowEnergyR / frames));
-            double seconds = frames / (double)rateHz;
-            // A pulse can begin and end inside a single audio callback.
-            // Real impacts keep their existing fast 10ms hold. Quiet texture
-            // stays quiet: publish its proportional window RMS for at most
-            // 6ms rather than creating a 10ms hard kick on every footstep.
-            bool pulseL = leftWasIdle && _left.SilentFrames >= silenceFrames
-                && immediateL >= OutputFloor;
-            bool pulseR = rightWasIdle && _right.SilentFrames >= silenceFrames
-                && immediateR >= OutputFloor;
-            bool burstL = pulseL && peakL >= ImpactPeakThreshold
-                && immediateL >= ImpactAmplitudeThreshold;
-            bool burstR = pulseR && peakR >= ImpactPeakThreshold
-                && immediateR >= ImpactAmplitudeThreshold;
-            bool textureL = pulseL && !burstL;
-            bool textureR = pulseR && !burstR;
-            UpdateEnvelope(ref _left, immediateL, highL, lowL, seconds, silenceFrames);
-            UpdateEnvelope(ref _right, immediateR, highR, lowR, seconds, silenceFrames);
-
-            return new Frame(
-                ToLevel(pulseL ? immediateL : _left.Envelope),
-                ToLevel(pulseR ? immediateR : _right.Envelope),
-                ToLevel(pulseL ? highL : _left.HighEnvelope),
-                ToLevel(pulseR ? highR : _right.HighEnvelope),
-                ToLevel(pulseL ? lowL : _left.LowEnvelope),
-                ToLevel(pulseR ? lowR : _right.LowEnvelope),
-                (byte)((burstL ? 1 : 0) | (burstR ? 2 : 0)),
-                (byte)((textureL ? 1 : 0) | (textureR ? 2 : 0)));
-        }
-
-        private static double Step(ref Channel state, double value,
-            double alpha, int silenceFrames, out double lowEnergy)
-        {
-            if (Math.Abs(value) <= SilenceSampleFloor)
+            double rawRmsL = Math.Sqrt(energyL / frames);
+            double rawRmsR = Math.Sqrt(energyR / frames);
+            double levelL = Vader5ProFidelitySettings.PerceptualRms(
+                energyL / frames, lowEnergyL / frames,
+                midEnergyL / frames, highEnergyL / frames, weights);
+            double levelR = Vader5ProFidelitySettings.PerceptualRms(
+                energyR / frames, lowEnergyR / frames,
+                midEnergyR / frames, highEnergyR / frames, weights);
+            if (boost)
             {
-                if (state.SilentFrames < silenceFrames)
-                    state.SilentFrames++;
+                levelL = Math.Min(1.0, levelL
+                    + Math.Max(0.0, PeakEnhanced(rawRmsL, peakL) - rawRmsL));
+                levelR = Math.Min(1.0, levelR
+                    + Math.Max(0.0, PeakEnhanced(rawRmsR, peakR) - rawRmsR));
             }
+
+            double highL = Math.Sqrt(highEnergyL / frames);
+            double highR = Math.Sqrt(highEnergyR / frames);
+            double lowBandL = Math.Sqrt(lowEnergyL / frames);
+            double lowBandR = Math.Sqrt(lowEnergyR / frames);
+
+            // If audio started and went silent within one callback, preserve
+            // its proportional RMS and its observed non-silent span. A pulse
+            // cannot be replayed retroactively at sample accuracy: the
+            // vendor command is one amplitude byte, so only the measured
+            // duration is represented (minimum 3 ms for the HID edge gap).
+            // Do not synthesize a constant 10 ms "impact" from a brief cue.
+            bool endedL = _left.SilentFrames >= silenceFrames;
+            bool endedR = _right.SilentFrames >= silenceFrames;
+            bool pulseL = idleL && endedL && activeL > 0 && levelL >= OutputFloor;
+            bool pulseR = idleR && endedR && activeR > 0 && levelR >= OutputFloor;
+            byte pulseLeftMs = pulseL ? PulseDuration(activeL, rateHz) : (byte)0;
+            byte pulseRightMs = pulseR ? PulseDuration(activeR, rateHz) : (byte)0;
+
+            if (endedL) _left = default;
             else
             {
-                state.SilentFrames = 0;
+                // Zero additional attack/release envelope in Fidelity mode.
+                // Do not mask quiet texture under an invented slow attack.
+                _left.Envelope = levelL;
+                _left.HighEnvelope = highL;
+                _left.LowEnvelope = lowBandL;
+            }
+            if (endedR) _right = default;
+            else
+            {
+                _right.Envelope = levelR;
+                _right.HighEnvelope = highR;
+                _right.LowEnvelope = lowBandR;
             }
 
-            // Two-pole IIR low-pass; the residual is the high band.
-            // Unlike an 83 ms pitch-detection ring, this introduces no
-            // audio-history-sized output delay and allocates nothing per tick.
-            state.LowPass1 += alpha * (value - state.LowPass1);
-            state.LowPass2 += alpha * (state.LowPass1 - state.LowPass2);
-            double high = value - state.LowPass2;
-            lowEnergy = state.LowPass2 * state.LowPass2;
+            return new Frame(
+                ToLevel(pulseL ? levelL : _left.Envelope),
+                ToLevel(pulseR ? levelR : _right.Envelope),
+                ToLevel(pulseL ? highL : _left.HighEnvelope),
+                ToLevel(pulseR ? highR : _right.HighEnvelope),
+                ToLevel(pulseL ? lowBandL : _left.LowEnvelope),
+                ToLevel(pulseR ? lowBandR : _right.LowEnvelope),
+                pulseLeftMs, pulseRightMs);
+        }
+
+        private static byte PulseDuration(int activeSamples, int rateHz)
+        {
+            long duration = ((long)activeSamples * 1000 + rateHz - 1) / rateHz;
+            return (byte)Math.Clamp(duration,
+                FlydigiVader5ProHidWriter.StopEdgeMinIntervalMs, byte.MaxValue);
+        }
+
+        private static double Step(ref Channel state, double input,
+            double alphaLow, double alphaHigh, int silenceFrames,
+            out double lowEnergy, out double midEnergy)
+        {
+            if (Math.Abs(input) <= SilenceSampleFloor)
+            {
+                if (state.SilentFrames < silenceFrames) state.SilentFrames++;
+            }
+            else state.SilentFrames = 0;
+
+            // Low <~120 Hz, mid ~120-400 Hz, high >~400 Hz.
+            // These are low-latency crossovers, not pitch detection; each
+            // branch is normalized by total band energy before weighting.
+            state.LowPole1 += alphaLow * (input - state.LowPole1);
+            state.LowPole2 += alphaLow * (state.LowPole1 - state.LowPole2);
+            state.MidPole1 += alphaHigh * (input - state.MidPole1);
+            state.MidPole2 += alphaHigh * (state.MidPole1 - state.MidPole2);
+            double low = state.LowPole2;
+            double mid = state.MidPole2 - state.LowPole2;
+            double high = input - state.MidPole2;
+            lowEnergy = low * low;
+            midEnergy = mid * mid;
             return high * high;
         }
 
-        private static void UpdateEnvelope(ref Channel state, double target,
-            double highTarget, double lowTarget, double seconds, int silenceFrames)
+        /// <summary>Only called for explicit, opt-in "Impact boost".</summary>
+        private static double PeakEnhanced(double rms, double peak)
         {
-            if (state.SilentFrames >= silenceFrames)
-            {
-                // A real sustained silent interval is a stop command, not
-                // another point in an exponentially decaying RMS tail.
-                state = default;
-                return;
-            }
-            state.Envelope = Follow(state.Envelope, target, seconds);
-            state.HighEnvelope = Follow(state.HighEnvelope, highTarget, seconds);
-            state.LowEnvelope = Follow(state.LowEnvelope, lowTarget, seconds);
+            double a = SmoothStep(0.12, 0.35, peak);
+            double b = SmoothStep(1.25, 1.9, peak / (rms + 0.0001));
+            return Math.Clamp(rms + Math.Max(0.0, peak * 0.85 - rms) * a * b,
+                0.0, 1.0);
         }
 
-        /// <summary>Transient boost only for a genuine loud, concentrated
-        /// event. Zero gain for faint PCM irrespective of the crest factor.
-        /// Both gates are smooth to avoid a new audible/tactile step.</summary>
-        private static double ShapeAmplitude(double rms, double oneMsPeak)
+        private static double SmoothStep(double low, double high, double x)
         {
-            double peakGate = SmoothStep(0.12, 0.35, oneMsPeak);
-            double crestGate = SmoothStep(1.25, 1.9,
-                oneMsPeak / (rms + 0.0001));
-            double impactContribution = Math.Max(0.0, oneMsPeak * 0.85 - rms)
-                * peakGate * crestGate;
-            return Math.Clamp(rms + impactContribution, 0.0, 1.0);
-        }
-
-        private static double SmoothStep(double min, double max, double value)
-        {
-            double x = Math.Clamp((value - min) / (max - min), 0.0, 1.0);
-            return x * x * (3.0 - 2.0 * x);
-        }
-
-        private static double Follow(double current, double target, double seconds)
-        {
-            // The old unconditional 1.5 ms attack accentuated each small
-            // fabric/footstep cue. Gentle haptics ramp without losing the
-            // rapid rise of high-energy impacts.
-            double attack = target <= 0.12 ? 0.012 :
-                target >= 0.30 ? 0.0015 :
-                0.012 - (target - 0.12) / 0.18 * 0.0105;
-            const double release = 0.008;
-            double tau = target >= current ? attack : release;
-            return Math.Clamp(current + (target - current)
-                * (1.0 - Math.Exp(-seconds / tau)), 0.0, 1.0);
+            double t = Math.Clamp((x - low) / (high - low), 0.0, 1.0);
+            return t * t * (3.0 - 2.0 * t);
         }
 
         private static ushort ToLevel(double amplitude)
             => amplitude < OutputFloor ? (ushort)0
-                : (ushort)Math.Clamp((int)Math.Round(amplitude * 65535.0), 0, 65535);
+                : (ushort)Math.Clamp((int)Math.Round(amplitude * 65535.0),
+                    0, 65535);
     }
 
-    /// <summary>
-    /// Per-motor 8-bit calibration, applied only to the native 0x12 writer.
-    /// Defaults are identity; a zero intent stays zero even with a drive floor.
-    /// A single immutable profile snapshot avoids tearing on the HID worker.
-    /// </summary>
+    /// <summary>Legacy gain/gamma/floor controls retained for compatibility.
+    /// Leave at 100/100/0 for fidelity, then tune device response with LUT.</summary>
     internal static class Vader5ProMotorCalibration
     {
         internal readonly record struct Curve(int GainPercent, int GammaPercent, int MinDrive);
