@@ -1,15 +1,17 @@
-name: Vader 5 Pro P0-P2 haptics - Windows verification
+name: Vader 5 Pro DualSense Fidelity - Windows verification
 
 on:
   push:
     branches:
       - feat/vader5pro-four-motor-hid
       - feat/vader5pro-haptics-p0-p2
+      - feat/vader5pro-dualsense-fidelity
     paths:
       - 'PadForge.App/**'
       - 'PadForge.Engine/**'
       - 'PadForge.Tests/**'
       - 'docs/flydigi-vader5pro-four-motor.md'
+      - 'docs/vader5pro-dualsense-fidelity.md'
       - '.github/workflows/vader5pro-four-motor.yml'
   pull_request:
     branches:
@@ -49,7 +51,7 @@ jobs:
       - name: Run Vader 5 Pro, persona haptics and bass-shaker regression tests
         shell: pwsh
         run: |
-          dotnet test PadForge.Tests/PadForge.Tests.csproj -c Release --filter "FullyQualifiedName~FlydigiVader5ProFourMotorTests|FullyQualifiedName~PersonaHapticRumbleTests|FullyQualifiedName~BassShakerPersonaHapticsTests|FullyQualifiedName~Vader5ProEnhancedHapticsTests|FullyQualifiedName~HapticPcmOwnershipTests|FullyQualifiedName~TriggerRumbleFoldTests" --logger "trx;LogFileName=vader5pro-tests.trx" --results-directory TestResults
+          dotnet test PadForge.Tests/PadForge.Tests.csproj -c Release --filter "FullyQualifiedName~FlydigiVader5ProFourMotorTests|FullyQualifiedName~PersonaHapticRumbleTests|FullyQualifiedName~BassShakerPersonaHapticsTests|FullyQualifiedName~Vader5ProEnhancedHapticsTests|FullyQualifiedName~Vader5ProFidelityTests|FullyQualifiedName~HapticPcmOwnershipTests|FullyQualifiedName~TriggerRumbleFoldTests" --logger "trx;LogFileName=vader5pro-tests.trx" --results-directory TestResults
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Publish PadForge for Windows x64
@@ -62,14 +64,14 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Vader5Pro-P0-P2-test-results
+          name: Vader5Pro-Fidelity-test-results
           path: TestResults/**/*.trx
           if-no-files-found: warn
 
       - name: Upload Windows x64 application
         uses: actions/upload-artifact@v4
         with:
-          name: PadForge-Vader5Pro-P0-P2-Windows-x64
+          name: PadForge-Vader5Pro-Fidelity-Windows-x64
           path: PadForge.App/bin/Release/net10.0-windows10.0.26100.0/win-x64/publish/
           if-no-files-found: error
           retention-days: 14
