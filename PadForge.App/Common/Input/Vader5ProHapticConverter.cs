@@ -19,12 +19,13 @@ namespace PadForge.Common.Input
         private const double OutputFloor = 0.02;
 
         internal readonly record struct Frame(ushort Left, ushort Right,
-            ushort HighLeft, ushort HighRight);
+            ushort HighLeft, ushort HighRight, ushort LowLeft, ushort LowRight);
 
         private struct Channel
         {
             public double Envelope;
             public double HighEnvelope;
+            public double LowEnvelope;
             public double LowPass1;
             public double LowPass2;
             public int SilentFrames;
@@ -73,6 +74,7 @@ namespace PadForge.Common.Input
             int bucketCount = 0;
             double bucketL = 0, bucketR = 0, peakL = 0, peakR = 0;
             double energyL = 0, energyR = 0, highEnergyL = 0, highEnergyR = 0;
+            double lowEnergyL = 0, lowEnergyR = 0;
             double alpha = 1.0 - Math.Exp(-2.0 * Math.PI * SpectralCutoffHz / rateHz);
             int silenceFrames = Math.Max(1, rateHz * SilenceConfirmMs / 1000);
 
@@ -88,8 +90,10 @@ namespace PadForge.Common.Input
                 bucketL += le; bucketR += re;
                 bucketCount++;
 
-                highEnergyL += Step(ref _left, l, alpha, silenceFrames);
-                highEnergyR += Step(ref _right, r, alpha, silenceFrames);
+                highEnergyL += Step(ref _left, l, alpha, silenceFrames, out double lowL);
+                highEnergyR += Step(ref _right, r, alpha, silenceFrames, out double lowR);
+                lowEnergyL += lowL;
+                lowEnergyR += lowR;
 
                 if (bucketCount >= bucketSize)
                 {
@@ -113,16 +117,19 @@ namespace PadForge.Common.Input
                 Math.Max(Math.Sqrt(energyR / frames), peakR * 0.85) * 1.4);
             double highL = Math.Min(1.0, Math.Sqrt(highEnergyL / frames) * 1.4);
             double highR = Math.Min(1.0, Math.Sqrt(highEnergyR / frames) * 1.4);
+            double lowL = Math.Min(1.0, Math.Sqrt(lowEnergyL / frames) * 1.4);
+            double lowR = Math.Min(1.0, Math.Sqrt(lowEnergyR / frames) * 1.4);
             double seconds = frames / (double)rateHz;
-            UpdateEnvelope(ref _left, immediateL, highL, seconds, silenceFrames);
-            UpdateEnvelope(ref _right, immediateR, highR, seconds, silenceFrames);
+            UpdateEnvelope(ref _left, immediateL, highL, lowL, seconds, silenceFrames);
+            UpdateEnvelope(ref _right, immediateR, highR, lowR, seconds, silenceFrames);
 
             return new Frame(ToLevel(_left.Envelope), ToLevel(_right.Envelope),
-                ToLevel(_left.HighEnvelope), ToLevel(_right.HighEnvelope));
+                ToLevel(_left.HighEnvelope), ToLevel(_right.HighEnvelope),
+                ToLevel(_left.LowEnvelope), ToLevel(_right.LowEnvelope));
         }
 
         private static double Step(ref Channel state, double value,
-            double alpha, int silenceFrames)
+            double alpha, int silenceFrames, out double lowEnergy)
         {
             if (Math.Abs(value) <= SilenceSampleFloor)
             {
@@ -140,11 +147,12 @@ namespace PadForge.Common.Input
             state.LowPass1 += alpha * (value - state.LowPass1);
             state.LowPass2 += alpha * (state.LowPass1 - state.LowPass2);
             double high = value - state.LowPass2;
+            lowEnergy = state.LowPass2 * state.LowPass2;
             return high * high;
         }
 
         private static void UpdateEnvelope(ref Channel state, double target,
-            double highTarget, double seconds, int silenceFrames)
+            double highTarget, double lowTarget, double seconds, int silenceFrames)
         {
             if (state.SilentFrames >= silenceFrames)
             {
@@ -155,6 +163,7 @@ namespace PadForge.Common.Input
             }
             state.Envelope = Follow(state.Envelope, target, seconds);
             state.HighEnvelope = Follow(state.HighEnvelope, highTarget, seconds);
+            state.LowEnvelope = Follow(state.LowEnvelope, lowTarget, seconds);
         }
 
         private static double Follow(double current, double target, double seconds)
