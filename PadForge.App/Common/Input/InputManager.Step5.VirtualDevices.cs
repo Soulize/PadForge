@@ -3130,16 +3130,16 @@ namespace PadForge.Common.Input
                 : Volatile.Read(ref feed.HapticLevel);
             long levelMs = Volatile.Read(ref feed.HapticLevelMs);
             if (fast && FlydigiVader5ProHidWriter.EnhancedHapticsEnabled)
-                level = ExpireVaderBurst(feed, level, nowMs);
+                level = ExpireVaderPulse(feed, level, nowMs);
             return PersonaHapticRumble.Fresh(level, levelMs, nowMs,
                 fast ? PersonaHapticRumble.LowLatencyStaleMs : PersonaHapticRumble.StaleMs);
         }
 
-        private static long ExpireVaderBurst(AudioPassthroughService.PersonaFeed feed,
+        private static long ExpireVaderPulse(AudioPassthroughService.PersonaFeed feed,
             long pack, long nowMs)
         {
-            long leftUntil = Volatile.Read(ref feed.HapticFastBurstLeftUntilMs);
-            long rightUntil = Volatile.Read(ref feed.HapticFastBurstRightUntilMs);
+            long leftUntil = Volatile.Read(ref feed.HapticFastPulseLeftUntilMs);
+            long rightUntil = Volatile.Read(ref feed.HapticFastPulseRightUntilMs);
             if ((leftUntil == 0 || nowMs < leftUntil)
                 && (rightUntil == 0 || nowMs < rightUntil))
                 return pack;
@@ -3165,7 +3165,7 @@ namespace PadForge.Common.Input
             if (feed == null) return 0L;
             long level = Volatile.Read(ref feed.HapticFastHighLevel);
             long at = Volatile.Read(ref feed.HapticLevelMs);
-            level = ExpireVaderBurst(feed, level, nowMs);
+            level = ExpireVaderPulse(feed, level, nowMs);
             return PersonaHapticRumble.Fresh(level, at, nowMs,
                 PersonaHapticRumble.LowLatencyStaleMs);
         }
