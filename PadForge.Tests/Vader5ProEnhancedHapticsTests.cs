@@ -93,6 +93,8 @@ namespace PadForge.Tests
                 "High-frequency energy of a 700 Hz tone must exceed 80 Hz");
             Assert.Equal((ushort)0, hf.HighRight);
             Assert.Equal((ushort)0, lf.HighRight);
+            Assert.True(lf.LowLeft > hf.LowLeft,
+                "80 Hz must carry more low-band energy than 700 Hz");
         }
 
         [Fact]
@@ -130,6 +132,57 @@ namespace PadForge.Tests
             var disabled = Vader5ProHapticMixer.Mix(0, 0, 0, 0, 45000, 40000, false);
             Assert.Equal((ushort)0, disabled.TriggerLeft);
             Assert.Equal((ushort)0, disabled.TriggerRight);
+        }
+
+        [Fact]
+        public void Scheduler_UrgentStartEdgeDoesNotCompromiseNormalCoalescing()
+        {
+            var silent = new FlydigiVader5ProHidWriter.Motors(0, 0, 0, 0);
+            var pulse = new FlydigiVader5ProHidWriter.Motors(200, 0, 0, 0);
+            Assert.True(FlydigiVader5ProHidWriter.HasStartingMotor(silent, pulse));
+            Assert.False(FlydigiVader5ProHidWriter.HasStartingMotor(pulse, pulse));
+            Assert.Equal(30, FlydigiVader5ProHidWriter.DelayUntilReport(
+                silent, pulse, 1000, 1000, true, 30));
+            Assert.Equal(3, FlydigiVader5ProHidWriter.DelayUntilReport(
+                silent, pulse, 1000, 1000, true, 30, urgentStarts: true));
+            Assert.Equal(0, FlydigiVader5ProHidWriter.DelayUntilReport(
+                silent, pulse, 1003, 1000, true, 30, urgentStarts: true));
+        }
+
+        [Fact]
+        public void CalibrationCsv_RoundTripsAndRejectsCorruptProfiles()
+        {
+            var identity = Vader5ProMotorCalibration.Profile.Identity;
+            Assert.Equal(identity, Vader5ProMotorCalibration.ParseCsv(""));
+            Assert.Equal(identity, Vader5ProMotorCalibration.ParseCsv("nope"));
+            var sample = "120,80,9;100,100,0;95,110,6;88,105,3";
+            Assert.Equal(sample, Vader5ProMotorCalibration.ToCsv(
+                Vader5ProMotorCalibration.ParseCsv(sample)));
+            var bounded = Vader5ProMotorCalibration.ParseCsv(
+                "-4,900,200;100,100,0;100,100,0;100,100,0");
+            Assert.Equal(0, bounded.GripLeft.GainPercent);
+            Assert.Equal(180, bounded.GripLeft.GammaPercent);
+            Assert.Equal(64, bounded.GripLeft.MinDrive);
+        }
+
+        [Fact]
+        public void NewSettings_PersistViaAppSettingsXmlWithSafeDefaults()
+        {
+            var settings = new PadForge.Services.AppSettingsData();
+            Assert.True(settings.FlydigiVader5ProEnhancedHapticsEnabled);
+            Assert.False(settings.FlydigiVader5ProSpectralTriggerAssist);
+            settings.FlydigiVader5ProSpectralTriggerAssist = true;
+            settings.FlydigiVader5ProMotorCalibrationCsv =
+                "120,80,9;100,100,0;95,110,6;88,105,3";
+            var serializer = new System.Xml.Serialization.XmlSerializer(
+                typeof(PadForge.Services.AppSettingsData));
+            using var output = new System.IO.StringWriter();
+            serializer.Serialize(output, settings);
+            using var input = new System.IO.StringReader(output.ToString());
+            var restored = (PadForge.Services.AppSettingsData)serializer.Deserialize(input)!;
+            Assert.True(restored.FlydigiVader5ProSpectralTriggerAssist);
+            Assert.Equal(settings.FlydigiVader5ProMotorCalibrationCsv,
+                restored.FlydigiVader5ProMotorCalibrationCsv);
         }
     }
 }
